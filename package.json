@@ -1,0 +1,72 @@
+{
+  "name": "cocogoat",
+  "version": "0.2.0",
+  "description": "cocogoat, produces cocomilk.",
+  "author": "The cocogoat team",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
+  },
+  "main": "background.js",
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "color-diff": "^1.2.0",
+    "context-filter-polyfill": "^0.2.4",
+    "core-js": "^3.6.5",
+    "dayjs": "^1.10.4",
+    "electron-active-window": "^0.0.5",
+    "element-plus": "^1.0.2-beta.36",
+    "fs-extra": "^9.1.0",
+    "iohook": "^0.9.0",
+    "node-addon-api": "^3.1.0",
+    "robotjs": "^0.6.0",
+    "string-similarity": "^4.0.4",
+    "tesseract.js": "^2.1.4",
+    "uuid": "^8.3.2",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0-0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^7.0.0",
+    "babel-eslint": "^10.1.0",
+    "electron": "^9.0.0",
+    "electron-devtools-installer": "^3.1.0",
+    "enigmavirtualbox": "^0.9.10",
+    "eslint": "^7.23.0",
+    "eslint-config-alloy": "^3.10.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-vue": "^7.0.0",
+    "generate-evb": "^1.0.3",
+    "prettier": "^2.2.1",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2",
+    "typescript": "~4.1.5",
+    "vue-cli-plugin-electron-builder": "~2.0.0-rc.6"
+  },
+  "iohook": {
+    "targets": [
+      "electron-80"
+    ],
+    "platforms": [
+      "win32"
+    ],
+    "arches": [
+      "x64"
+    ]
+  }
+}
