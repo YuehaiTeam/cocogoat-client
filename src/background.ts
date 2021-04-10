@@ -4,9 +4,11 @@ import { app, protocol } from 'electron'
 import { interactInit } from './Background/interact'
 import { createWindow } from './Background/windows'
 import { config } from './typings/config'
+import { automateInit } from './Background/automate'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
+app.allowRendererProcessReuse = false
 app.on('window-all-closed', () => {
     app.quit()
 })
@@ -27,6 +29,7 @@ app.on('ready', async () => {
     }
     createWindow()
     interactInit()
+    automateInit()
 })
 if (isDevelopment) {
     if (process.platform === 'win32') {

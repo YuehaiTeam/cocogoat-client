@@ -36,6 +36,10 @@ export default {
             },
         )
         ipcRenderer.send('readyArtifactView')
+        ipcRenderer.on('tryocr', async (event, { id }) => {
+            await this.processWithTimeout()
+            ipcRenderer.sendTo(event.senderId, `tryocr-${id}`)
+        })
     },
     beforeUnmount() {
         this._watchauto()

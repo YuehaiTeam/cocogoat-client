@@ -1,7 +1,7 @@
 import robot from 'robotjs'
 import ioHook from 'iohook'
 import { app, ipcMain } from 'electron'
-import { windows, createArtifactView } from './windows'
+import { windows, createArtifactView, createArtifactSwitch } from './windows'
 // @ts-ignore
 import activeWindows from 'electron-active-window/build/Release/wm.node'
 import { config } from '@/typings/config'
@@ -25,12 +25,17 @@ export function interactInit() {
     })
     ioHook.on('keydown', (event) => {
         windows.artifactView && windows.artifactView.webContents.send('keydown', event)
+        windows.artifactSwitch && windows.artifactSwitch.webContents.send('keydown', event)
     })
     ioHook.on('mouseup', (event) => {
         windows.artifactView && windows.artifactView.webContents.send('mouseup', event)
     })
     ioHook.start()
     ipcMain.on('createArtifactView', createArtifactView)
+    ipcMain.on('createArtifactSwitch', createArtifactSwitch)
+    ipcMain.on('readyArtifactSwitch', () => {
+        windows.artifactSwitch && windows.artifactSwitch.show()
+    })
     ipcMain.on('readyArtifactView', () => {
         windows.artifactView && windows.artifactView.show()
         if (windows.app) {
@@ -46,6 +51,24 @@ export function interactInit() {
             // do nothing
         }
         windows.artifactView.close()
+    })
+    ipcMain.on('closeArtifactSwitch', () => {
+        if (!windows.artifactSwitch) return
+        windows.artifactSwitch.hide()
+        try {
+            windows.artifactSwitch.webContents.closeDevTools()
+        } catch (e) {
+            // do nothing
+        }
+        windows.artifactSwitch.close()
+    })
+    ipcMain.on('setTransparentArtifactSwitch', (event, { transparent }) => {
+        if (!windows.artifactSwitch) return
+        if (transparent) {
+            windows.artifactSwitch.setIgnoreMouseEvents(true, { forward: true })
+        } else {
+            windows.artifactSwitch.setIgnoreMouseEvents(false)
+        }
     })
     ipcMain.on('devtoolsApp', () => {
         if (!windows.app) return
@@ -71,6 +94,10 @@ export function interactInit() {
     ipcMain.on('getArtifactViewPosition', (event, { id }) => {
         if (!windows.artifactView) return
         event.reply(`getArtifactViewPosition-${id}`, windows.artifactView.getPosition())
+    })
+    ipcMain.on('getArtifactSwitchPosition', (event, { id }) => {
+        if (!windows.artifactSwitch) return
+        event.reply(`getArtifactSwitchPosition-${id}`, windows.artifactSwitch.getPosition())
     })
     ipcMain.on('getActiveWindow', async (event, { id }) => {
         event.reply(`getActiveWindow-${id}`, await getActiveWindow())

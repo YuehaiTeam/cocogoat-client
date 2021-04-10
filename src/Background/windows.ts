@@ -1,9 +1,11 @@
 import { app, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ocrInit, ocrStop } from './ocr'
+import path from 'path'
 export const windows = <Record<string, BrowserWindow | null>>{
     app: null,
     artifactView: null,
+    artifactSwitch: null,
 }
 
 export async function createWindow() {
@@ -67,4 +69,38 @@ export async function createArtifactView() {
         windows.artifactView.loadURL('app://./ArtifactView.html')
     }
     ocrInit()
+}
+export async function createArtifactSwitch() {
+    if (windows.artifactSwitch) {
+        windows.artifactSwitch.focus()
+        return
+    }
+    windows.artifactSwitch = new BrowserWindow({
+        width: 888,
+        height: 810,
+        frame: false,
+        transparent: true,
+        alwaysOnTop: true,
+        webPreferences: {
+            // @ts-ignore
+            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+        },
+        show: false,
+    })
+    windows.artifactSwitch.on('close', () => {
+        windows.artifactSwitch = null
+    })
+    windows.artifactSwitch.on('closed', () => {
+        windows.artifactSwitch = null
+    })
+    const params =
+        `dataDir=${encodeURIComponent(path.join(__dirname, '..', 'data'))}` +
+        `&windowAppId=${windows.app ? windows.app.webContents.id : -1}` +
+        `&windowArtifactViewId=${windows.artifactView ? windows.artifactView.webContents.id : -1}`
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+        await windows.artifactSwitch.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}ArtifactSwitch.html?${params}`)
+        if (!process.env.IS_TEST) windows.artifactSwitch.webContents.openDevTools()
+    } else {
+        windows.artifactSwitch.loadURL('app://./ArtifactSwitch.html?' + params)
+    }
 }

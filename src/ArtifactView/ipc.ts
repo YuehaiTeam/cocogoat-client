@@ -61,6 +61,9 @@ export function close() {
 export function devtools() {
     ipcRenderer.send('devtoolsArtifactView')
 }
+export function createArtifactSwitch() {
+    ipcRenderer.send('createArtifactSwitch')
+}
 export async function sendToAppWindow(channel: string, data: any): Promise<void> {
     const id = uuid()
     const p = new Promise((resolve) => {
