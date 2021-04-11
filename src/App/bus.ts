@@ -44,24 +44,7 @@ export async function loadData() {
         bus.artifacts = []
     }
     ipcRenderer.on('artifactPush', (event, artifact: Artifact) => {
-        let isModify = false
-        if (bus.artifacts.length > 0) {
-            for (const i in bus.artifacts) {
-                if ({}.hasOwnProperty.call(bus.artifacts, i)) {
-                    if (bus.artifacts[i].id === artifact.id) {
-                        // ID重复，是修改。
-                        isModify = true
-                        bus.artifacts[i] = artifact
-                        console.log('got edit from artifactView', artifact)
-                        break
-                    }
-                }
-            }
-        }
-        if (!isModify) {
-            bus.artifacts.push(artifact)
-            console.log('got new from artifactView', artifact)
-        }
+        artifactPush(artifact)
     })
 
     ipcRenderer.on('artifactDelete', (event, { id }: { id: number }) => {
@@ -88,6 +71,26 @@ export async function loadData() {
             }
         } catch (e) {}
     })()
+}
+export function artifactPush(artifact: Artifact) {
+    let isModify = false
+    if (bus.artifacts.length > 0) {
+        for (const i in bus.artifacts) {
+            if ({}.hasOwnProperty.call(bus.artifacts, i)) {
+                if (bus.artifacts[i].id === artifact.id) {
+                    // ID重复，是修改。
+                    isModify = true
+                    bus.artifacts[i] = artifact
+                    console.log('EDIT', artifact)
+                    break
+                }
+            }
+        }
+    }
+    if (!isModify) {
+        bus.artifacts.push(artifact)
+        console.log('PUSH', artifact)
+    }
 }
 watch(
     () => bus.artifacts,

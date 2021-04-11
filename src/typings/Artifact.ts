@@ -48,3 +48,17 @@ export interface Artifact {
      */
     sub: ArtifactParam[]
 }
+export function createEmptyArtifact() {
+    return {
+        id: Date.now(),
+        name: '',
+        stars: 0,
+        level: 0,
+        main: {
+            name: '',
+            value: '',
+        },
+        sub: [],
+        user: '',
+    } as Artifact
+}

@@ -23,6 +23,17 @@ export default {
             return status.potentialErrors
         },
     },
+    methods: {
+        doAddSub() {
+            status.artifact.sub.push({
+                name: '',
+                value: '',
+            })
+        },
+        doDeleteSub(key: number) {
+            status.artifact.sub.splice(key, 1)
+        },
+    },
 }
 </script>
 <template>
@@ -51,8 +62,8 @@ export default {
                         <el-option v-for="(j, a) in ArtifactParamTypes" :key="a" :value="j" :label="j"></el-option>
                     </el-select>
                 </template>
-                <template #append>
-                    <el-button icon="el-icon-plus"></el-button>
+                <template v-if="artifact.sub.length < 4" #append>
+                    <el-button icon="el-icon-plus" @click="doAddSub"></el-button>
                 </template>
             </el-input>
         </div>
@@ -70,7 +81,7 @@ export default {
                         </el-select>
                     </template>
                     <template #append>
-                        <el-button icon="el-icon-delete-solid"></el-button>
+                        <el-button icon="el-icon-delete-solid" @click="doDeleteSub(a)"></el-button>
                     </template>
                 </el-input>
             </li>

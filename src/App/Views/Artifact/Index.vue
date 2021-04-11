@@ -1,16 +1,24 @@
 <script lang="ts">
 import Artifact from './Components/Artifact.vue'
+import { Artifact as ArtifactType } from '@/typings/Artifact'
+import ArtifactEditPanel from './Components/EditPanel.vue'
 import { openArtifactView } from '../../ipc'
 import { ElNotification } from 'element-plus'
-import { bus } from '@/App/bus'
+import { artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { clipboard } from 'electron'
-export default {
+import { defineComponent } from 'vue'
+export default defineComponent({
     components: {
         Artifact,
+        ArtifactEditPanel,
     },
     data() {
-        return {}
+        return {
+            showEdit: false,
+            editData: this.createEmptyArtifact(),
+            isEdit: false,
+        }
     },
     computed: {
         list() {
@@ -18,6 +26,20 @@ export default {
         },
     },
     methods: {
+        createEmptyArtifact() {
+            return {
+                id: Date.now(),
+                name: '',
+                stars: 0,
+                level: 0,
+                main: {
+                    name: '',
+                    value: '',
+                },
+                sub: [],
+                user: '',
+            } as ArtifactType
+        },
         openArtifactView() {
             ElNotification({
                 type: 'info',
@@ -32,6 +54,24 @@ export default {
                 return e.id !== id
             })
         },
+        doCreate() {
+            this.editData = this.createEmptyArtifact()
+            this.showEdit = true
+            this.isEdit = false
+        },
+        doEdit(id: number) {
+            for (let i of bus.artifacts) {
+                if (i.id === id) {
+                    this.editData = i
+                    this.showEdit = true
+                    this.isEdit = true
+                }
+            }
+        },
+        doEditSave(artifact: ArtifactType) {
+            artifactPush(artifact)
+            this.showEdit = false
+        },
         doClear() {
             bus.artifacts = []
         },
@@ -45,12 +85,12 @@ export default {
             })
         },
     },
-}
+})
 </script>
 <template>
     <teleport to="#app-title"> 圣遗物仓库 </teleport>
     <teleport to="#app-actions">
-        <el-button size="mini" plain icon="el-icon-plus">添加</el-button>
+        <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">添加</el-button>
         <el-tooltip class="item" effect="light" content="导出为兼容『莫娜占卜铺』的JSON格式" placement="bottom">
             <el-button size="mini" plain icon="el-icon-download" @click="doExport">导出</el-button> </el-tooltip
         ><el-popconfirm
@@ -68,11 +108,17 @@ export default {
         <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView"> 识别 </el-button>
     </teleport>
     <div class="page-main">
-        <artifact v-for="i in list" :key="i.id" :artifact="i" @delete="doDelete" />
+        <artifact v-for="i in list" :key="i.id" :artifact="i" @delete="doDelete" @edit="doEdit" />
         <div v-if="list.length <= 0" class="emptyState">
             <el-empty description="工作…工作还没做完…真的可以提前休息吗？"></el-empty>
         </div>
     </div>
+    <artifact-edit-panel
+        v-model:show="showEdit"
+        :title="isEdit ? '编辑圣遗物' : '添加圣遗物'"
+        :model-value="editData"
+        @update:model-value="doEditSave"
+    />
 </template>
 
 <style lang="scss" scoped>
