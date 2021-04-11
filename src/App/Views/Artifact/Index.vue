@@ -32,6 +32,9 @@ export default {
                 return e.id !== id
             })
         },
+        doClear() {
+            bus.artifacts = []
+        },
         doExport() {
             const convertedJson = convertAsMona(JSON.parse(JSON.stringify(bus.artifacts)))
             clipboard.writeText(convertedJson)
@@ -49,11 +52,20 @@ export default {
     <teleport to="#app-actions">
         <el-button size="mini" plain icon="el-icon-plus">添加</el-button>
         <el-tooltip class="item" effect="light" content="导出为兼容『莫娜占卜铺』的JSON格式" placement="bottom">
-            <el-button size="mini" plain icon="el-icon-download" @click="doExport">导出</el-button>
-        </el-tooltip>
-        <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView">
-            圣遗物识别
-        </el-button>
+            <el-button size="mini" plain icon="el-icon-download" @click="doExport">导出</el-button> </el-tooltip
+        ><el-popconfirm
+            confirmButtonText="确定"
+            cancelButtonText="算了"
+            icon="el-icon-warning"
+            title="真的要清空吗？"
+            confirmButtonType="danger"
+            @confirm="doClear"
+        >
+            <template #reference>
+                <el-button size="mini" type="danger" plain icon="el-icon-delete">清空</el-button>
+            </template>
+        </el-popconfirm>
+        <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView"> 识别 </el-button>
     </teleport>
     <div class="page-main">
         <artifact v-for="i in list" :key="i.id" :artifact="i" @delete="doDelete" />
@@ -64,6 +76,10 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.page-main {
+    width: 100%;
+    height: 100%;
+}
 .emptyState {
     width: 100%;
     height: 100%;

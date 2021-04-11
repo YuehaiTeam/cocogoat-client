@@ -13,11 +13,19 @@ interface IBusData {
 }
 export const bus = reactive(<IBusData>{
     config: {
+        version: '',
+        build: null,
+        dataDir: '',
         configDir: '',
         options: {
             firstRun: true,
             sendErrorReports: true,
             sendWrongOCRReports: false,
+            artifacts: {
+                preserveSwitcher: false,
+                keepSameArtifacts: false,
+                autoSwitchDelay: 0.5,
+            },
         },
     },
     artifacts: [],
@@ -31,14 +39,16 @@ export async function loadData() {
     }
     ipcRenderer.on('artifactPush', (event, artifact: Artifact) => {
         let isModify = false
-        for (const i in bus.artifacts) {
-            if ({}.hasOwnProperty.call(bus.artifacts, i)) {
-                if (bus.artifacts[i].id === artifact.id) {
-                    // ID重复，是修改。
-                    isModify = true
-                    bus.artifacts[i] = artifact
-                    console.log('got edit from artifactView', artifact)
-                    break
+        if (bus.artifacts.length > 0) {
+            for (const i in bus.artifacts) {
+                if ({}.hasOwnProperty.call(bus.artifacts, i)) {
+                    if (bus.artifacts[i].id === artifact.id) {
+                        // ID重复，是修改。
+                        isModify = true
+                        bus.artifacts[i] = artifact
+                        console.log('got edit from artifactView', artifact)
+                        break
+                    }
                 }
             }
         }
@@ -53,6 +63,16 @@ export async function loadData() {
             return e.id !== id
         })
     })
+
+    watch(
+        () => bus.config.options,
+        async (newValue) => {
+            ipcRenderer.send('saveOptions', JSON.parse(JSON.stringify(newValue)))
+        },
+        {
+            deep: true,
+        },
+    )
 }
 watch(
     () => bus.artifacts,

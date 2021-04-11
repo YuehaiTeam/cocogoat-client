@@ -1,6 +1,7 @@
 // @ts-ignore
 import { v4 as uuid } from 'uuid'
 import { ipcRenderer } from 'electron'
+export { getConfig } from '@/App/ipc'
 export { capture } from '@/ArtifactView/ipc'
 export function close() {
     ipcRenderer.send('closeArtifactSwitch')

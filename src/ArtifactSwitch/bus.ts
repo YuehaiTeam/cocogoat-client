@@ -1,3 +1,4 @@
+import { IOptions } from '@/typings/config'
 import { reactive } from 'vue'
 export enum STATUS {
     'INTRO',
@@ -21,6 +22,7 @@ interface IArtifactSwitchBus {
     totalCount: number
     isLastPage: boolean
     blockWidth: number
+    options: IOptions | null
 }
 export const bus = reactive(<IArtifactSwitchBus>{
     status: STATUS.INTRO,
@@ -35,4 +37,7 @@ export const bus = reactive(<IArtifactSwitchBus>{
     cols: 0,
     isLastPage: false,
     blockWidth: 0,
+    options: null,
 })
+// @ts-ignore
+window.bus = bus

@@ -1,6 +1,6 @@
 {
   "name": "cocogoat",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "cocogoat, produces cocomilk.",
   "author": "The cocogoat team",
   "private": true,
@@ -23,6 +23,7 @@
     "element-plus": "^1.0.2-beta.36",
     "ffi-napi": "^4.0.3",
     "fs-extra": "^9.1.0",
+    "got": "^11.8.2",
     "iohook": "^0.9.0",
     "lodash": "^4.17.21",
     "robotjs": "^0.6.0",

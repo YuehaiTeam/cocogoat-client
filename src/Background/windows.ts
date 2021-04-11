@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ocrInit, ocrStop } from './ocr'
 import path from 'path'
+import { config } from '@/typings/config'
 export const windows = <Record<string, BrowserWindow | null>>{
     app: null,
     artifactView: null,
@@ -43,6 +44,7 @@ export async function createArtifactView() {
         frame: false,
         transparent: true,
         alwaysOnTop: true,
+        maximizable: false,
         webPreferences: {
             // @ts-ignore
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
@@ -53,6 +55,9 @@ export async function createArtifactView() {
         windows.artifactView = null
         if (windows.app && windows.app.isMinimized()) {
             windows.app.restore()
+        }
+        if (!config.options.artifacts.preserveSwitcher && windows.artifactSwitch) {
+            windows.artifactSwitch.close()
         }
         ocrStop()
     })
@@ -81,6 +86,7 @@ export async function createArtifactSwitch() {
         frame: false,
         transparent: true,
         alwaysOnTop: true,
+        maximizable: false,
         webPreferences: {
             // @ts-ignore
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,

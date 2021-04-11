@@ -82,11 +82,33 @@ body,
 .el-message-box {
     margin-left: 80px;
 }
+
+.menubox {
+    width: 30px;
+    height: 30px;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.1s;
+    margin-left: 8px;
+    margin-right: -5px;
+    outline: 0;
+    border-color: #55baff;
+    color: #55baff;
+    border-radius: 2px;
+    &:hover {
+        background-color: #55baff;
+        color: #f7fcff;
+    }
+}
 </style>
 <style lang="scss" scoped>
 $main: #007acc;
 $front: rgba(255, 255, 255, 0.75);
 header {
+    user-select: none;
     -webkit-app-region: drag;
     overflow: hidden;
     position: absolute;
@@ -158,6 +180,7 @@ header {
     }
 }
 aside {
+    user-select: none;
     box-shadow: 2px 0 12px 0 rgb(0 0 0 / 10%);
     position: fixed;
     z-index: 9998;

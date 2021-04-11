@@ -1,3 +1,5 @@
+import path from 'path'
+import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
 import { app, ipcMain } from 'electron'
@@ -22,6 +24,10 @@ export function interactInit() {
                 windows.app.maximize()
             }
         }
+    })
+    ipcMain.on('saveOptions', async (event, options) => {
+        config.options = options
+        await fsex.writeJSON(path.join(config.configDir, 'options.json'), config.options)
     })
     ioHook.on('keydown', (event) => {
         windows.artifactView && windows.artifactView.webContents.send('keydown', event)

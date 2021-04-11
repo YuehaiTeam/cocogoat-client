@@ -182,7 +182,7 @@ export default {
                 bus.checkedCount++
                 await sleep(100)
                 await tryocr()
-                await sleep(1000)
+                await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
             }
         },
@@ -192,7 +192,7 @@ export default {
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(100)
+                await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 await tryocr()
                 await sleep(1000)
             }

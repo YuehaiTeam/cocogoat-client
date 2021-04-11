@@ -18,16 +18,23 @@ exports.default = async function (context) {
     const distDir = path.join(baseDir, 'win-unpacked')
     const ouptDir = path.join(projDir, 'dist')
     const packageJSON = await fsex.readJSON(path.join(projDir, 'package.json'))
-    const build = dayjs().format('YYYYMMDDHHmm')
+    const build = dayjs().format('YYMMDDHHmm')
+    const buildData = {
+        type: process.env.BUILD_TYPE === 'REL' ? 'REL' : 'TES',
+        timestamp: Date.now(),
+    }
+    await fsex.writeJSON(path.join(distDir, 'resources', 'data', 'build.json'), buildData)
     await fsex.rename(path.join(distDir, '椰羊cocogoat.exe'), path.join(distDir, 'cocogoat.exe'))
     await fsex.ensureDir(ouptDir)
     console.log('preparing evb file')
     const evbFile = path.join(baseDir, 'build.evb')
-    const ouptFile = path.join(ouptDir, `cocogoat-v${packageJSON.version}-win64-b${build}.exe`)
+    const ouptFile = path.join(
+        ouptDir,
+        `cocogoat-v${packageJSON.version}-win64-${buildData.type.toLowerCase()}${build}.exe`,
+    )
     generateEvb(evbFile, path.join(distDir, 'cocogoat.exe'), ouptFile, path.join(baseDir, 'win-unpacked'), {
         filter(fullPath, name) {
             if (name === 'cocogoat.exe') return false
-            if (name.endsWith('.map')) return false
             return true
         },
         shareVirtualSystem: true,
@@ -41,7 +48,9 @@ exports.default = async function (context) {
         child.on('exit', resolve)
     })
     console.log('compressing as gzip')
-    const gzip = createGzip()
+    const gzip = createGzip({
+        level: 9,
+    })
     const source = fsex.createReadStream(ouptFile)
     const destination = fsex.createWriteStream(`${ouptFile}.gz`)
     await pipe(source, gzip, destination)

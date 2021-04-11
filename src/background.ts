@@ -3,7 +3,7 @@ import fsex from 'fs-extra'
 import { app, protocol } from 'electron'
 import { interactInit } from './Background/interact'
 import { createWindow } from './Background/windows'
-import { config } from './typings/config'
+import { config, EBuild } from './typings/config'
 import { automateInit } from './Background/automate'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -23,10 +23,19 @@ app.on('ready', async () => {
         await fsex.ensureDir(config.configDir)
     }
     try {
-        config.options = await fsex.readJSON(path.join(config.configDir, 'options.json'))
+        config.options = Object.assign(config.options, await fsex.readJSON(path.join(config.configDir, 'options.json')))
     } catch (e) {
         await fsex.writeJSON(path.join(config.configDir, 'options.json'), config.options)
     }
+    try {
+        config.dataDir = path.join(path.dirname(app.getAppPath()), 'data')
+        config.build = await fsex.readJSON(path.join(config.dataDir, 'build.json'))
+    } catch (e) {
+        console.log(e)
+        config.build = { type: EBuild.DEV, timestamp: Date.now() }
+    }
+    config.version = app.getVersion()
+
     createWindow()
     interactInit()
     automateInit()

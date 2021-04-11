@@ -19,7 +19,7 @@ const getStander = {
         魔女的炎之花: ['crimsonWitch', 'flower'],
         魔女常燃之羽: ['crimsonWitch', 'plume'],
         魔女破灭之时: ['crimsonWitch', 'sands'],
-        魔女的心之火: ['crimsonWitch', 'circlet'],
+        魔女的心之火: ['crimsonWitch', 'goblet'],
         焦灼的魔女帽: ['crimsonWitch', 'circlet'],
         角斗士的留恋: ['gladiatorFinale', 'flower'],
         角斗士的归宿: ['gladiatorFinale', 'plume'],
@@ -164,6 +164,7 @@ const getStander = {
 }
 
 export function convertAsMona(artifacts: Artifact[]) {
+    console.log(artifacts)
     const json = <Record<string, {}[]>>{
         flower: [],
         plume: [],
