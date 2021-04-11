@@ -5,11 +5,16 @@ import { IConfig } from '@/typings/config'
 import { reactive, watch } from 'vue'
 import { getConfig } from './ipc'
 import { ipcRenderer } from 'electron'
+import { latestRelease } from '@/api/upgrade'
+export { API_BASE } from '@/config'
+import { version_compare } from '@/plugins/version_compare'
+
 let lastConfigWrite: Promise<any> | null = null
 let configRead = false
 interface IBusData {
     config: IConfig
     artifacts: Artifact[]
+    hasUpgrade: boolean
 }
 export const bus = reactive(<IBusData>{
     config: {
@@ -29,6 +34,7 @@ export const bus = reactive(<IBusData>{
         },
     },
     artifacts: [],
+    hasUpgrade: false,
 })
 export async function loadData() {
     bus.config = await getConfig()
@@ -73,6 +79,15 @@ export async function loadData() {
             deep: true,
         },
     )
+    ;(async function () {
+        try {
+            const release = await latestRelease()
+            const cmp = version_compare(bus.config.version, release.version)
+            if (cmp && cmp < 0) {
+                bus.hasUpgrade = true
+            }
+        } catch (e) {}
+    })()
 }
 watch(
     () => bus.artifacts,

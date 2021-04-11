@@ -3350,7 +3350,7 @@ commander@2.9.0:
   dependencies:
     graceful-readlink ">= 1.0.0"
 
-commander@^2.12.1, commander@^2.18.0, commander@^2.20.0:
+commander@^2.12.1, commander@^2.18.0, commander@^2.20.0, commander@^2.20.3:
   version "2.20.3"
   resolved "https://registry.npm.taobao.org/commander/download/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha1-/UhehMA+tIgcIHIrpIA16FMa6zM=
@@ -3733,6 +3733,11 @@ cssesc@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npm.taobao.org/cssesc/download/cssesc-3.0.0.tgz#37741919903b868565e1c09ea747445cd18983ee"
   integrity sha1-N3QZGZA7hoVl4cCep0dEXNGJg+4=
+
+cssfilter@0.0.10:
+  version "0.0.10"
+  resolved "https://registry.npm.taobao.org/cssfilter/download/cssfilter-0.0.10.tgz#c6d2672632a2e5c83e013e6864a42ce8defd20ae"
+  integrity sha1-xtJnJjKi5cg+AT5oZKQs6N79IK4=
 
 cssnano-preset-default@^4.0.0, cssnano-preset-default@^4.0.8:
   version "4.0.8"
@@ -4849,6 +4854,11 @@ extend@~3.0.2:
   resolved "https://registry.npm.taobao.org/extend/download/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
   integrity sha1-+LETa0Bx+9jrFAr/hYsQGewpFfo=
 
+extendable-error-class@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.npm.taobao.org/extendable-error-class/download/extendable-error-class-0.1.2.tgz#d5ceb59526a9a33cb60a7e896aa77d2776ade27c"
+  integrity sha1-1c61lSapozy2Cn6Jaqd9J3at4nw=
+
 external-editor@^3.0.3:
   version "3.1.0"
   resolved "https://registry.npm.taobao.org/external-editor/download/external-editor-3.1.0.tgz#cb03f740befae03ea4d283caed2741a83f335495"
@@ -5118,6 +5128,13 @@ flush-write-stream@^1.0.0:
   dependencies:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
+
+flyio@^0.6.14:
+  version "0.6.14"
+  resolved "https://registry.npm.taobao.org/flyio/download/flyio-0.6.14.tgz#c5d83eb7a9b4fc1c915a463d2ea6dfce755c2d6f"
+  integrity sha1-xdg+t6m0/ByRWkY9LqbfznVcLW8=
+  dependencies:
+    request "^2.85.0"
 
 follow-redirects@^1.0.0:
   version "1.13.3"
@@ -7114,6 +7131,11 @@ map-visit@^1.0.0:
   integrity sha1-7Nyo8TFE5mDxtb1B8S80edmN+48=
   dependencies:
     object-visit "^1.0.0"
+
+marked@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.npm.taobao.org/marked/download/marked-2.0.2.tgz#ecfbc20c36bae0db444996c31c224c61d5b30b8c"
+  integrity sha1-7PvCDDa64NtESZbDHCJMYdWzC4w=
 
 matcher@^3.0.0:
   version "3.0.0"
@@ -9226,7 +9248,7 @@ repeating@^2.0.0:
   dependencies:
     is-finite "^1.0.0"
 
-request@2.88.2, request@^2.45.0, request@^2.88.2:
+request@2.88.2, request@^2.45.0, request@^2.85.0, request@^2.88.2:
   version "2.88.2"
   resolved "https://registry.npm.taobao.org/request/download/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha1-1zyRhzHLWofaBH4gcjQUb2ZNErM=
@@ -11456,6 +11478,14 @@ xmldom@^0.5.0:
   version "0.5.0"
   resolved "https://registry.npm.taobao.org/xmldom/download/xmldom-0.5.0.tgz?cache=0&sync_timestamp=1615270394430&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fxmldom%2Fdownload%2Fxmldom-0.5.0.tgz#193cb96b84aa3486127ea6272c4596354cb4962e"
   integrity sha1-GTy5a4SqNIYSfqYnLEWWNUy0li4=
+
+xss@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.npm.taobao.org/xss/download/xss-1.0.8.tgz?cache=0&sync_timestamp=1595842886299&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fxss%2Fdownload%2Fxss-1.0.8.tgz#32feb87feb74b3dcd3d404b7a68ababf10700535"
+  integrity sha1-Mv64f+t0s9zT1AS3poq6vxBwBTU=
+  dependencies:
+    commander "^2.20.3"
+    cssfilter "0.0.10"
 
 xtend@^4.0.0, xtend@~4.0.0, xtend@~4.0.1:
   version "4.0.2"

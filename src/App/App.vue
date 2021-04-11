@@ -1,6 +1,12 @@
 <script>
+import { bus } from './bus'
 import { ipcRenderer } from 'electron'
 export default {
+    computed: {
+        bus() {
+            return bus
+        },
+    },
     created() {
         ipcRenderer.send('ready')
     },
@@ -50,10 +56,14 @@ export default {
 
                 <span class="txt">圣遗物</span>
             </router-link>
-            <router-link :to="{ name: 'Options' }" class="options-btn">
-                <i class="el-icon-s-tools"></i>
-                <span class="txt">设置</span>
-            </router-link>
+            <div class="options-btn">
+                <el-badge is-dot class="item" :hidden="!bus.hasUpgrade" type="danger">
+                    <router-link :to="{ name: 'Options' }">
+                        <i class="el-icon-s-tools"></i>
+                        <span class="txt">设置</span>
+                    </router-link>
+                </el-badge>
+            </div>
         </div>
     </aside>
 
@@ -82,7 +92,12 @@ body,
 .el-message-box {
     margin-left: 80px;
 }
-
+.el-dialog {
+    left: 30px;
+}
+.el-loading-mask {
+    z-index: 9998 !important;
+}
 .menubox {
     width: 30px;
     height: 30px;
@@ -253,5 +268,8 @@ main {
     bottom: 0;
     left: 10px;
     right: 10px;
+    .el-badge {
+        width: 100%;
+    }
 }
 </style>

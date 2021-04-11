@@ -5,6 +5,7 @@ import { interactInit } from './Background/interact'
 import { createWindow } from './Background/windows'
 import { config, EBuild } from './typings/config'
 import { automateInit } from './Background/automate'
+import { upgradeInit } from './Background/upgrade'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
@@ -39,6 +40,7 @@ app.on('ready', async () => {
     createWindow()
     interactInit()
     automateInit()
+    upgradeInit()
 })
 if (isDevelopment) {
     if (process.platform === 'win32') {

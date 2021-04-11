@@ -1,8 +1,8 @@
 {
   "name": "cocogoat",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "cocogoat, produces cocomilk.",
-  "author": "The cocogoat team",
+  "author": "月海亭YuehaiTeam",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -21,16 +21,20 @@
     "dayjs": "^1.10.4",
     "electron-active-window": "^0.0.5",
     "element-plus": "^1.0.2-beta.36",
+    "extendable-error-class": "^0.1.2",
     "ffi-napi": "^4.0.3",
+    "flyio": "^0.6.14",
     "fs-extra": "^9.1.0",
     "got": "^11.8.2",
     "iohook": "^0.9.0",
     "lodash": "^4.17.21",
+    "marked": "^2.0.2",
     "robotjs": "^0.6.0",
     "tesseract.js": "^2.1.4",
     "uuid": "^8.3.2",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0"
+    "vue-router": "^4.0.0-0",
+    "xss": "^1.0.8"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",

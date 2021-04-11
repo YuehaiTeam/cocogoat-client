@@ -6,6 +6,19 @@ export function openArtifactView() {
     ipcRenderer.send('createArtifactView')
 }
 
+export function upgrade(url: string, patch = false) {
+    ipcRenderer.send('doUpgrade', { url, patch })
+}
+
+export async function getApphash(): Promise<IConfig> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`getApphash-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('getApphash', { id })
+    return <IConfig>await p
+}
+
 export async function getConfig(): Promise<IConfig> {
     const id = uuid()
     const p = new Promise((resolve) => {

@@ -1,13 +1,23 @@
 <script>
+import xss from 'xss'
 import dayjs from 'dayjs'
-import { ipcRenderer } from 'electron'
-import { bus } from '@/App/bus'
+import marked from 'marked'
 import $set from 'lodash/set'
+import { upgrade, getApphash } from '../../ipc'
+import { bus } from '@/App/bus'
+import { ipcRenderer } from 'electron'
+import { latestRelease, checkPatch } from '@/api/upgrade'
+import { ElLoading, ElNotification } from 'element-plus'
+import { version_compare } from '@/plugins/version_compare'
 export default {
     data() {
         return {
             clickTimes: 0,
             runtimeDebug: false,
+            showUpgrade: false,
+            newVersion: false,
+            versionHTML: '',
+            upgradeButtonLoading: false,
         }
     },
     computed: {
@@ -25,10 +35,47 @@ export default {
         opt(k, v) {
             $set(bus.config.options, k, v)
         },
-        checkUpdate() {
-            this.$alert('请自行前往 https://github.com/YuehaiTeam/cocogoat 查看新版本', '暂未开放', {
-                confirmButtonText: '知道了',
-            })
+        async checkUpgrade() {
+            this.upgradeButtonLoading = true
+            try {
+                const release = await latestRelease()
+                const cmp = version_compare(bus.config.version, release.version)
+                if (cmp < 0) {
+                    this.newVersion = release
+                    this.showUpgrade = true
+                    this.versionHTML = xss(marked(release.content))
+                } else {
+                    ElNotification({
+                        type: 'success',
+                        title: '已经是最新版本',
+                    })
+                }
+            } catch (e) {}
+            this.upgradeButtonLoading = false
+        },
+        async doUpgrade() {
+            this.showUpgrade = false
+            const l = ElLoading.service({ fullscreen: true, text: '趴在草地上，能听见大地的心跳...' })
+            const hash = await getApphash()
+            console.log('appHash=', hash)
+            let hasPatch = false
+            let patchUrl = ''
+            try {
+                patchUrl = await checkPatch(this.newVersion.url, hash)
+                hasPatch = true
+            } catch (e) {
+                console.log(e)
+            }
+            console.log('hasPatch=', hasPatch, patchUrl)
+            if (bus.config.build.type === 'DEV') {
+                ElNotification({
+                    type: 'info',
+                    title: '开发模式无法自动更新',
+                })
+                l.close()
+                return
+            }
+            upgrade(hasPatch ? patchUrl : this.newVersion.url.fullUpgrade, hasPatch)
         },
         clickVersion() {
             this.clickTimes++
@@ -51,8 +98,37 @@ export default {
             <span class="main"> v{{ bus.config.version }}</span
             ><small>_{{ bus.config.build?.type.toLowerCase() }}{{ buildTime }}</small>
         </span>
-        <el-button size="mini" plain icon="el-icon-position" @click="checkUpdate">检查更新</el-button>
+        <span class="upgrade-button">
+            <el-badge is-dot class="item" :hidden="!bus.hasUpgrade" type="danger">
+                <el-button
+                    :loading="upgradeButtonLoading"
+                    size="mini"
+                    plain
+                    icon="el-icon-position"
+                    @click="checkUpgrade"
+                >
+                    检查更新
+                </el-button>
+            </el-badge>
+        </span>
     </teleport>
+    <el-dialog
+        v-if="newVersion"
+        v-model="showUpgrade"
+        custom-class="upgrade-dialog"
+        :title="`新版本: v${newVersion.version}`"
+        width="400px"
+    >
+        <section class="version-details">
+            <h4>{{ newVersion.name }}</h4>
+            <article class="md-render" v-html="versionHTML"></article>
+        </section>
+        <template #footer>
+            <span class="dialog-footer" @click="doUpgrade">
+                <el-button size="small" style="width: 100%" type="primary">更新</el-button>
+            </span>
+        </template>
+    </el-dialog>
     <div class="page-main">
         <article>
             <h3>基础</h3>
@@ -61,7 +137,7 @@ export default {
                     <el-switch
                         :model-value="options.sendErrorReports"
                         active-text="发送错误日志，协助我们改进程序"
-                        @update:model-value="opt('sendErrorReports', $event)"
+                        @upgrade:model-value="opt('sendErrorReports', $event)"
                     >
                     </el-switch>
                 </div>
@@ -82,7 +158,7 @@ export default {
                     <el-form-item label="独立切换模式">
                         <el-switch
                             :model-value="options.artifacts.preserveSwitcher"
-                            @update:model-value="opt('artifacts.preserveSwitcher', $event)"
+                            @upgrade:model-value="opt('artifacts.preserveSwitcher', $event)"
                         ></el-switch>
                         <div class="form-desc">允许在关闭识别器时，保留切换器窗口以配合其他工具使用。</div>
                     </el-form-item>
@@ -93,7 +169,7 @@ export default {
                             :precision="1"
                             :step="0.1"
                             :max="30"
-                            @update:model-value="opt('artifacts.autoSwitchDelay', $event)"
+                            @upgrade:model-value="opt('artifacts.autoSwitchDelay', $event)"
                         ></el-input-number>
                         秒
                         <div class="form-desc">
@@ -153,5 +229,22 @@ h3 {
     display: inline-block;
     margin-right: 23px;
     font-size: 13px;
+}
+.version-details {
+    h4 {
+        margin-bottom: 5px;
+    }
+}
+.upgrade-button {
+    display: inline-block;
+    line-height: normal;
+}
+</style>
+<style lang="scss">
+.upgrade-dialog {
+    .el-dialog__body {
+        padding: 5px 20px;
+        margin-top: -20px;
+    }
 }
 </style>
