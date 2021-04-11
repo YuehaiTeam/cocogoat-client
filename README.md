@@ -3,8 +3,6 @@
 一个原神工具箱。是半仙之兽。  
 A toolbox for genshin impact. Half-adeptus.  
 
-详细请参考[使用说明](https://cocogoat.work) (Currently Chinese only)
-
 ## 功能 / Features
  - 圣遗物导出 Artifacts exporting
 
