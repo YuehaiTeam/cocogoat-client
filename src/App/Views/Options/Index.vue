@@ -9,6 +9,7 @@ import { ipcRenderer } from 'electron'
 import { latestRelease, checkPatch } from '@/api/upgrade'
 import { ElLoading, ElNotification } from 'element-plus'
 import { version_compare } from '@/plugins/version_compare'
+import { EBuild } from '@/typings/config'
 export default {
     data() {
         return {
@@ -39,7 +40,15 @@ export default {
             this.upgradeButtonLoading = true
             try {
                 const release = await latestRelease()
-                const cmp = version_compare(bus.config.version, release.version)
+                let buildType = ''
+                if (bus.config.build?.type === EBuild.DEV) {
+                    buildType = 'dev'
+                } else if (bus.config.build?.type === EBuild.TES) {
+                    buildType = 'beta'
+                }
+                const localVersion = bus.config.version + buildType
+                const cmp = version_compare(localVersion, release.version)
+                console.log(localVersion, cmp)
                 if (cmp < 0) {
                     this.newVersion = release
                     this.showUpgrade = true

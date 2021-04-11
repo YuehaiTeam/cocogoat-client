@@ -1,7 +1,7 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { Artifact } from '@/typings/Artifact'
-import { IConfig } from '@/typings/config'
+import { EBuild, IConfig } from '@/typings/config'
 import { reactive, watch } from 'vue'
 import { getConfig } from './ipc'
 import { ipcRenderer } from 'electron'
@@ -65,7 +65,14 @@ export async function loadData() {
     ;(async function () {
         try {
             const release = await latestRelease()
-            const cmp = version_compare(bus.config.version, release.version)
+            let buildType = ''
+            if (bus.config.build?.type === EBuild.DEV) {
+                buildType = 'dev'
+            } else if (bus.config.build?.type === EBuild.TES) {
+                buildType = 'beta'
+            }
+            const localVersion = bus.config.version + buildType
+            const cmp = version_compare(localVersion, release.version)
             if (cmp && cmp < 0) {
                 bus.hasUpgrade = true
             }
