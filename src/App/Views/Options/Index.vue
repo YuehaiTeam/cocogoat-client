@@ -141,6 +141,7 @@ export default {
     <div class="page-main">
         <article>
             <h3>基础</h3>
+            <div class="content-desc">这些选项将在程序重启后生效。</div>
             <div class="content">
                 <div class="opt">
                     <el-switch

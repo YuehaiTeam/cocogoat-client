@@ -1,1 +1,1 @@
-export const API_BASE = 'https://77.cocogoat.work'
+export const API_BASE = process.env.VUE_APP_APIBASE

@@ -1,6 +1,7 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { app, protocol } from 'electron'
+import * as Sentry from '@sentry/electron'
 import { interactInit } from './Background/interact'
 import { createWindow } from './Background/windows'
 import { config, EBuild } from './typings/config'
@@ -36,6 +37,13 @@ app.on('ready', async () => {
         config.build = { type: EBuild.DEV, timestamp: Date.now() }
     }
     config.version = app.getVersion()
+    if (config.options.sendErrorReports && process.env.NODE_ENV !== 'development') {
+        Sentry.init({
+            dsn: process.env.VUE_APP_SENTRY,
+            environment: config.build ? config.build.type : 'DEV',
+            release: config.build && config.build.type === EBuild.REL ? config.version : 'dev',
+        })
+    }
 
     createWindow()
     interactInit()
