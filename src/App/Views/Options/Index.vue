@@ -144,15 +144,20 @@ export default {
             <div class="content">
                 <div class="opt">
                     <el-switch
-                        :model-value="options.sendErrorReports"
                         active-text="发送错误日志，协助我们改进程序"
+                        :model-value="options.sendErrorReports"
                         @upgrade:model-value="opt('sendErrorReports', $event)"
                     >
                     </el-switch>
                 </div>
-                <!--div class="opt">
-                    <el-switch active-text="上传圣遗物识别错误与修改日志，帮助我们提高识别率"> </el-switch>
-                </div-->
+                <div class="opt">
+                    <el-switch
+                        active-text="上传圣遗物识别错误与修改日志，帮助我们提高识别率"
+                        :model-value="options.sendWrongOCRReports"
+                        @upgrade:model-value="opt('sendWrongOCRReports', $event)"
+                    >
+                    </el-switch>
+                </div>
             </div>
         </article>
         <article>

@@ -1,7 +1,11 @@
 <script>
 import { bus } from './bus'
 import { ipcRenderer } from 'electron'
+import FirstrunDialog from './Views/FirstrunDialog'
 export default {
+    components: {
+        FirstrunDialog,
+    },
     computed: {
         bus() {
             return bus
@@ -70,6 +74,7 @@ export default {
     <main>
         <router-view />
     </main>
+    <firstrun-dialog :show="bus.config.options.firstRun" />
 </template>
 <style lang="scss">
 html,
@@ -95,6 +100,9 @@ body,
 .el-dialog {
     left: 30px;
 }
+.fullscreen-dialog {
+    left: 0;
+}
 .el-loading-mask {
     z-index: 9998 !important;
 }
@@ -117,6 +125,9 @@ body,
         background-color: #55baff;
         color: #f7fcff;
     }
+}
+#app > .el-overlay {
+    z-index: 9998 !important;
 }
 </style>
 <style lang="scss" scoped>
