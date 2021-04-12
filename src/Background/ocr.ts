@@ -1,14 +1,28 @@
 import path from 'path'
-import { ipcMain } from 'electron'
+import fsex from 'fs-extra'
+import { dialog, ipcMain } from 'electron'
 import { createWorker, createScheduler, Worker, Scheduler, OEM } from 'tesseract.js'
+import { config } from '@/typings/config'
 const workerCount = 5
 let scheduler: Scheduler | null
 let ocrWorker: Worker[] = []
 let workerReadyPms: Promise<void>[] = []
 let ocrReady: Promise<any> | null
-export function ocrInit() {
+export async function ocrInit() {
     if (scheduler) return
-    const ocrData = path.join(__dirname, '..', 'data', 'lang-data')
+    let ocrData = path.join(config.dataDir, 'lang-data')
+    const ocrUserData = path.join(config.configDir, 'lang-data')
+    try {
+        await fsex.access(path.join(ocrUserData, 'chi_sim.traineddata'))
+        dialog.showMessageBox({
+            type: 'info',
+            title: '自定义OCR训练集',
+            message: '当前已加载用户自定义OCR训练集。如果你不知道发生了什么，请联系开发者。',
+            buttons: ['好的'],
+        })
+        ocrData = ocrUserData
+    } catch (e) {}
+    console.log('OCR Datadir is ', ocrData)
     scheduler = createScheduler()
     for (let i = 0; i < workerCount; i++) {
         const worker = createWorker({
