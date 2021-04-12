@@ -51,6 +51,27 @@ module.exports = {
                 ],
                 afterAllArtifactBuild: 'build/evb.js',
                 extraResources: ['./data/**'],
+                files: [
+                    '**/*',
+                    '!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}',
+                    '!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}',
+                    '!**/node_modules/*.d.ts',
+                    '!**/node_modules/.bin',
+                    '!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj,vcxproj,pdb,ipdb,tlog,iobj}',
+                    '!.editorconfig',
+                    '!**/._*',
+                    '!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}',
+                    '!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output,.vscode,.github}',
+                    '!**/{appveyor.yml,.travis.yml,circle.yml}',
+                    '!**/tesseract-core.wasm.js', // package wasm-file version of tesseract.js only
+                    '!**/tesseract-core.asm.js',
+                    '!**/deps/libffi/**', // ffi's source code is not needed
+                    '!**/*.map', // source map is not important
+                    '!**/zlibjs/**', // zlibjs is not used during runtime
+                    '!**/node_modules/nan/**', // nan is not used during runtime
+                    '!**/prebuild-install/**', // prebuild-install is not used during runtime
+                    '!**/ref-napi/docs/**', // docs is not needed
+                ],
             },
         },
     },
