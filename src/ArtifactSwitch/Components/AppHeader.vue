@@ -45,7 +45,7 @@ export default {
 <template>
     <header>
         <div class="icon"></div>
-        <div class="title">圣遗物切换器 - {{ auto ? '自动切换中' : '准备' }}</div>
+        <div class="title">圣遗物切换器 - 如鼠标无法选中本窗口，请按热键（~）</div>
         <div class="actions">
             <button class="dump" :class="{ show: runtimeDebug }" @click="clickDebug" @contextmenu="ctxDebug">
                 <i class="el-icon-s-opportunity"></i>

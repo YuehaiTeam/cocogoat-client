@@ -92,6 +92,14 @@ export function interactInit() {
             // do nothing
         }
     })
+    ipcMain.on('devtoolsArtifactSwitch', () => {
+        if (!windows.artifactSwitch) return
+        try {
+            windows.artifactSwitch.webContents.openDevTools()
+        } catch (e) {
+            // do nothing
+        }
+    })
 
     ipcMain.on('capture', (event, { x, y, w, h, id }) => {
         const t = robot.screen.capture(x, y, w, h)

@@ -12,6 +12,7 @@ export enum STATUS {
     'DELETED',
 }
 interface IArtifactSwitchBus {
+    intro: boolean
     status: STATUS
     runtimeDebug: boolean
     auto: boolean
@@ -25,7 +26,8 @@ interface IArtifactSwitchBus {
     options: IOptions | null
 }
 export const bus = reactive(<IArtifactSwitchBus>{
-    status: STATUS.INTRO,
+    intro: true,
+    status: STATUS.READY,
     runtimeDebug: false,
     auto: false,
     hotkey: 41,

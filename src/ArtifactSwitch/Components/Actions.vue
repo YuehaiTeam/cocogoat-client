@@ -31,7 +31,7 @@ export default {
                 <i class="el-icon-location-information"></i>
                 尝试检测
             </button>
-            <button v-if="bus.status !== STATUS.INTRO && !bus.auto" size="mini" @click="$emit('startauto')">
+            <button v-if="!bus.intro && !bus.auto" size="mini" @click="$emit('startauto')">
                 <i class="el-icon-s-flag"></i>
                 开始切换
             </button>

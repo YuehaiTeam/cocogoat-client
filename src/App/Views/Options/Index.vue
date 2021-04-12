@@ -147,7 +147,7 @@ export default {
                     <el-switch
                         active-text="发送错误日志，协助我们改进程序"
                         :model-value="options.sendErrorReports"
-                        @upgrade:model-value="opt('sendErrorReports', $event)"
+                        @update:model-value="opt('sendErrorReports', $event)"
                     >
                     </el-switch>
                 </div>
@@ -155,7 +155,7 @@ export default {
                     <el-switch
                         active-text="上传圣遗物识别错误与修改日志，帮助我们提高识别率"
                         :model-value="options.sendWrongOCRReports"
-                        @upgrade:model-value="opt('sendWrongOCRReports', $event)"
+                        @update:model-value="opt('sendWrongOCRReports', $event)"
                     >
                     </el-switch>
                 </div>
@@ -173,7 +173,7 @@ export default {
                     <el-form-item label="独立切换模式">
                         <el-switch
                             :model-value="options.artifacts.preserveSwitcher"
-                            @upgrade:model-value="opt('artifacts.preserveSwitcher', $event)"
+                            @update:model-value="opt('artifacts.preserveSwitcher', $event)"
                         ></el-switch>
                         <div class="form-desc">允许在关闭识别器时，保留切换器窗口以配合其他工具使用。</div>
                     </el-form-item>
@@ -184,7 +184,7 @@ export default {
                             :precision="1"
                             :step="0.1"
                             :max="30"
-                            @upgrade:model-value="opt('artifacts.autoSwitchDelay', $event)"
+                            @update:model-value="opt('artifacts.autoSwitchDelay', $event)"
                         ></el-input-number>
                         秒
                         <div class="form-desc">

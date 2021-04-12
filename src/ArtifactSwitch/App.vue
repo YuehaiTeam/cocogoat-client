@@ -9,6 +9,7 @@ import { imageDump, getBlocks } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
 import { click, toWindowPos } from './mkAutomate'
 import { sleep } from '@/ArtifactView/utils'
+import { ElMessageBox } from 'element-plus'
 export default {
     components: {
         Actions,
@@ -79,15 +80,31 @@ export default {
             /* 获取区块 */
             const { blocks, rows, cols } = santizeBlocks(getBlocks(canvas), canvas)
 
+            bus.currentCount = blocks.length
+            if (blocks.length <= 0) {
+                // 完全未识别，推断区域有误
+                bus.auto = false
+                bus.status = STATUS.ERROR
+                ElMessageBox({
+                    type: 'error',
+                    title: '检测失败',
+                    message: '请确保您已经使切换器窗口恰好包围圣遗物列表区域。如始终提示出错，请提交反馈',
+                })
+                throw new Error()
+            }
             bus.blocks = blocks
             bus.totalCount += bus.isLastPage ? blocks.length - cols : revertStatus ? blocks.length : cols
-            bus.currentCount = blocks.length
             if (firstRun) {
                 bus.rows = rows
                 bus.cols = cols
                 bus.blockWidth = (blocks[cols - 1].x - blocks[0].x) / (cols - 1)
                 if (bus.rows * bus.cols !== blocks.length) {
                     // 首屏不满，推断有丢
+                    ElMessageBox({
+                        type: 'error',
+                        title: '检测失败',
+                        message: '无法确认行列数量\n请确认圣遗物列表的顶部对齐某一行的顶端，且当前页不是最后一页。',
+                    })
                     bus.auto = false
                     bus.status = STATUS.ERROR
                     throw new Error()
