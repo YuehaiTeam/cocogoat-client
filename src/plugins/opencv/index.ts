@@ -1,6 +1,7 @@
 import * as OpenCV from './types/opencv'
-const dataDir = new URL(location.href).searchParams.get('dataDir')
-export const cv: typeof OpenCV = __non_webpack_require__(require('path').join(dataDir, 'opencv', 'opencv.all.js'))
+import _cv from './opencv.esm'
+// @ts-ignore
+export const getCV: () => typeof OpenCV = _cv
 /**
  * Translate error number from OpenCV into a meaningful message
  * @param cvObject OpenCV object

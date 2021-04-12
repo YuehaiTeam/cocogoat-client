@@ -3,11 +3,10 @@ import { ipcRenderer } from 'electron'
 import Actions from './Components/Actions'
 import AppHeader from './Components/AppHeader'
 import TransparentArea from './Components/TransparentArea'
-import { getposition, capture, setTransparent, tryocr } from './ipc'
+import { getposition, capture, setTransparent, tryocr, click } from './ipc'
 import { bus, STATUS } from './bus'
-import { imageDump, getBlocks } from './imageProcess'
+import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
-import { click, toWindowPos } from './mkAutomate'
 import { sleep } from '@/ArtifactView/utils'
 import { ElMessageBox } from 'element-plus'
 export default {
@@ -78,7 +77,7 @@ export default {
 
             const canvas = await this.getCanvas()
             /* 获取区块 */
-            const { blocks, rows, cols } = santizeBlocks(getBlocks(canvas), canvas)
+            const { blocks, rows, cols } = santizeBlocks(await getBlocks(canvas), canvas)
 
             bus.currentCount = blocks.length
             if (blocks.length <= 0) {
@@ -103,7 +102,8 @@ export default {
                     ElMessageBox({
                         type: 'error',
                         title: '检测失败',
-                        message: '无法确认行列数量\n请确认圣遗物列表的顶部对齐某一行的顶端，且当前页不是最后一页。',
+                        message:
+                            '无法确认行列数量\n请确认圣遗物列表的顶部对齐某一行的顶端，且当前页不是最后一页，或换到暗处并重新打开背包。',
                     })
                     bus.auto = false
                     bus.status = STATUS.ERROR
@@ -135,7 +135,7 @@ export default {
                 ipcRenderer.send('scrollTick', false)
                 time++
                 const canvas = await this.getCanvas()
-                const { blocks } = santizeBlocks(getBlocks(canvas), canvas)
+                const { blocks } = santizeBlocks(await getBlocks(canvas), canvas)
                 const curr = blocks[0]
                 if (!middlePassed && curr.y <= orig.y - orig.height - 1) {
                     middlePassed = true
@@ -214,12 +214,19 @@ export default {
                 await sleep(1000)
             }
         },
+        async onDetect() {
+            await this.detectOnce()
+            bus.intro = false
+        },
+        async onAuto() {
+            this.auto()
+        },
     },
 }
 </script>
 <template>
     <app-header />
-    <actions @detectonce="detectOnce" @startauto="auto" @pagedown="nextPage" />
+    <actions @detectonce="onDetect" @startauto="onAuto" @pagedown="nextPage" />
     <transparent-area />
 </template>
 <style lang="scss">

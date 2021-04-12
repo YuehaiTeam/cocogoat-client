@@ -37,3 +37,7 @@ export async function tryocr(): Promise<void> {
     await p
     return
 }
+
+export async function click({ x, y }: { x: number; y: number }) {
+    ipcRenderer.send('mouseClick', { x, y })
+}

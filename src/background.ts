@@ -9,8 +9,9 @@ import { automateInit } from './Background/automate'
 import { upgradeInit } from './Background/upgrade'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
-protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
-app.allowRendererProcessReuse = false
+protocol.registerSchemesAsPrivileged([
+    { scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true } },
+])
 app.on('window-all-closed', () => {
     app.quit()
 })

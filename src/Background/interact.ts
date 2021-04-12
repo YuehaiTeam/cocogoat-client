@@ -3,10 +3,11 @@ import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
 import { app, ipcMain } from 'electron'
+import { config } from '@/typings/config'
 import { windows, createArtifactView, createArtifactSwitch } from './windows'
 // @ts-ignore
 import activeWindows from 'electron-active-window/build/Release/wm.node'
-import { config } from '@/typings/config'
+robot.setMouseDelay(8)
 const getActiveWindow = activeWindows.getActiveWindow
 
 export function interactInit() {
@@ -121,6 +122,12 @@ export function interactInit() {
     })
     ipcMain.on('getAppWindowId', (event, { id }) => {
         event.reply(`getAppWindowId-${id}`, windows.app ? windows.app.webContents.id : -1)
+    })
+    ipcMain.on('mouseClick', (event, { x: dx, y: dy, delay }: { x: number; y: number; delay?: number }) => {
+        robot.moveMouse(dx, dy)
+        setTimeout(() => {
+            robot.mouseClick()
+        }, delay || 50)
     })
     ipcMain.on('exit', () => {
         app.exit()

@@ -50,7 +50,7 @@
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
     "babel-eslint": "^10.1.0",
-    "electron": "^9.0.0",
+    "electron": "^11.0.0",
     "enigmavirtualbox": "^0.9.10",
     "eslint": "^7.23.0",
     "eslint-config-alloy": "^3.10.0",
@@ -65,7 +65,7 @@
   },
   "iohook": {
     "targets": [
-      "electron-80"
+      "electron-85"
     ],
     "platforms": [
       "win32"

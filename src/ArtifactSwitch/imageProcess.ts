@@ -1,5 +1,7 @@
-import { cv } from '@/plugins/opencv'
-export function getBlocks(canvas: HTMLCanvasElement) {
+import { getposition } from './ipc'
+import { getCV } from '@/plugins/opencv'
+export async function getBlocks(canvas: HTMLCanvasElement) {
+    const cv = await getCV()
     const src = cv.imread(canvas)
     const contours = new cv.MatVector()
     const hierarchy = new cv.Mat()
@@ -47,4 +49,12 @@ export async function imageDump(canvas: HTMLCanvasElement) {
     console.log(filename)
     const b64img = canvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, '')
     await fsex.writeFile(filename, Buffer.from(b64img, 'base64'))
+}
+export async function toWindowPos(dx: number, dy: number) {
+    const offsetY = 80
+    const offsetX = 2
+    const [winx, winy] = await getposition()
+    const x = winx + dx + offsetX
+    const y = winy + dy + offsetY
+    return { x, y }
 }
