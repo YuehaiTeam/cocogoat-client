@@ -1,0 +1,19 @@
+name: Build Test
+
+on: [ push, pull_request ]
+jobs:
+  build:
+    runs-on: windows-latest
+    name: Build
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          architecture: 'x64' # optional, x64 or x86. If not specified, x64 will be used by default
+      - run: yarn
+      - run: yarn electron:build
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.gz
+    
