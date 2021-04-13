@@ -1,5 +1,5 @@
 import { createColorFilter } from './imageProcess'
-export const padding = 50
+export const padding = 80
 export default <Record<string, string | false | ((ctx: CanvasRenderingContext2D, w: number, h: number) => void)>>{
     title: 'invert(100%) brightness(180%) grayscale(100%) contrast(300%)',
     color: false,

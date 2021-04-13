@@ -10,7 +10,11 @@ export function santizeBlocks(origBlocks: Block[], canvas: HTMLCanvasElement) {
     blocks = blocks.filter((e) => {
         return Math.abs(e.width - canvas.width) > 100
     })
-    /* 过滤噪声区块 */
+    /* 过滤噪声区块：长宽比 */
+    blocks = blocks.filter((e) => {
+        return e.width / e.height > 1.5
+    })
+    /* 过滤噪声区块：固定宽度值 */
     blocks = blocks.filter((e) => {
         return e.width > canvas.width / 16
     })
