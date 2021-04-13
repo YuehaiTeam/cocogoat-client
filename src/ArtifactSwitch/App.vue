@@ -165,9 +165,8 @@ export default {
                 await this.detectOnce(false, true)
                 const orig = bus.blocks[0]
                 while (bus.auto) {
-                    console.log(1)
                     bus.status = STATUS.CLICK
-                    await sleep(1000)
+                    await sleep(500)
                     if (!bus.isLastPage) {
                         await this.clickFirstLine()
                         const p = await this.nextPage(false, orig, avgTimes)
@@ -209,9 +208,9 @@ export default {
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
+                await sleep(100)
                 await tryocr()
-                await sleep(1000)
+                await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
             }
         },
         async onDetect() {

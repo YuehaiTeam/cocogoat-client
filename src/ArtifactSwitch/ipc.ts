@@ -23,9 +23,21 @@ export async function getposition(): Promise<number[]> {
     return <number[]>await p
 }
 
+export async function getArtifactViewWindowId(): Promise<number> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`getArtifactViewWindowId-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('getArtifactViewWindowId', { id })
+    const windowId = Number(await p)
+    console.log('getArtifactViewWindowId:', windowId)
+    return windowId
+}
+
 export async function tryocr(): Promise<void> {
-    const artifactViewWindowId = Number(new URLSearchParams(location.search).get('windowArtifactViewId'))
+    const artifactViewWindowId = await getArtifactViewWindowId()
     if (artifactViewWindowId < 0) {
+        console.log('圣遗物识别器未打开')
         return
         // throw new Error('圣遗物识别器未打开')
     }
@@ -39,5 +51,11 @@ export async function tryocr(): Promise<void> {
 }
 
 export async function click({ x, y }: { x: number; y: number }) {
-    ipcRenderer.send('mouseClick', { x, y })
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`mouseClick-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('mouseClick', { x, y, id })
+    await p
+    return
 }

@@ -123,12 +123,19 @@ export function interactInit() {
     ipcMain.on('getAppWindowId', (event, { id }) => {
         event.reply(`getAppWindowId-${id}`, windows.app ? windows.app.webContents.id : -1)
     })
-    ipcMain.on('mouseClick', (event, { x: dx, y: dy, delay }: { x: number; y: number; delay?: number }) => {
-        robot.moveMouse(dx, dy)
-        setTimeout(() => {
-            robot.mouseClick()
-        }, delay || 50)
+    ipcMain.on('getArtifactViewWindowId', (event, { id }) => {
+        event.reply(`getArtifactViewWindowId-${id}`, windows.artifactView ? windows.artifactView.webContents.id : -1)
     })
+    ipcMain.on(
+        'mouseClick',
+        (event, { x: dx, y: dy, delay, id }: { x: number; y: number; id: number; delay?: number }) => {
+            robot.moveMouse(dx, dy)
+            setTimeout(() => {
+                robot.mouseClick()
+                event.reply(`mouseClick-${id}`)
+            }, delay || 50)
+        },
+    )
     ipcMain.on('exit', () => {
         app.exit()
     })

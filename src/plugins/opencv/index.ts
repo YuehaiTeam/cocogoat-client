@@ -1,7 +1,12 @@
 import * as OpenCV from './types/opencv'
-import _cv from './opencv.esm'
+import createCVInstance from './opencv.esm'
+export let cv: typeof OpenCV
 // @ts-ignore
-export const getCV: () => typeof OpenCV = _cv
+export const getCV: () => typeof OpenCV = async function () {
+    if (cv) return cv
+    cv = await createCVInstance()
+    return cv
+}
 /**
  * Translate error number from OpenCV into a meaningful message
  * @param cvObject OpenCV object
