@@ -10,7 +10,12 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-          architecture: 'x64' # optional, x64 or x86. If not specified, x64 will be used by default
+          architecture: 'x64'
+      - uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "Asia/Shanghai"
+          timezoneMacos: "Asia/Shanghai"
+          timezoneWindows: "China Standard Time"
       - run: yarn
       - run: yarn electron:build
       - uses: actions/upload-artifact@v2
