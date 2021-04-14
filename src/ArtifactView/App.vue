@@ -166,6 +166,13 @@ export default {
 @import '~@/styles/fonts.scss';
 * {
     font-family: GenshinImpact;
+    overflow: hidden;
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
+    .float,
+    .actions {
+        zoom: 0.85;
+    }
 }
 </style>
 <style lang="scss" scoped>

@@ -54,7 +54,7 @@ export async function toWindowPos(dx: number, dy: number) {
     const offsetY = 80
     const offsetX = 2
     const [winx, winy] = await getposition()
-    const x = winx + dx + offsetX
-    const y = winy + dy + offsetY
+    const x = winx * window.devicePixelRatio + (dx + offsetX) * window.devicePixelRatio
+    const y = winy * window.devicePixelRatio + (dy + offsetY) * window.devicePixelRatio
     return { x, y }
 }
