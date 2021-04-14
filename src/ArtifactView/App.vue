@@ -261,10 +261,16 @@ export default {
     font-family: GenshinImpact;
     overflow: hidden;
 }
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.2) {
     .float,
     .actions {
         zoom: 0.85;
+    }
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
+    .float,
+    .actions {
+        zoom: 0.72;
     }
 }
 .el-overlay {
