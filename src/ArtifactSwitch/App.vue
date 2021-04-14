@@ -125,14 +125,15 @@ export default {
             const orig = rawOrig || bus.blocks[0]
             let middlePassed = false
             setTransparent(true)
-            await sleep(100)
+            await sleep(50)
             const { x, y } = getBlockCenter(orig)
             await click(await toWindowPos(x, y))
-            await sleep(100)
+            await sleep(50)
             let time = 0
             while (true) {
                 if (!bus.auto) return
                 ipcRenderer.send('scrollTick', false)
+                await sleep(50)
                 time++
                 const canvas = await this.getCanvas()
                 const { blocks } = santizeBlocks(await getBlocks(canvas), canvas)
