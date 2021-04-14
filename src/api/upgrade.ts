@@ -18,8 +18,8 @@ export async function latestRelease() {
         content: data.body,
         url: {
             download: githubUrl,
-            fullUpdate: `${API_BASE}/v1/ascension/${fileName}`,
-            diffUpdate: `${API_BASE}/v1/ascension/diff/${fileName}/$HASH.cocomilk`,
+            fullPackage: `${API_BASE}/v1/ascension/${fileName}`,
+            diffPackage: `${API_BASE}/v1/ascension/diff/${fileName}/$HASH.cocomilk`,
             diffCheck: `${API_BASE}/v1/ascension/diff/${fileName}/$HASH.cocomilk?TC_check`,
         },
         _raw: data,
@@ -27,5 +27,5 @@ export async function latestRelease() {
 }
 export async function checkPatch(url: any, hash: string) {
     await flyAny.head(url.diffCheck.replace('$HASH', hash))
-    return url.diffUpdate.replace('$HASH', hash)
+    return url.diffPackage.replace('$HASH', hash)
 }

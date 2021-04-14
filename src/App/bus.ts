@@ -67,9 +67,9 @@ export async function loadData() {
             const release = await latestRelease()
             let buildType = ''
             if (bus.config.build?.type === EBuild.DEV) {
-                buildType = 'dev'
+                buildType = `.${bus.config.build?.timestamp}dev`
             } else if (bus.config.build?.type === EBuild.TES) {
-                buildType = 'beta'
+                buildType = `.${bus.config.build?.timestamp}beta`
             }
             const localVersion = bus.config.version + buildType
             const cmp = version_compare(localVersion, release.version)

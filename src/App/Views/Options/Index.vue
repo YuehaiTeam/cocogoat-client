@@ -42,13 +42,13 @@ export default {
                 const release = await latestRelease()
                 let buildType = ''
                 if (bus.config.build?.type === EBuild.DEV) {
-                    buildType = 'dev'
+                    buildType = `.${bus.config.build?.timestamp}dev`
                 } else if (bus.config.build?.type === EBuild.TES) {
-                    buildType = 'beta'
+                    buildType = `.${bus.config.build?.timestamp}beta`
                 }
                 const localVersion = bus.config.version + buildType
                 const cmp = version_compare(localVersion, release.version)
-                console.log(localVersion, cmp)
+                console.log(localVersion, release.version, cmp)
                 if (cmp < 0) {
                     this.newVersion = release
                     this.showUpgrade = true
@@ -84,7 +84,7 @@ export default {
                 l.close()
                 return
             }
-            upgrade(hasPatch ? patchUrl : this.newVersion.url.fullUpgrade, hasPatch)
+            upgrade(hasPatch ? patchUrl : this.newVersion.url.fullPackage, hasPatch)
         },
         clickVersion() {
             this.clickTimes++
