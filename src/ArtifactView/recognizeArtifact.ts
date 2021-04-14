@@ -1,6 +1,6 @@
 import { ocr, SplitResults } from './imageProcess'
 import { Artifact, ArtifactParam } from '@/typings/Artifact'
-import { ArtifactNames, ArtifactParamTypes, ArtifactSubParamTypes, ArtifactUsers } from '@/typings/ArtifactMap'
+import { ArtifactNames, ArtifactParamTypes, ArtifactSubParamTypes } from '@/typings/ArtifactMap'
 import { detectStars, textChinese, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
 
 const ocrCorrectionMap = [
@@ -26,6 +26,7 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ArtifactNames.includes(name)) {
         name = textBestmatch(name, ArtifactNames)
     }
+    name = fixOcrText(name)
 
     /* 等级 */
     if (!ocrres.level || !ocrres.level.text) {
@@ -33,28 +34,6 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     }
     const level = Number(textNumber(ocrres.level.text))
 
-    /* 使用 */
-    if (!ocrres.user) {
-        throw new Error("User cant't be error")
-    }
-    let user = ''
-    try {
-        if (ocrres.user.text) {
-            user = textChinese(ocrres.user.text)
-        }
-        if (!ArtifactUsers.includes(user)) {
-            user = textBestmatch(user, ArtifactUsers)
-        }
-        for (const i of ocrCorrectionMap) {
-            user = user.replace(i[0], i[1])
-        }
-        user = user.replace('已装备', '')
-        if (user === '空') {
-            user = '旅行者'
-        }
-    } catch (e) {
-        console.log(e)
-    }
     /* 主词条 */
     if (!ocrres.main || !ocrres.main.text) {
         throw new Error("Main cant't be empty")
@@ -95,7 +74,7 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
             name,
             stars,
             level,
-            user,
+            user: '',
             main,
             sub,
         },
@@ -168,4 +147,11 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
         },
         maybeError,
     ]
+}
+// TODO：只是一个临时修复
+function fixOcrText(name: string) {
+    if (name[0] === '终' && name.includes('的时计')) {
+        return '终末的时计'
+    }
+    return name
 }
