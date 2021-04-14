@@ -9,7 +9,7 @@ export default {
         Actions,
         RecognizeResult,
     },
-    emits: ['start', 'modify', 'delete', 'reset'],
+    emits: ['start', 'modify', 'delete', 'reset', 'feedback'],
     data() {
         return {
             STATUS,
@@ -55,6 +55,13 @@ export default {
     <section class="float">
         <intro :class="{ show: status.status === STATUS.INTRO }" @start="$emit('start')" />
         <recognize-result class="recognize-result" :class="{ show: status.status !== STATUS.LOADING }" />
+        <button
+            v-if="status.status !== STATUS.LOADING && status.options.sendWrongOCRReports && status.wrongReportData"
+            class="feedback"
+            @click="$emit('feedback')"
+        >
+            识别错了？点此反馈
+        </button>
     </section>
     <section class="actions" :class="{ intro: status.status === STATUS.INTRO }">
         <actions @modify="$emit('modify')" @delete="$emit('delete')" @reset="$emit('reset')" />
@@ -169,6 +176,20 @@ export default {
     background: #ece5d8;
     &.intro {
         opacity: 0;
+    }
+}
+.feedback {
+    background: #007acc;
+    color: #fff;
+    border: 0;
+    padding: 3px 8px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+    outline: 0;
+    &:hover {
+        opacity: 0.9;
     }
 }
 </style>

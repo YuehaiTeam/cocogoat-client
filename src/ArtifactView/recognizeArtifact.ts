@@ -10,11 +10,10 @@ const ocrCorrectionMap = [
     ['魁已装备', '魈已装备'],
 ]
 
-export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, string[]]> {
+export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, string[], any]> {
     const potentialErrors: string[] = []
     /* OCR */
     const ocrres = await ocr(ret)
-    console.log(ocrres)
 
     /* 星数 */
     const stars = detectStars(ret.color.canvas)
@@ -101,6 +100,7 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
             sub,
         },
         potentialErrors,
+        ocrres,
     ]
 }
 function recognizeParams(text: string, main = false): [ArtifactParam, string | null] {

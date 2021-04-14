@@ -1,4 +1,5 @@
 import { Artifact } from '@/typings/Artifact'
+import { IOptions } from '@/typings/config'
 import { reactive } from 'vue'
 export enum STATUS {
     'INTRO',
@@ -8,7 +9,18 @@ export enum STATUS {
     'MODIFIED',
     'DELETED',
 }
+interface WrongReportData {
+    ocrResult: any
+    artifact: Artifact
+    screenshot: string
+    message: string
+    screen: any
+    devicePixelRatio: typeof window.devicePixelRatio
+    windowWidth: number
+    windowHeight: number
+}
 interface statusType {
+    options: IOptions | null
     status: STATUS
     artifact: Artifact
     artifactBackup: Artifact | null
@@ -16,8 +28,10 @@ interface statusType {
     runtimeDebug: boolean
     auto: boolean
     hotkey: number
+    wrongReportData: WrongReportData | null
 }
 export const status = reactive(<statusType>{
+    options: null,
     status: STATUS.INTRO,
     runtimeDebug: false,
     auto: false,
@@ -53,4 +67,5 @@ export const status = reactive(<statusType>{
             },
         ],
     },
+    wrongReportData: null,
 })

@@ -3,9 +3,12 @@ import { watch } from 'vue'
 import { sleep } from './utils'
 import { ipcRenderer } from 'electron'
 import { status, STATUS } from './status'
+import { ElMessageBox } from 'element-plus'
 import { recognizeArtifact } from './recognizeArtifact'
 import { split, imageDump } from './imageProcess'
 import { getposition, capture, getActiveWindow, sendToAppWindow } from './ipc'
+
+import { sendWrongOCRFeedback } from '@/api/feedback'
 
 import AppHeader from './Components/AppHeader'
 import Capture from './Components/Capture/Index'
@@ -18,6 +21,9 @@ export default {
         return {
             activeWindow: '',
             intro: true,
+            feedbackVisible: false,
+            feedbackContent: '',
+            feedbackLoading: false,
         }
     },
     computed: {
@@ -124,12 +130,50 @@ export default {
             }
 
             /* OCR、识别 */
-            const [artifact, potentialErrors] = await recognizeArtifact(ret)
+            const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ret)
             status.artifact = artifact
             status.potentialErrors = potentialErrors
 
-            console.log(JSON.parse(JSON.stringify(status.artifact)))
-            console.log(JSON.parse(JSON.stringify(status.potentialErrors)))
+            const wrongReportData = JSON.parse(
+                JSON.stringify({
+                    artifact,
+                    screenshot: '',
+                    message: '',
+                    ocrResult: {},
+                }),
+            )
+            console.log(artifact, ocrResult)
+            for (let i in ocrResult) {
+                if ({}.hasOwnProperty.call(ocrResult, i)) {
+                    for (let j of ocrResult[i].words) {
+                        delete j.line
+                        delete j.page
+                        delete j.block
+                        delete j.paragraph
+                    }
+                    wrongReportData.ocrResult[i] = ocrResult[i].words
+                }
+            }
+            const alt = {}
+            for (let i of [
+                'availHeight',
+                'availLeft',
+                'availTop',
+                'availWidth',
+                'width',
+                'height',
+                'pixelDepth',
+                'colorDepth',
+            ]) {
+                alt[i] = window.screen[i]
+            }
+            alt.angle = window.screen.orientation.angle
+            wrongReportData.screen = alt
+            wrongReportData.devicePixelRatio = window.devicePixelRatio
+            wrongReportData.windowWidth = window.innerWidth
+            wrongReportData.windowHeight = window.innerHeight
+            status.wrongReportData = wrongReportData
+            status.wrongReportData.screenshot = canvas.toDataURL('image/webp')
 
             this.saveToMain()
         },
@@ -152,6 +196,25 @@ export default {
                 status.artifact = JSON.parse(JSON.stringify(status.artifactBackup))
             }
         },
+        async onFeedback() {
+            this.feedbackContent = ''
+            this.feedbackLoading = false
+            this.feedbackVisible = true
+        },
+        async doFeedback() {
+            this.feedbackLoading = true
+            status.wrongReportData.message = this.feedbackContent
+            try {
+                const id = await sendWrongOCRFeedback(status.wrongReportData)
+                this.feedbackVisible = false
+                ElMessageBox({
+                    type: 'success',
+                    title: '感谢您的反馈',
+                    message: `数据已提交，我们将尽快检查与改进。 ID：${id || 0}`,
+                })
+            } catch (e) {}
+            this.feedbackLoading = false
+        },
     },
 }
 </script>
@@ -159,7 +222,37 @@ export default {
 <template>
     <app-header @clickprocess="processWithTimeout" />
     <div class="app-main">
-        <capture ref="captureDom" @start="processWithTimeout" @modify="onModify" @delete="onDelete" @reset="onReset" />
+        <capture
+            ref="captureDom"
+            @start="processWithTimeout"
+            @modify="onModify"
+            @delete="onDelete"
+            @reset="onReset"
+            @feedback="onFeedback"
+        />
+        <el-dialog v-model="feedbackVisible" title="反馈识别错误" width="90%">
+            <div class="feedback-desc">
+                反馈识别信息将会发送以下内容到我们的服务器：
+                <ul>
+                    <li>- 本次抓取到的圣遗物图片</li>
+                    <li>- 您设备的屏幕分辨率和dpi</li>
+                    <li>- 本地ORC识别结果与纠错尝试</li>
+                    <li>- 您在下方填写的备注文字信息</li>
+                </ul>
+                若您不主动向我们反馈，这些内容都会在识别下一个圣遗物后被删除。
+            </div>
+            <el-input
+                v-model="feedbackContent"
+                type="textarea"
+                placeholder="有什么特别的备注吗？也可以留空。"
+            ></el-input>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="feedbackVisible = false">取消</el-button>
+                    <el-button :loading="feedbackLoading" type="primary" @click="doFeedback">发送</el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 </template>
 <style lang="scss">
@@ -174,6 +267,16 @@ export default {
         zoom: 0.85;
     }
 }
+.el-overlay {
+    top: 30px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: auto;
+}
+.el-message-box {
+    max-width: 85%;
+}
 </style>
 <style lang="scss" scoped>
 .app-main {
@@ -182,5 +285,17 @@ export default {
     left: 2px;
     right: 2px;
     bottom: 2px;
+}
+.feedback-desc {
+    margin-top: -30px;
+    margin-bottom: 15px;
+    ul {
+        margin: 7px;
+        padding: 0;
+        padding-left: 10px;
+        li {
+            list-style: none;
+        }
+    }
 }
 </style>
