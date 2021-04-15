@@ -189,7 +189,7 @@ export function convertAsMona(artifacts: Artifact[]) {
                     : Number(artifacts[i].sub[j].value),
             })
         }
-        try{
+        try {
             const tmp = {
                 setName: getStander.setName[artifacts[i].name][0],
                 detailName: artifacts[i].name,
@@ -213,8 +213,7 @@ export function convertAsMona(artifacts: Artifact[]) {
                 id: artifacts[i].id,
             }
             json[tmp.position].push(tmp)
-        }
-        catch(e){
+        } catch (e) {
             console.log(e)
         }
     }
