@@ -20,6 +20,7 @@ jobs:
           timezoneLinux: "Asia/Shanghai"
           timezoneMacos: "Asia/Shanghai"
           timezoneWindows: "China Standard Time"
+      - run: (Get-content yarn.lock) | Foreach-Object {$_ -replace "registry.npm.taobao.org", "r.cnpmjs.org"} | Set-Content yarn.lock
       - run: yarn
       - run: yarn electron:build
       - uses: actions/upload-artifact@v2
