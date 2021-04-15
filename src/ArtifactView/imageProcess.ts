@@ -72,16 +72,16 @@ export async function imageDump(canvas: HTMLCanvasElement, list: SplitResults) {
     await fsex.ensureDir(exportPath)
     const pms = []
     {
-        const filename = path.join(exportPath, `window.png`)
+        const filename = path.join(exportPath, `window.webp`)
         console.log(filename)
-        const b64img = canvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, '')
+        const b64img = canvas.toDataURL('image/webp').replace(/^data:image\/webp;base64,/, '')
         pms.push(fsex.writeFile(filename, Buffer.from(b64img, 'base64')))
     }
     for (const i in list) {
         if ({}.hasOwnProperty.call(list, i)) {
-            const filename = path.join(exportPath, `${i}.png`)
+            const filename = path.join(exportPath, `${i}.webp`)
             if (list[i]) {
-                const b64img = list[i].canvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, '')
+                const b64img = list[i].canvas.toDataURL('image/webp').replace(/^data:image\/webp;base64,/, '')
                 pms.push(fsex.writeFile(filename, Buffer.from(b64img, 'base64')))
             }
         }

@@ -50,7 +50,7 @@ export default {
     <section ref="overlay.level" class="overlay overlay-level"></section>
     <section ref="overlay.sub" class="overlay overlay-sub"></section>
     <section class="overlay overlay-user">
-        <section ref="overlay.user" class="overlay-user-in"></section>
+        <section class="overlay-user-in"></section>
     </section>
     <section class="float">
         <intro :class="{ show: status.status === STATUS.INTRO }" @start="$emit('start')" />

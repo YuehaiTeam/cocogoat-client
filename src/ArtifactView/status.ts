@@ -10,16 +10,21 @@ export enum STATUS {
     'DELETED',
 }
 interface WrongReportData {
-    ocrResult: any
+    ocrResult: Record<string, any>
     artifact: Artifact
     screenshot: string
+    splitImages: Record<string, string>
     message: string
     screen: any
     devicePixelRatio: typeof window.devicePixelRatio
     windowWidth: number
     windowHeight: number
+    version: string
+    build: any
 }
 interface statusType {
+    version: string
+    build: any
     options: IOptions | null
     status: STATUS
     artifact: Artifact
@@ -31,6 +36,8 @@ interface statusType {
     wrongReportData: WrongReportData | null
 }
 export const status = reactive(<statusType>{
+    version: '',
+    build: {},
     options: null,
     status: STATUS.INTRO,
     runtimeDebug: false,

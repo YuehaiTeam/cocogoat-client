@@ -140,6 +140,9 @@ export default {
                     screenshot: '',
                     message: '',
                     ocrResult: {},
+                    splitImages: {},
+                    version: status.version,
+                    build: status.build,
                 }),
             )
             console.log(artifact, ocrResult)
@@ -174,7 +177,12 @@ export default {
             wrongReportData.windowHeight = window.innerHeight
             status.wrongReportData = wrongReportData
             status.wrongReportData.screenshot = canvas.toDataURL('image/webp')
-
+            for (const i in ret) {
+                if ({}.hasOwnProperty.call(ret, i)) {
+                    if (i === 'color') continue
+                    status.wrongReportData.splitImages[i] = ret[i].canvas.toDataURL('image/webp')
+                }
+            }
             this.saveToMain()
         },
         async saveToMain() {
