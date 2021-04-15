@@ -88,6 +88,16 @@ module.exports = {
             .use('file-loader')
             .loader('file-loader')
             .end()
+        config.module
+            .rule('vue')
+            .use('vue-loader')
+            .tap((options) => {
+                options.compilerOptions = options.compilerOptions || {}
+                options.compilerOptions.isCustomElement = (tag) => {
+                    return tag === 'webview'
+                }
+                return options
+            })
         /* Sentry: source map uploading */
         if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {
             config.plugin('sentry').use(SentryPlugin, [
