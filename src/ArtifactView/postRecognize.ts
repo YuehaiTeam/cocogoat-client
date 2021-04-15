@@ -30,11 +30,8 @@ export function detectStars(colorCanvas: HTMLCanvasElement) {
 }
 export function textBestmatch(text: string, list: string[]) {
     if (list.includes(text)) return text
-    let matches = findBestMatch(text, list)
-    if (matches.bestMatch.rating <= 0.1) {
-        matches = findBestMatch(text, list, true)
-    }
-    if (matches.bestMatch.rating <= 0.1) return ''
+    const matches = findBestMatch(text, list)
+    if (matches.bestMatch.rating > 3) return ''
     return matches.bestMatch.target
 }
 export function textChinese(t: string) {
@@ -48,72 +45,63 @@ export function textNumber(t: string) {
     return str
 }
 
-function compareTwoStrings(firstStr: string, secondStr: string) {
-    const first = firstStr.replace(/\s+/g, '')
-    const second = secondStr.replace(/\s+/g, '')
+export function levenshteinEditDistance(value: string, other: string): number {
+    let distance: number
+    let distanceOther: number
+    const codes: number[] = []
+    const cache: number[] = []
 
-    if (first === second) return 1 // identical or empty
-    if (first.length < 2 || second.length < 2) return 0 // if either is a 0-letter or 1-letter string
-
-    const firstBigrams = new Map()
-    for (let i = 0; i < first.length; i++) {
-        const bigram = first.substring(i, i + 1)
-        const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) + 1 : 1
-
-        firstBigrams.set(bigram, count)
+    if (value === other) {
+        return 0
     }
-    let intersectionSize = 0
-    for (let i = 0; i < second.length; i++) {
-        const bigram = second.substring(i, i + 1)
-        const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) : 0
 
-        if (count > 0) {
-            firstBigrams.set(bigram, count - 1)
-            intersectionSize++
+    if (value.length === 0) {
+        return other.length
+    }
+
+    if (other.length === 0) {
+        return value.length
+    }
+
+    let index = 0
+
+    while (index < value.length) {
+        codes[index] = value.charCodeAt(index)
+        cache[index] = ++index
+    }
+
+    let indexOther = 0
+    let result
+    while (indexOther < other.length) {
+        const code = other.charCodeAt(indexOther)
+        result = distance = indexOther++
+        index = -1
+
+        while (++index < value.length) {
+            distanceOther = code === codes[index] ? distance : distance + 1
+            distance = cache[index]
+            cache[index] = result =
+                distance > result
+                    ? distanceOther > result
+                        ? result + 1
+                        : distanceOther
+                    : distanceOther > distance
+                    ? distance + 1
+                    : distanceOther
         }
     }
 
-    return (2.0 * intersectionSize) / (first.length + second.length - 2)
+    return result || Infinity
 }
-function compareTwoStrings2(firstStr: string, secondStr: string) {
-    const first = firstStr.replace(/\s+/g, '')
-    const second = secondStr.replace(/\s+/g, '')
-
-    if (first === second) return 1 // identical or empty
-    if (first.length < 2 || second.length < 2) return 0 // if either is a 0-letter or 1-letter string
-
-    const firstBigrams = new Map()
-    for (let i = 0; i < first.length - 1; i++) {
-        const bigram = first.substring(i, i + 2)
-        const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) + 1 : 1
-
-        firstBigrams.set(bigram, count)
-    }
-
-    let intersectionSize = 0
-    for (let i = 0; i < second.length - 1; i++) {
-        const bigram = second.substring(i, i + 2)
-        const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) : 0
-
-        if (count > 0) {
-            firstBigrams.set(bigram, count - 1)
-            intersectionSize++
-        }
-    }
-
-    return (2.0 * intersectionSize) / (first.length + second.length - 2)
-}
-export function findBestMatch(mainString: string, targetStrings: string[], singleWord = false) {
+export function findBestMatch(mainString: string, targetStrings: string[]) {
     const ratings = []
     let bestMatchIndex = 0
 
     for (let i = 0; i < targetStrings.length; i++) {
         const currentTargetString = targetStrings[i]
-        const currentRating = singleWord
-            ? compareTwoStrings(mainString, currentTargetString)
-            : compareTwoStrings2(mainString, currentTargetString)
+        const currentRating = levenshteinEditDistance(mainString, currentTargetString)
         ratings.push({ target: currentTargetString, rating: currentRating })
-        if (currentRating > ratings[bestMatchIndex].rating) {
+        if (currentRating < ratings[bestMatchIndex].rating) {
             bestMatchIndex = i
         }
     }
