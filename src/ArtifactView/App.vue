@@ -57,7 +57,7 @@ export default {
             if (event.keycode === status.hotkey) {
                 switch (status.status) {
                     case STATUS.INTRO:
-                        this.startCapture()
+                        this.processWithTimeout()
                         break
                     default:
                         if (event.altKey) {
