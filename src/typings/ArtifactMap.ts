@@ -38,7 +38,7 @@ export const ArtifactSubParamTypes = [
 export const ArtifactNames = [
     '磐陀裂生之花',
     '嵯峨群峰之翼',
-    '星罗圭壁之晷',
+    '星罗圭璧之晷',
     '巉岩琢塑之樽',
     '不动玄石之相',
     '历经风雪的思念',

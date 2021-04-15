@@ -151,7 +151,7 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
 // TODO：只是一个临时修复
 function fixOcrText(name: string) {
     if (name[0] === '终' && name.includes('的时计')) {
-        return '终末的时计'
+        return '终幕的时计'
     }
     return name
 }

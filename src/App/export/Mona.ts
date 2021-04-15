@@ -4,6 +4,7 @@ const getStander = {
         磐陀裂生之花: ['archaicPetra', 'flower'],
         嵯峨群峰之翼: ['archaicPetra', 'plume'],
         星罗圭壁之晷: ['archaicPetra', 'sands'],
+        星罗圭璧之晷: ['archaicPetra', 'sands'],
         巉岩琢塑之樽: ['archaicPetra', 'goblet'],
         不动玄石之相: ['archaicPetra', 'circlet'],
         历经风雪的思念: ['blizzardStrayer', 'flower'],
@@ -188,29 +189,34 @@ export function convertAsMona(artifacts: Artifact[]) {
                     : Number(artifacts[i].sub[j].value),
             })
         }
-        const tmp = {
-            setName: getStander.setName[artifacts[i].name][0],
-            detailName: artifacts[i].name,
-            position: getStander.setName[artifacts[i].name][1],
-            mainTag: {
-                name:
-                    artifacts[i].main.value.includes('%') ||
-                    (!artifacts[i].main.name.includes('生命值') &&
-                        !artifacts[i].main.name.includes('防御力') &&
-                        !artifacts[i].main.name.includes('攻击力'))
-                        ? getStander.tag[artifacts[i].main.name]
-                        : getStander.tag['固定' + artifacts[i].main.name],
-                value: artifacts[i].main.value.includes('%')
-                    ? parseFloat(artifacts[i].main.value.replace('%', '')) * 0.01
-                    : Number(artifacts[i].main.value),
-            },
-            normalTags: sub,
-            omit: false,
-            level: artifacts[i].level,
-            star: artifacts[i].stars,
-            id: artifacts[i].id,
+        try{
+            const tmp = {
+                setName: getStander.setName[artifacts[i].name][0],
+                detailName: artifacts[i].name,
+                position: getStander.setName[artifacts[i].name][1],
+                mainTag: {
+                    name:
+                        artifacts[i].main.value.includes('%') ||
+                        (!artifacts[i].main.name.includes('生命值') &&
+                            !artifacts[i].main.name.includes('防御力') &&
+                            !artifacts[i].main.name.includes('攻击力'))
+                            ? getStander.tag[artifacts[i].main.name]
+                            : getStander.tag['固定' + artifacts[i].main.name],
+                    value: artifacts[i].main.value.includes('%')
+                        ? parseFloat(artifacts[i].main.value.replace('%', '')) * 0.01
+                        : Number(artifacts[i].main.value),
+                },
+                normalTags: sub,
+                omit: false,
+                level: artifacts[i].level,
+                star: artifacts[i].stars,
+                id: artifacts[i].id,
+            }
+            json[tmp.position].push(tmp)
         }
-        json[tmp.position].push(tmp)
+        catch(err){
+            console.log(err.message)
+        }
     }
     return JSON.stringify(json, null, 4)
 }
