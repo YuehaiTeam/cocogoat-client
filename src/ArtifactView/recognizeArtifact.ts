@@ -23,10 +23,10 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         throw new Error("Title cant't be empty")
     }
     let name = textChinese(ocrres.title.text)
+    name = fixOcrText(name)
     if (!ArtifactNames.includes(name)) {
         name = textBestmatch(name, ArtifactNames)
     }
-    name = fixOcrText(name)
 
     /* 等级 */
     if (!ocrres.level || !ocrres.level.text) {

@@ -214,8 +214,8 @@ export function convertAsMona(artifacts: Artifact[]) {
             }
             json[tmp.position].push(tmp)
         }
-        catch(err){
-            console.log(err.message)
+        catch(e){
+            console.log(e)
         }
     }
     return JSON.stringify(json, null, 4)
