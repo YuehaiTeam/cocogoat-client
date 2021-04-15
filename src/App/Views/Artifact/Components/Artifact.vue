@@ -12,8 +12,13 @@ export default {
         return {}
     },
     methods: {
-        getImg(name: string) {
-            return require(`@/assets/artifacts/${name}.webp`)
+        getImg(name: string): string | false {
+            try {
+                const imgUrl = require(`@/assets/artifacts/${name}.webp`)
+                return `url(${imgUrl})`
+            } catch (e) {
+                return `none`
+            }
         },
     },
 }
