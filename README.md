@@ -1,3 +1,4 @@
+[English](https://github.com/YuehaiTeam/cocogoat/blob/main/README_en.md)
 <div align="center">
 
 # 椰羊cocogoat  
