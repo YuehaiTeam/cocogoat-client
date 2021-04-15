@@ -1,3 +1,7 @@
+const SentryPlugin = require('@sentry/webpack-plugin')
+const path = require('path')
+const fsex = require('fs-extra')
+const packageJSON = fsex.readJSONSync(path.join(__dirname, 'package.json'))
 module.exports = {
     pages: {
         app: {
@@ -84,5 +88,23 @@ module.exports = {
             .use('file-loader')
             .loader('file-loader')
             .end()
+        /* Sentry: source map uploading */
+        if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {
+            config.plugin('sentry').use(SentryPlugin, [
+                {
+                    url: process.env.SENTRY_URL,
+                    authToken: process.env.SENTRY_KEY,
+                    org: 'yuehaiteam',
+                    project: 'cocogoat',
+                    ignore: ['node_modules'],
+                    include: './dist_electron/bundled',
+                    release: packageJSON.version,
+                    setCommits: {
+                        auto: true,
+                    },
+                    urlPrefix: '~/',
+                },
+            ])
+        }
     },
 }

@@ -1033,6 +1033,18 @@
     "@sentry/utils" "5.27.6"
     tslib "^1.9.3"
 
+"@sentry/cli@^1.63.1":
+  version "1.64.0"
+  resolved "https://registry.npm.taobao.org/@sentry/cli/download/@sentry/cli-1.64.0.tgz#8eadb93118ad295b0ac49de55a80eeb5a682c403"
+  integrity sha1-jq25MRitKVsKxJ3lWoDutaaCxAM=
+  dependencies:
+    https-proxy-agent "^5.0.0"
+    mkdirp "^0.5.5"
+    node-fetch "^2.6.0"
+    npmlog "^4.1.2"
+    progress "^2.0.3"
+    proxy-from-env "^1.1.0"
+
 "@sentry/core@5.27.6":
   version "5.27.6"
   resolved "https://registry.npm.taobao.org/@sentry/core/download/@sentry/core-5.27.6.tgz#3ceeb58acd857f1e17d52d3087bfecb506adc1f7"
@@ -1136,6 +1148,13 @@
   dependencies:
     "@sentry/types" "6.2.5"
     tslib "^1.9.3"
+
+"@sentry/webpack-plugin@^1.15.0":
+  version "1.15.0"
+  resolved "https://registry.npm.taobao.org/@sentry/webpack-plugin/download/@sentry/webpack-plugin-1.15.0.tgz#c7f9eafbbace1929c3fb81bb720fc0d7e8b4f86d"
+  integrity sha1-x/nq+7rOGSnD+4G7cg/A1+i0+G0=
+  dependencies:
+    "@sentry/cli" "^1.63.1"
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -7887,7 +7906,7 @@ npm-run-path@^4.0.0, npm-run-path@^4.0.1:
   dependencies:
     path-key "^3.0.0"
 
-npmlog@^4.0.1:
+npmlog@^4.0.1, npmlog@^4.1.2:
   version "4.1.2"
   resolved "https://registry.npm.taobao.org/npmlog/download/npmlog-4.1.2.tgz#08a7f2a8bf734604779a9efa4ad5cc717abb954b"
   integrity sha1-CKfyqL9zRgR3mp76StXMcXq7lUs=
@@ -8989,6 +9008,11 @@ proxy-addr@~2.0.5:
   dependencies:
     forwarded "~0.1.2"
     ipaddr.js "1.9.1"
+
+proxy-from-env@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.npm.taobao.org/proxy-from-env/download/proxy-from-env-1.1.0.tgz#e102f16ca355424865755d2c9e8ea4f24d58c3e2"
+  integrity sha1-4QLxbKNVQkhldV0sno6k8k1Yw+I=
 
 prr@~1.0.1:
   version "1.0.1"

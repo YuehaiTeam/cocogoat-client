@@ -7,6 +7,8 @@ jobs:
   build:
     env:
       BUILD_TYPE: REL
+      SENTRY_URL: ${{ secrets.SENTRY_URL }}
+      SENTRY_KEY: ${{ secrets.SENTRY_KEY }}
     runs-on: windows-latest
     name: Build
     steps:
