@@ -26,7 +26,7 @@ export default {
 <template>
     <el-card class="artifact">
         <div class="main-part" :class="`star${artifact.stars}`">
-            <div class="image" :style="{ backgroundImage: `url(${getImg(artifact.name)})` }"></div>
+            <div class="image" :style="{ backgroundImage: getImg(artifact.name) }"></div>
             <div class="name">
                 {{ artifact.name }}
             </div>
