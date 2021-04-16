@@ -63,8 +63,13 @@ export default {
             识别错了？点此反馈
         </button>
     </section>
-    <section class="actions" :class="{ intro: status.status === STATUS.INTRO }">
-        <actions @modify="$emit('modify')" @delete="$emit('delete')" @reset="$emit('reset')" />
+    <section class="actions">
+        <actions
+            v-show="status.status !== STATUS.INTRO"
+            @modify="$emit('modify')"
+            @delete="$emit('delete')"
+            @reset="$emit('reset')"
+        />
     </section>
 </template>
 
@@ -174,9 +179,6 @@ export default {
     bottom: 0;
     height: 9.5%;
     background: #ece5d8;
-    &.intro {
-        opacity: 0;
-    }
 }
 .feedback {
     background: #007acc;
