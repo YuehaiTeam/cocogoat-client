@@ -14,31 +14,21 @@ export default defineComponent({
         const frame: any = this.$refs.monaFrame
         // @ts-ignore
         window.monaFrame = frame
-        frame.addEventListener('dom-ready', () => {
-            frame.insertCSS(`
-            aside.el-aside {
-                width: 220px !important;
-            }
-            .title.past {
-                margin: 0 !important;
-            }
-            .character-panel {
-                flex-wrap: wrap !important;
-            }`)
-        })
         frame.addEventListener(
             'dom-ready',
             () => {
-                frame.executeJavaScript(`localStorage.artifacts='${convertedJson}';location.reload();`)
-                frame.addEventListener(
-                    'dom-ready',
-                    () => {
-                        setTimeout(() => {
-                            this.loading = false
-                        }, 100)
-                    },
-                    { once: true },
-                )
+                frame.insertCSS(`
+                aside.el-aside {
+                    width: 220px !important;
+                }
+                .title.past {
+                    margin: 0 !important;
+                }
+                .character-panel {
+                    flex-wrap: wrap !important;
+                }`)
+                frame.executeJavaScript(`monaAPI.updateAllArtifacts(${convertedJson})`)
+                this.loading = false
             },
             { once: true },
         )
@@ -61,8 +51,7 @@ export default defineComponent({
             id="mona-frame"
             ref="monaFrame"
             src="https://genshin.art/"
-            style="width: 100%; height: 100%"
-            :useragent="ua"
+            style="width: 100%; height: 100%; margin: 0"
         ></webview>
     </div>
 </template>
