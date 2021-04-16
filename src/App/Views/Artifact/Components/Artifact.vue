@@ -49,8 +49,8 @@ export default {
                 </button>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item @click="$emit('edit', artifact.id)">修改</el-dropdown-item>
-                        <el-dropdown-item @click="$emit('delete', artifact.id)">删除</el-dropdown-item>
+                        <el-dropdown-item @click="$emit('edit', artifact.id)">{{ __('修改') }}</el-dropdown-item>
+                        <el-dropdown-item @click="$emit('delete', artifact.id)">{{ __('删除') }}</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>

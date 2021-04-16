@@ -3,7 +3,7 @@ import fsex from 'fs-extra'
 import { Artifact } from '@/typings/Artifact'
 import { EBuild, IConfig } from '@/typings/config'
 import { reactive, watch } from 'vue'
-import { getConfig } from './ipc'
+import { getConfig, readArtifacts } from './ipc'
 import { ipcRenderer } from 'electron'
 import { latestRelease } from '@/api/upgrade'
 export { API_BASE } from '@/config'
@@ -39,7 +39,7 @@ export const bus = reactive(<IBusData>{
 export async function loadData() {
     bus.config = await getConfig()
     try {
-        bus.artifacts = await fsex.readJSON(path.join(bus.config.configDir, 'artifacts.json'))
+        bus.artifacts = await readArtifacts()
     } catch (e) {
         bus.artifacts = []
     }

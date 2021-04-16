@@ -2,6 +2,7 @@
 import { v4 as uuid } from 'uuid'
 import { ipcRenderer } from 'electron'
 import { IConfig } from '@/typings/config'
+import { Artifact } from '@/typings/Artifact'
 export function openArtifactView() {
     ipcRenderer.send('createArtifactView')
 }
@@ -26,4 +27,12 @@ export async function getConfig(): Promise<IConfig> {
     })
     ipcRenderer.send('getConfig', { id })
     return <IConfig>await p
+}
+export async function readArtifacts(): Promise<Artifact[]> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`readArtifacts-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('readArtifacts', { id })
+    return <Artifact[]>await p
 }

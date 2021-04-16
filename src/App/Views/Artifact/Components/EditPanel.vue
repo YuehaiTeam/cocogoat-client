@@ -87,7 +87,7 @@ export default defineComponent({
                 <el-input v-model="artifact.main.value" size="small" placeholder="主词条值"> </el-input>
             </div>
             <br />
-            副词条<br />
+            {{ __('副词条') }}<br />
             <el-empty v-if="artifact.sub.length <= 0" :image-size="80" description="暂无副词条"></el-empty>
             <ul v-else class="sub">
                 <li v-for="(i, a) in artifact.sub" :key="a">
@@ -118,10 +118,10 @@ export default defineComponent({
                     :disabled="artifact.sub.length >= 4"
                     @click="doAddSub"
                 >
-                    添加副词条
+                    {{ __('添加副词条') }}
                 </el-button>
-                <el-button size="small" type="danger" plain @click="doReset">重置</el-button>
-                <el-button size="small" type="primary" @click="doSave">保存</el-button>
+                <el-button size="small" type="danger" plain @click="doReset">{{ __('重置') }}</el-button>
+                <el-button size="small" type="primary" @click="doSave">{{ __('保存') }}</el-button>
             </span>
         </template>
     </el-dialog>

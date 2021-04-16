@@ -56,7 +56,7 @@ export default {
                 } else {
                     ElNotification({
                         type: 'success',
-                        title: '已经是最新版本',
+                        title: this.__('已经是最新版本'),
                     })
                 }
             } catch (e) {}
@@ -64,7 +64,7 @@ export default {
         },
         async doUpgrade() {
             this.showUpgrade = false
-            const l = ElLoading.service({ fullscreen: true, text: '趴在草地上，能听见大地的心跳...' })
+            const l = ElLoading.service({ fullscreen: true, text: this.__('趴在草地上，能听见大地的心跳...') })
             const hash = await getApphash()
             console.log('appHash=', hash)
             let hasPatch = false
@@ -79,7 +79,7 @@ export default {
             if (bus.config.build.type === 'DEV') {
                 ElNotification({
                     type: 'info',
-                    title: '开发模式无法自动更新',
+                    title: this.__('开发模式无法自动更新'),
                 })
                 l.close()
                 return
@@ -101,7 +101,9 @@ export default {
 }
 </script>
 <template>
-    <teleport to="#app-title"> 设置 </teleport>
+    <teleport to="#app-title">
+        <span>{{ __('设置') }}</span>
+    </teleport>
     <teleport to="#app-actions">
         <span class="version" @click="clickVersion" @contextmenu="ctxVersion">
             <span class="main"> v{{ bus.config.version }}</span
@@ -116,7 +118,7 @@ export default {
                     icon="el-icon-position"
                     @click="checkUpgrade"
                 >
-                    检查更新
+                    <span>{{ __('检查更新') }}</span>
                 </el-button>
             </el-badge>
         </span>
@@ -140,12 +142,24 @@ export default {
     </el-dialog>
     <div class="page-main">
         <article>
-            <h3>基础</h3>
-            <div class="content-desc">这些选项将在程序重启后生效。</div>
+            <el-form label-position="right" label-width="auto" size="small">
+                <el-form-item :label="__(`语言(Language)`)">
+                    <el-select v-model="$lang.lang">
+                        <el-option value="zh" label="简体中文"> 简体中文 </el-option>
+                        <el-option v-for="(i, a) in $availableLocales" :key="a" :value="a" :label="i.__name">
+                            {{ i.__name }}
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+        </article>
+        <article>
+            <h3>{{ __('基础') }}</h3>
+            <div class="content-desc">{{ __('这些选项将在程序重启后生效。') }}</div>
             <div class="content">
                 <div class="opt">
                     <el-switch
-                        active-text="发送错误日志，协助我们改进程序"
+                        :active-text="__('发送错误日志，协助我们改进程序')"
                         :model-value="options.sendErrorReports"
                         @update:model-value="opt('sendErrorReports', $event)"
                     >
@@ -153,7 +167,7 @@ export default {
                 </div>
                 <div class="opt">
                     <el-switch
-                        active-text="上传圣遗物识别错误与修改日志，帮助我们提高识别率"
+                        :active-text="__('启用OCR识别错误反馈功能')"
                         :model-value="options.sendWrongOCRReports"
                         @update:model-value="opt('sendWrongOCRReports', $event)"
                     >
@@ -162,22 +176,22 @@ export default {
             </div>
         </article>
         <article>
-            <h3>圣遗物</h3>
-            <div class="content-desc">这些选项将在下次打开识别器或切换器时生效。</div>
+            <h3>{{ __('圣遗物') }}</h3>
+            <div class="content-desc">{{ __('这些选项将在下次打开识别器或切换器时生效。') }}</div>
             <div class="content">
                 <el-form label-position="right" label-width="auto" size="small">
-                    <el-form-item label="保留重复识别">
+                    <el-form-item :label="__('保留重复识别')">
                         <el-switch disabled :model-value="options.artifacts.keepSameArtifacts"></el-switch>
-                        <div class="form-desc">得到两个完全一致的圣遗物的概率是多少呢？</div>
+                        <div class="form-desc">{{ __('得到两个完全一致的圣遗物的概率是多少呢？') }}</div>
                     </el-form-item>
-                    <el-form-item label="独立切换模式">
+                    <el-form-item :label="__('独立切换模式')">
                         <el-switch
                             :model-value="options.artifacts.preserveSwitcher"
                             @update:model-value="opt('artifacts.preserveSwitcher', $event)"
                         ></el-switch>
-                        <div class="form-desc">允许在关闭识别器时，保留切换器窗口以配合其他工具使用。</div>
+                        <div class="form-desc">{{ __('允许在关闭识别器时，保留切换器窗口以配合其他工具使用。') }}</div>
                     </el-form-item>
-                    <el-form-item label="自动切换延迟">
+                    <el-form-item :label="__('自动切换延迟')">
                         <el-input-number
                             :modelValue="options.artifacts.autoSwitchDelay"
                             :min="0.5"
@@ -186,19 +200,23 @@ export default {
                             :max="30"
                             @update:model-value="opt('artifacts.autoSwitchDelay', $event)"
                         ></el-input-number>
-                        秒
+                        {{ __('秒') }}
                         <div class="form-desc">
-                            圣遗物切换器每次点击（并识别完成）后切换到下一个的间隔。<br />可用于人工检查识别准确性，或关闭识别器窗口并配合其他工具使用。
+                            {{ __('圣遗物切换器每次点击（并识别完成）后切换到下一个的间隔。') }}
+                            <br />
+                            {{ __('可用于人工检查识别准确性，或关闭识别器窗口并配合其他工具使用。') }}
                         </div>
                     </el-form-item>
                 </el-form>
             </div>
         </article>
         <article>
-            <h3>关于</h3>
+            <h3>
+                {{ __('关于') }}
+            </h3>
             <div class="content">
-                <div class="opt title">椰羊cocogoat</div>
-                <div class="opt">一个简单的原神工具箱，保证每一行代码都是加班打造。是半仙之兽。</div>
+                <div class="opt title">{{ __('椰羊cocogoat') }}</div>
+                <div class="opt">{{ __('一个简单的原神工具箱，保证每一行代码都是加班打造。是半仙之兽。') }}</div>
                 <div class="opt">&copy; 2021 月海亭 YuehaiTeam</div>
             </div>
         </article>

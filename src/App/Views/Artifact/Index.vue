@@ -8,6 +8,7 @@ import { artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { clipboard } from 'electron'
 import { defineComponent } from 'vue'
+import { __ } from '@/i18n'
 export default defineComponent({
     components: {
         Artifact,
@@ -43,8 +44,8 @@ export default defineComponent({
         openArtifactView() {
             ElNotification({
                 type: 'info',
-                title: '正在打开圣遗物识别工具',
-                message: '请确保原神已经运行',
+                title: __('正在打开圣遗物识别工具'),
+                message: __('请确保原神已经运行'),
                 duration: 5000,
             })
             openArtifactView()
@@ -80,42 +81,47 @@ export default defineComponent({
             clipboard.writeText(convertedJson)
             ElNotification({
                 type: 'success',
-                title: '导出成功',
-                message: '已复制到剪贴板',
+                title: __('导出成功'),
+                message: __('已复制到剪贴板'),
             })
         },
     },
 })
 </script>
 <template>
-    <teleport to="#app-title"> 圣遗物仓库 </teleport>
+    <teleport to="#app-title"> {{ __('圣遗物仓库') }} </teleport>
     <teleport to="#app-actions">
-        <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">添加</el-button>
+        <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">{{ __('添加') }}</el-button>
         <el-tooltip class="item" effect="light" content="导出为兼容『莫娜占卜铺』的JSON格式" placement="bottom">
-            <el-button size="mini" plain icon="el-icon-download" @click="doExport">导出</el-button> </el-tooltip
-        ><el-popconfirm
-            confirmButtonText="确定"
-            cancelButtonText="算了"
+            <el-button size="mini" plain icon="el-icon-download" @click="doExport">
+                {{ __('导出') }}
+            </el-button>
+        </el-tooltip>
+        <el-popconfirm
+            :confirmButtonText="__('确定')"
+            :cancelButtonText="__('算了')"
             icon="el-icon-warning"
-            title="真的要清空吗？"
+            :title="__('真的要清空吗？')"
             confirmButtonType="danger"
             @confirm="doClear"
         >
             <template #reference>
-                <el-button size="mini" type="danger" plain icon="el-icon-delete">清空</el-button>
+                <el-button size="mini" type="danger" plain icon="el-icon-delete">{{ __('清空') }}</el-button>
             </template>
         </el-popconfirm>
-        <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView"> 识别 </el-button>
+        <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView">
+            {{ __('识别') }}
+        </el-button>
     </teleport>
     <div class="page-main">
         <artifact v-for="i in list" :key="i.id" :artifact="i" @delete="doDelete" @edit="doEdit" />
         <div v-if="list.length <= 0" class="emptyState">
-            <el-empty description="工作…工作还没做完…真的可以提前休息吗？"></el-empty>
+            <el-empty :description="__('工作…工作还没做完…真的可以提前休息吗？')"></el-empty>
         </div>
     </div>
     <artifact-edit-panel
         v-model:show="showEdit"
-        :title="isEdit ? '编辑圣遗物' : '添加圣遗物'"
+        :title="__(isEdit ? '编辑圣遗物' : '添加圣遗物')"
         :model-value="editData"
         @update:model-value="doEditSave"
     />

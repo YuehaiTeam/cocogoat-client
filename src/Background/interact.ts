@@ -26,9 +26,18 @@ export function interactInit() {
             }
         }
     })
+
+    ipcMain.on('getConfig', (event, { id }) => {
+        event.reply(`getConfig-${id}`, config)
+    })
     ipcMain.on('saveOptions', async (event, options) => {
         config.options = options
         await fsex.writeJSON(path.join(config.configDir, 'options.json'), config.options)
+    })
+    ipcMain.on('readArtifacts', async (event, { id }) => {
+        console.log('readArtifacts')
+        const artifacts = await fsex.readJSON(path.join(config.configDir, 'artifacts.json'))
+        event.reply(`readArtifacts-${id}`, artifacts)
     })
     ioHook.on('keydown', (event) => {
         windows.artifactView && windows.artifactView.webContents.send('keydown', event)
@@ -116,9 +125,6 @@ export function interactInit() {
     })
     ipcMain.on('getActiveWindow', async (event, { id }) => {
         event.reply(`getActiveWindow-${id}`, await getActiveWindow())
-    })
-    ipcMain.on('getConfig', (event, { id }) => {
-        event.reply(`getConfig-${id}`, config)
     })
     ipcMain.on('getAppWindowId', (event, { id }) => {
         event.reply(`getAppWindowId-${id}`, windows.app ? windows.app.webContents.id : -1)

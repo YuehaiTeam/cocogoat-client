@@ -33,7 +33,7 @@ export const config = <IConfig>{
     options: {
         firstRun: true,
         sendErrorReports: true,
-        sendWrongOCRReports: false,
+        sendWrongOCRReports: true,
         artifacts: {
             preserveSwitcher: false,
             keepSameArtifacts: false,
