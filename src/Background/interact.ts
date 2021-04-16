@@ -2,7 +2,7 @@ import path from 'path'
 import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
-import { app, ipcMain } from 'electron'
+import { app, dialog, ipcMain } from 'electron'
 import { config } from '@/typings/config'
 import { windows, createArtifactView, createArtifactSwitch } from './windows'
 // @ts-ignore
@@ -142,6 +142,10 @@ export function interactInit() {
             }, delay || 50)
         },
     )
+    ipcMain.on('showSaveDialog', async (event, { id, options }) => {
+        const res = await dialog.showSaveDialog(options)
+        event.reply(`showSaveDialog-${id}`, res)
+    })
     ipcMain.on('exit', () => {
         app.exit()
     })

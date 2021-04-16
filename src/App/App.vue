@@ -137,6 +137,22 @@ body,
 #app > .el-overlay {
     z-index: 9998 !important;
 }
+.header-plain-dropdown {
+    .el-button {
+        height: 29px;
+        vertical-align: middle;
+    }
+    .el-button:focus,
+    .el-button:hover {
+        background: #fff;
+        border-color: #409eff;
+        color: #409eff;
+    }
+}
+.el-button + .header-plain-dropdown,
+.header-plain-dropdown + .el-button {
+    margin-left: 10px;
+}
 </style>
 <style lang="scss" scoped>
 $main: #007acc;

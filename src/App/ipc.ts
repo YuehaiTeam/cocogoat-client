@@ -1,8 +1,9 @@
 // @ts-ignore
 import { v4 as uuid } from 'uuid'
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, SaveDialogReturnValue } from 'electron'
 import { IConfig } from '@/typings/config'
 import { Artifact } from '@/typings/Artifact'
+import { SaveDialogOptions } from 'electron/main'
 export function openArtifactView() {
     ipcRenderer.send('createArtifactView')
 }
@@ -35,4 +36,12 @@ export async function readArtifacts(): Promise<Artifact[]> {
     })
     ipcRenderer.send('readArtifacts', { id })
     return <Artifact[]>await p
+}
+export async function showSaveDialog(options: SaveDialogOptions) {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`showSaveDialog-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('showSaveDialog', { id, options })
+    return <SaveDialogReturnValue>await p
 }

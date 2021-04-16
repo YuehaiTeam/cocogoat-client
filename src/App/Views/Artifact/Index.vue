@@ -2,12 +2,13 @@
 import Artifact from './Components/Artifact.vue'
 import { Artifact as ArtifactType } from '@/typings/Artifact'
 import ArtifactEditPanel from './Components/EditPanel.vue'
-import { openArtifactView } from '../../ipc'
+import { openArtifactView, showSaveDialog } from '../../ipc'
 import { ElNotification } from 'element-plus'
 import { artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { clipboard } from 'electron'
 import { defineComponent } from 'vue'
+import fsex from 'fs-extra'
 import { __ } from '@/i18n'
 export default defineComponent({
     components: {
@@ -85,33 +86,55 @@ export default defineComponent({
                 message: __('已复制到剪贴板'),
             })
         },
+        async doExportToFile() {
+            try {
+                const { filePath, canceled } = await showSaveDialog({
+                    title: __('导出'),
+                    filters: [{ name: 'JSON Files', extensions: ['json'] }],
+                })
+                if (canceled || !filePath) return
+                const convertedJson = convertAsMona(JSON.parse(JSON.stringify(bus.artifacts)))
+                await fsex.writeFile(filePath, convertedJson)
+                ElNotification({
+                    type: 'success',
+                    title: __('导出成功'),
+                })
+            } catch (e) {
+                console.log(e)
+            }
+        },
     },
 })
 </script>
 <template>
     <teleport to="#app-title"> {{ __('圣遗物仓库') }} </teleport>
     <teleport to="#app-actions">
-        <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">{{ __('添加') }}</el-button>
-        <el-tooltip class="item" effect="light" content="导出为兼容『莫娜占卜铺』的JSON格式" placement="bottom">
-            <el-button size="mini" plain icon="el-icon-download" @click="doExport">
+        <div class="actions">
+            <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">{{ __('添加') }}</el-button>
+            <el-dropdown class="header-plain-dropdown" size="mini" split-button @click="doExport">
                 {{ __('导出') }}
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item @click="doExportToFile">{{ __('到文件') }}</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            <el-popconfirm
+                :confirmButtonText="__('确定')"
+                :cancelButtonText="__('算了')"
+                icon="el-icon-warning"
+                :title="__('真的要清空吗？')"
+                confirmButtonType="danger"
+                @confirm="doClear"
+            >
+                <template #reference>
+                    <el-button size="mini" type="danger" plain icon="el-icon-delete">{{ __('清空') }}</el-button>
+                </template>
+            </el-popconfirm>
+            <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView">
+                {{ __('识别') }}
             </el-button>
-        </el-tooltip>
-        <el-popconfirm
-            :confirmButtonText="__('确定')"
-            :cancelButtonText="__('算了')"
-            icon="el-icon-warning"
-            :title="__('真的要清空吗？')"
-            confirmButtonType="danger"
-            @confirm="doClear"
-        >
-            <template #reference>
-                <el-button size="mini" type="danger" plain icon="el-icon-delete">{{ __('清空') }}</el-button>
-            </template>
-        </el-popconfirm>
-        <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView">
-            {{ __('识别') }}
-        </el-button>
+        </div>
     </teleport>
     <div class="page-main">
         <artifact v-for="i in list" :key="i.id" :artifact="i" @delete="doDelete" @edit="doEdit" />
