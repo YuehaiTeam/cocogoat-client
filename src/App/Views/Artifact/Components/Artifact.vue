@@ -1,13 +1,16 @@
 <script lang="ts">
 import { Artifact as ArtifactType } from '@/typings/Artifact'
-import { PropType } from 'vue'
-export default {
+import { defineComponent, PropType } from 'vue'
+export default defineComponent({
     props: {
         artifact: {
             type: Object as PropType<ArtifactType>,
         },
+        selected: {
+            type: Boolean as PropType<boolean>,
+        },
     },
-    emits: ['edit', 'delete'],
+    emits: ['edit', 'delete', 'update:selected'],
     data() {
         return {}
     },
@@ -20,11 +23,17 @@ export default {
                 return `none`
             }
         },
+        updateSelected() {
+            this.$emit('update:selected', !this.selected)
+        },
     },
-}
+})
 </script>
 <template>
-    <el-card class="artifact">
+    <el-card class="artifact" :class="{ selected }" @click="updateSelected">
+        <div class="selected-icon" :class="{ selected }">
+            <i class="el-icon-check"></i>
+        </div>
         <div class="main-part" :class="`star${artifact.stars}`">
             <div class="image" :style="{ backgroundImage: getImg(artifact.name) }"></div>
             <div class="name">
@@ -43,8 +52,8 @@ export default {
             </li>
         </ul>
         <div class="action-area">
-            <el-dropdown size="small" trigger="click" placement="bottom-end">
-                <button class="actions">
+            <el-dropdown size="small" trigger="click" placement="bottom-end" @click.prevent.stop>
+                <button class="actions" @click.prevent.stop>
                     <i class="el-icon-more"></i>
                 </button>
                 <template #dropdown>
@@ -151,6 +160,44 @@ export default {
             }
             padding-bottom: 2px;
         }
+    }
+
+    .selected-icon {
+        position: absolute;
+        bottom: -1px;
+        left: 1px;
+        width: 30px;
+        height: 30px;
+        border-bottom-left-radius: 3px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.1s;
+        &:before {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            box-sizing: border-box;
+            border-bottom: solid 30px #007acc;
+            border-right: solid 30px rgba(0, 0, 0, 0);
+            content: '';
+        }
+        i {
+            color: #fff;
+            position: absolute;
+            bottom: 2px;
+            z-index: 2;
+            font-size: 19px;
+            font-weight: bold;
+        }
+        &.selected {
+            opacity: 1;
+        }
+    }
+
+    &.selected ::v-deep(.el-card) {
+        box-shadow: 0 2px 12px 0 rgba(0, 122, 204, 0.5);
+        border-color: #bce4ff;
     }
 }
 .action-area {

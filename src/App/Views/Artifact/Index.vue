@@ -20,6 +20,7 @@ export default defineComponent({
             showEdit: false,
             editData: this.createEmptyArtifact(),
             isEdit: false,
+            selectedIds: [] as number[],
         }
     },
     computed: {
@@ -56,6 +57,12 @@ export default defineComponent({
                 return e.id !== id
             })
         },
+        doDeleteSelected() {
+            bus.artifacts = bus.artifacts.filter((e) => {
+                return !this.selectedIds.includes(e.id)
+            })
+            this.selectedIds = []
+        },
         doCreate() {
             this.editData = this.createEmptyArtifact()
             this.showEdit = true
@@ -76,6 +83,14 @@ export default defineComponent({
         },
         doClear() {
             bus.artifacts = []
+            this.selectedIds = []
+        },
+        doSelect(id: number, status: boolean) {
+            if (status) {
+                this.selectedIds.push(id)
+            } else {
+                this.selectedIds = this.selectedIds.filter((e) => e !== id)
+            }
         },
         doExport() {
             const convertedJson = convertAsMona(JSON.parse(JSON.stringify(bus.artifacts)))
@@ -110,7 +125,6 @@ export default defineComponent({
     <teleport to="#app-title"> {{ __('圣遗物仓库') }} </teleport>
     <teleport to="#app-actions">
         <div class="actions">
-            <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">{{ __('添加') }}</el-button>
             <el-dropdown class="header-plain-dropdown" size="mini" split-button @click="doExport">
                 {{ __('导出') }}
                 <template #dropdown>
@@ -119,25 +133,44 @@ export default defineComponent({
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
-            <el-popconfirm
-                :confirmButtonText="__('确定')"
-                :cancelButtonText="__('算了')"
-                icon="el-icon-warning"
-                :title="__('真的要清空吗？')"
-                confirmButtonType="danger"
-                @confirm="doClear"
-            >
-                <template #reference>
-                    <el-button size="mini" type="danger" plain icon="el-icon-delete">{{ __('清空') }}</el-button>
-                </template>
-            </el-popconfirm>
+            <template v-if="selectedIds.length <= 0">
+                <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">{{ __('添加') }}</el-button>
+                <el-popconfirm
+                    :confirmButtonText="__('确定')"
+                    :cancelButtonText="__('算了')"
+                    icon="el-icon-warning"
+                    :title="__('真的要清空吗？')"
+                    confirmButtonType="danger"
+                    @confirm="doClear"
+                >
+                    <template #reference>
+                        <el-button size="mini" type="danger" plain icon="el-icon-delete">{{ __('清空') }}</el-button>
+                    </template>
+                </el-popconfirm>
+            </template>
+            <template v-else>
+                <el-button size="mini" plain icon="el-icon-remove-outline" @click="selectedIds = []">
+                    {{ __('取消选择') }}
+                </el-button>
+                <el-button size="mini" type="danger" plain icon="el-icon-delete" @click="doDeleteSelected">
+                    {{ __('删除选中') }}
+                </el-button>
+            </template>
             <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView">
                 {{ __('识别') }}
             </el-button>
         </div>
     </teleport>
     <div class="page-main">
-        <artifact v-for="i in list" :key="i.id" :artifact="i" @delete="doDelete" @edit="doEdit" />
+        <artifact
+            v-for="i in list"
+            :key="i.id"
+            :artifact="i"
+            :selected="selectedIds.includes(i.id)"
+            @update:selected="doSelect(i.id, $event)"
+            @delete="doDelete"
+            @edit="doEdit"
+        />
         <div v-if="list.length <= 0" class="emptyState">
             <el-empty :description="__('工作…工作还没做完…真的可以提前休息吗？')"></el-empty>
         </div>
