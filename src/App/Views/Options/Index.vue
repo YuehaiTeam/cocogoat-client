@@ -39,7 +39,6 @@ export default {
         async checkUpgrade() {
             this.upgradeButtonLoading = true
             try {
-                const release = await latestRelease()
                 let buildType = ''
                 if (bus.config.build?.type === EBuild.DEV) {
                     buildType = `.${bus.config.build?.timestamp}dev`
@@ -47,6 +46,7 @@ export default {
                     buildType = `.${bus.config.build?.timestamp}beta`
                 }
                 const localVersion = bus.config.version + buildType
+                const release = await latestRelease(localVersion, 'check')
                 const cmp = version_compare(localVersion, release.version)
                 console.log(localVersion, release.version, cmp)
                 if (cmp < 0) {

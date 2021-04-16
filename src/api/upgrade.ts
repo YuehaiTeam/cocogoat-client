@@ -1,7 +1,7 @@
 import { API_BASE } from '@/config'
 import fly, { flyAny } from './index'
-export async function latestRelease() {
-    const { data } = await fly.get('/3rdparty/github/cocogoat/releases/latest')
+export async function latestRelease(current: string = '', mode: string = 'auto') {
+    const { data } = await fly.get('/3rdparty/github/cocogoat/releases/latest', { current, mode })
     let fileName
     let githubUrl
     for (const i of data.assets) {

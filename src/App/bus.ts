@@ -64,7 +64,6 @@ export async function loadData() {
     )
     ;(async function () {
         try {
-            const release = await latestRelease()
             let buildType = ''
             if (bus.config.build?.type === EBuild.DEV) {
                 buildType = `.${bus.config.build?.timestamp}dev`
@@ -72,6 +71,7 @@ export async function loadData() {
                 buildType = `.${bus.config.build?.timestamp}beta`
             }
             const localVersion = bus.config.version + buildType
+            const release = await latestRelease(localVersion, 'auto')
             const cmp = version_compare(localVersion, release.version)
             if (cmp && cmp < 0) {
                 bus.hasUpgrade = true
