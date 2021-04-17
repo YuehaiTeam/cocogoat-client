@@ -23,7 +23,6 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         throw new Error("Title cant't be empty")
     }
     let name = textChinese(ocrres.title.text)
-    name = fixOcrText(name)
     if (!ArtifactNames.includes(name)) {
         name = textBestmatch(name, ArtifactNames)
     }
@@ -102,6 +101,16 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
         console.log(newtext)
         throw e
     }
+
+    /*
+     * PaddleOCR会将逗号(,)识别成点(.)
+     * 此处对点后2位及以上的把点去掉
+     */
+    const [, b] = value.split('.')
+    if (b && b.length >= 2) {
+        value = value.replace(/\./g, '')
+    }
+
     /*
      * 词条属性的简单区间处理
      *
@@ -147,11 +156,4 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
         },
         maybeError,
     ]
-}
-// TODO：只是一个临时修复
-function fixOcrText(name: string) {
-    if (name[0] === '终' && name.includes('的时计')) {
-        return '终幕的时计'
-    }
-    return name
 }
