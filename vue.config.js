@@ -25,6 +25,8 @@ module.exports = {
             externals: ['iohook', 'bindings', 'robotjs', 'tesseract.js', 'ffi-napi', 'ref-napi'],
             nodeIntegration: true,
             chainWebpackMainProcess: (config) => {
+                // worker entry
+                config.entry('background_worker').add('./src/background_worker.ts').end()
                 // Chain webpack config for electron main process only
                 config.externals({
                     robotjs: 'commonjs2 robotjs',
@@ -67,8 +69,6 @@ module.exports = {
                     '!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}',
                     '!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output,.vscode,.github}',
                     '!**/{appveyor.yml,.travis.yml,circle.yml}',
-                    '!**/tesseract-core.wasm.js', // package wasm-file version of tesseract.js only
-                    '!**/tesseract-core.asm.js',
                     '!**/deps/libffi/**', // ffi's source code is not needed
                     '!**/*.map', // source map is not important
                     '!**/zlibjs/**', // zlibjs is not used during runtime

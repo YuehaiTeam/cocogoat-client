@@ -1,19 +1,29 @@
 import path from 'path'
 import fsex from 'fs-extra'
-import { dialog, ipcMain } from 'electron'
-import { createWorker, createScheduler, Worker, Scheduler, OEM } from 'tesseract.js'
+import { Worker } from 'worker_threads'
+import { dialog, ipcMain, webContents } from 'electron'
 import { config } from '@/typings/config'
-const workerCount = 5
-let scheduler: Scheduler | null
+import Queue from 'queue'
 let ocrWorker: Worker[] = []
 let workerReadyPms: Promise<void>[] = []
 let ocrReady: Promise<any> | null
+let workerPtr: number = 0
+const workerCount = 1
+const q = Queue({
+    concurrency: workerCount,
+    autostart: true,
+    timeout: 10e3,
+})
 export async function ocrInit() {
-    if (scheduler) return
-    let ocrData = path.join(config.dataDir, 'lang-data')
-    const ocrUserData = path.join(config.configDir, 'lang-data')
+    workerPtr = 0
+    ocrWorker = []
+    workerReadyPms = []
+    let ocrData = path.join(config.dataDir, 'ppocr-data')
+    const ocrUserData = path.join(config.configDir, 'ppocr-data')
     try {
-        await fsex.access(path.join(ocrUserData, 'chi_sim.traineddata'))
+        await fsex.access(path.join(ocrUserData, 'rec'))
+        await fsex.access(path.join(ocrUserData, 'det'))
+        await fsex.access(path.join(ocrUserData, 'dic.txt'))
         dialog.showMessageBox({
             type: 'info',
             title: '自定义OCR训练集',
@@ -23,49 +33,81 @@ export async function ocrInit() {
         ocrData = ocrUserData
     } catch (e) {}
     console.log('OCR Datadir is ', ocrData)
-    scheduler = createScheduler()
+
     for (let i = 0; i < workerCount; i++) {
-        const worker = createWorker({
-            langPath: ocrData,
-            cacheMethod: 'none',
-            gzip: false,
-        })
         workerReadyPms.push(
-            (async function ocrload() {
-                await worker.load()
-                await worker.loadLanguage('chi_sim')
-                await worker.initialize('chi_sim', OEM.LSTM_ONLY)
-                await worker.setParameters({
-                    tessjs_create_hocr: '0',
-                    tessjs_create_box: '0',
-                    tessjs_create_unlv: '0',
-                    tessjs_create_osd: '0',
-                    tessjs_create_tsv: '0',
+            new Promise((resolve, reject) => {
+                const worker = new Worker(path.join(__dirname, 'background_worker.js'), {
+                    workerData: {
+                        worker: 'ppocr',
+                        data: {
+                            rec: path.join(ocrData, 'rec'),
+                            det: path.join(ocrData, 'det'),
+                            dic: path.join(ocrData, 'dic.txt'),
+                        },
+                        config,
+                    },
                 })
-            })(),
+                worker.on(
+                    'message',
+                    ({ event, message, reply, id }: { event: string; message: any; reply?: any; id?: string }) => {
+                        if (event === 'ready') {
+                            resolve()
+                        }
+                        if (event === 'reply' && id && reply) {
+                            const win = webContents.fromId(reply.window)
+                            if (win) {
+                                webContents.fromId(reply.window).send(`${reply.event}-${id}`, message)
+                            } else {
+                                console.log('Window', win, 'not found')
+                            }
+                        }
+                    },
+                )
+                worker.on('error', reject)
+                ocrWorker.push(worker)
+            }),
         )
-        scheduler.addWorker(worker)
-        ocrWorker.push(worker)
     }
-    ocrReady = Promise.all(workerReadyPms)
     ipcMain.on('ocr', async (event, { image, id }: { image: string; id: string }) => {
         await ocrReady
-        if (!scheduler) return
-        const result = await scheduler.addJob('recognize', image, {}, id)
-        event.reply(`ocr-${id}`, result)
+        let workerId = workerPtr++ % workerCount
+        if (workerId > workerCount - 1) workerId = 0
+        q.push((cb) => {
+            console.log(`Worker ${workerId} processing`)
+            ocrWorker[workerId].postMessage({
+                event: 'ocr',
+                message: {
+                    image,
+                },
+                id,
+                reply: {
+                    window: event.sender.id,
+                    event: 'ocr',
+                },
+            })
+            ocrWorker[workerId].once('message', () => {
+                // @ts-ignore
+                cb()
+            })
+        })
     })
+    ocrReady = Promise.all(workerReadyPms)
     ocrReady.then(() => {
         console.log('ocr ready')
     })
 }
 export async function ocrStop() {
     await ocrReady
-    if (!scheduler) return
-    ipcMain.removeAllListeners('ocr')
-    const p = scheduler.terminate()
-    scheduler = null
-    ocrWorker = []
-    workerReadyPms = []
-    await p
+    const p = []
+    for (const i of ocrWorker) {
+        i.postMessage({ event: 'exit' })
+        p.push(
+            new Promise((resolve) => {
+                i.on('exit', resolve)
+            }),
+        )
+    }
+    await Promise.all(p)
     console.log('ocr stopped')
 }

@@ -48,7 +48,7 @@ export async function getActiveWindow(): Promise<IactiveWindow> {
     ipcRenderer.send('getActiveWindow', { id })
     return <IactiveWindow>await p
 }
-export async function ocr(image: string): Promise<RecognizeResult> {
+export async function ocr(image: string | Record<string, any>): Promise<RecognizeResult> {
     const id = uuid()
     const p = new Promise((resolve) => {
         ipcRenderer.once(`ocr-${id}`, (result, data) => resolve(data))
