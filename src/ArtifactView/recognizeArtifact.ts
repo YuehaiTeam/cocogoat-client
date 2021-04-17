@@ -112,11 +112,16 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
 
     /*
      * PaddleOCR会将逗号(,)识别成点(.)
-     * 此处对点后2位及以上的把点去掉
+     * 并且可能把百分号识别为数字
+     * 此处对点后3位及以上的把点去掉
+     * 两位的把最后一位去掉
      */
     const [, b] = value.split('.')
-    if (b && b.length >= 2) {
+    if (b && b.length >= 3) {
         value = value.replace(/\./g, '')
+    }
+    if (b && b.length === 2) {
+        value = value.substr(0, value.length - 1)
     }
 
     /*
