@@ -70,10 +70,10 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     }
 
     /* 副词条低置信度检查 */
-    potentialErrors.push(...findLowConfidence(ocrres.sub, 45, true))
+    potentialErrors.push(...findLowConfidence(ocrres.sub, 80, true))
 
     /* 主词条低置信度检查 */
-    potentialErrors.push(...findLowConfidence(ocrres.main, 45, true))
+    potentialErrors.push(...findLowConfidence(ocrres.main, 80, true))
 
     return [
         {
