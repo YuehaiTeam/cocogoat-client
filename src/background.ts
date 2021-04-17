@@ -16,7 +16,7 @@ app.on('window-all-closed', () => {
     app.quit()
 })
 app.on('ready', async () => {
-    const currentPath = app.getAppPath()
+    const currentPath = path.dirname(app.getPath('exe'))
     const appdataPath = app.getPath('userData')
     try {
         await fsex.access(path.join(currentPath, 'cocogoat'))

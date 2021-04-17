@@ -36,8 +36,12 @@ export function interactInit() {
     })
     ipcMain.on('readArtifacts', async (event, { id }) => {
         console.log('readArtifacts')
-        const artifacts = await fsex.readJSON(path.join(config.configDir, 'artifacts.json'))
-        event.reply(`readArtifacts-${id}`, artifacts)
+        try {
+            const artifacts = await fsex.readJSON(path.join(config.configDir, 'artifacts.json'))
+            event.reply(`readArtifacts-${id}`, artifacts)
+        } catch (e) {
+            event.reply(`readArtifacts-${id}`, [])
+        }
     })
     ioHook.on('keydown', (event) => {
         windows.artifactView && windows.artifactView.webContents.send('keydown', event)
