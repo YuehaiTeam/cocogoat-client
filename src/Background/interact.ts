@@ -2,17 +2,18 @@ import path from 'path'
 import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
-import { app, dialog, ipcMain } from 'electron'
+import { app, dialog, ipcMain, BrowserWindow } from 'electron'
 import { config } from '@/typings/config'
-import { windows, createArtifactView, createArtifactSwitch } from './windows'
+import { windows, createArtifactView, createArtifactSwitch, createMapView } from './windows'
 // @ts-ignore
 import activeWindows from 'electron-active-window/build/Release/wm.node'
 robot.setMouseDelay(8)
 const getActiveWindow = activeWindows.getActiveWindow
 
 export function interactInit() {
-    ipcMain.on('ready', () => {
-        windows.app && windows.app.show()
+    ipcMain.on('ready', (event) => {
+        const win = BrowserWindow.fromWebContents(event.sender)
+        win && win.show()
     })
     ipcMain.on('minimizeApp', () => {
         windows.app && windows.app.minimize()
@@ -52,6 +53,7 @@ export function interactInit() {
     })
     ioHook.start()
     ipcMain.on('createArtifactView', createArtifactView)
+    ipcMain.on('createMapView', createMapView)
     ipcMain.on('createArtifactSwitch', createArtifactSwitch)
     ipcMain.on('readyArtifactSwitch', () => {
         windows.artifactSwitch && windows.artifactSwitch.show()

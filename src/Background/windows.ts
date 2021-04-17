@@ -111,3 +111,33 @@ export async function createArtifactSwitch() {
         windows.artifactSwitch.loadURL('app://./ArtifactSwitch.html?' + params)
     }
 }
+
+export async function createMapView() {
+    if (windows.mapView) {
+        windows.mapView.focus()
+        return
+    }
+    windows.mapView = new BrowserWindow({
+        width: 320,
+        height: 420,
+        frame: false,
+        alwaysOnTop: true,
+        maximizable: false,
+        webPreferences: {
+            // @ts-ignore
+            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+            contextIsolation: false,
+            webviewTag: true,
+        },
+        show: false,
+    })
+    windows.mapView.on('close', () => {
+        windows.mapView = null
+    })
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+        await windows.mapView.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}MapView.html`)
+        if (!process.env.IS_TEST) windows.mapView.webContents.openDevTools()
+    } else {
+        windows.mapView.loadURL('app://./MapView.html')
+    }
+}
