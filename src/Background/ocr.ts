@@ -37,17 +37,20 @@ export async function ocrInit() {
     for (let i = 0; i < workerCount; i++) {
         workerReadyPms.push(
             new Promise((resolve, reject) => {
-                const worker = new Worker(path.join(__dirname, 'background_worker.js'), {
-                    workerData: {
-                        worker: 'ppocr',
-                        data: {
-                            rec: path.join(ocrData, 'rec'),
-                            det: path.join(ocrData, 'det'),
-                            dic: path.join(ocrData, 'dic.txt'),
+                const worker = new Worker(
+                    path.join(__dirname.replace('app.asar', 'app.asar.unpacked'), 'background_worker.js'),
+                    {
+                        workerData: {
+                            worker: 'ppocr',
+                            data: {
+                                rec: path.join(ocrData, 'rec'),
+                                det: path.join(ocrData, 'det'),
+                                dic: path.join(ocrData, 'dic.txt'),
+                            },
+                            config,
                         },
-                        config,
                     },
-                })
+                )
                 worker.on(
                     'message',
                     ({ event, message, reply, id }: { event: string; message: any; reply?: any; id?: string }) => {

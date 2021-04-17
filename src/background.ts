@@ -22,6 +22,7 @@ app.on('ready', async () => {
         await fsex.access(path.join(currentPath, 'cocogoat'))
         config.configDir = path.join(currentPath, 'cocogoat')
     } catch (e) {
+        console.log(e.message)
         config.configDir = path.join(appdataPath, 'config')
         await fsex.ensureDir(config.configDir)
     }

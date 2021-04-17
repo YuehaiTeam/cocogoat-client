@@ -22,7 +22,7 @@ module.exports = {
     },
     pluginOptions: {
         electronBuilder: {
-            externals: ['iohook', 'bindings', 'robotjs', 'tesseract.js', 'ffi-napi', 'ref-napi'],
+            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi'],
             nodeIntegration: true,
             chainWebpackMainProcess: (config) => {
                 // worker entry
@@ -34,7 +34,6 @@ module.exports = {
                     iohook: 'commonjs2 iohook',
                     'ffi-napi': 'commonjs2 ffi-napi',
                     'ref-napi': 'commonjs2 ref-napi',
-                    'tesseract.js': 'commonjs2 tesseract.js',
                     'electron-active-window/build/Release/wm.node':
                         'commonjs2 electron-active-window/build/Release/wm.node',
                 })
@@ -50,10 +49,12 @@ module.exports = {
                 },
                 asarUnpack: [
                     'node_modules/robotjs',
+                    'node_modules/robotjs',
                     'node_modules/iohook',
                     'node_modules/ref-napi',
                     'node_modules/ffi-napi',
                     'node_modules/electron-active-window',
+                    'background_worker.js',
                 ],
                 afterAllArtifactBuild: 'build/evb.js',
                 extraResources: ['./data/**'],

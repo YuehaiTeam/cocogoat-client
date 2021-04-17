@@ -46,7 +46,7 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ocrres.sub || !ocrres.sub.text) {
         throw new Error("Sub cant't be empty")
     }
-    const subTextArray = ocrres.sub.text.split('\n').filter((e) => {
+    const subTextArray = ocrres.sub.text.split('\n').filter((e: string) => {
         return e.trim() !== ''
     })
     const sub = []

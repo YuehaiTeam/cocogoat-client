@@ -1,5 +1,4 @@
 import 'context-filter-polyfill'
-import { Page } from 'tesseract.js'
 import { ocr as ipcOcr } from './ipc'
 
 import imageConfig, { padding } from './imageConfig'
@@ -106,7 +105,7 @@ export async function ocr(ret: SplitResults) {
         }
     }
     const ocrresArr = await Promise.all(ocrpms)
-    const ocrres: Record<string, Page | null> = {}
+    const ocrres: Record<string, any> = {}
     for (const i in ocrresArr) {
         if ({}.hasOwnProperty.call(ocrresArr, i)) {
             ocrres[ocrpmk[i]] = ocrresArr[i].data || ocrresArr[i] || null
