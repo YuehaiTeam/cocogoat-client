@@ -1,6 +1,5 @@
 // @ts-ignore
 import { closest } from 'color-diff'
-import { Page } from 'tesseract.js'
 const color_palette = [
     { R: 189, G: 105, B: 50 }, // 五星
     { R: 162, G: 86, B: 225 }, // 四星
@@ -117,7 +116,7 @@ export function findBestMatch(mainString: string, targetStrings: string[]) {
  * @param numberOnly - 是否只对数字处理
  * @returns 所有可能错误的文本数组
  */
-export function findLowConfidence(page: Page, lowerThan: number, numberOnly = true) {
+export function findLowConfidence(page: any, lowerThan: number, numberOnly = true) {
     const potentialErrors: string[] = []
     for (const i of page.words) {
         if (i.confidence > 0 && i.confidence < lowerThan) {

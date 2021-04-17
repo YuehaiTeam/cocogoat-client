@@ -19,7 +19,7 @@
  - 圣遗物自动切换
 
 ### 圣遗物导出
- - 使用游戏字体特殊训练的本地`tesseract` OCR  
+ - 使用游戏字体特殊训练的本地[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
  - 支持所有服务器(天空岛、世界树、外服)  
  - 支持大部分游戏分辨率、部分云游戏平台  
  - 目前暂时仅支持识别中文  

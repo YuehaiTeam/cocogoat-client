@@ -1,5 +1,4 @@
 import 'context-filter-polyfill'
-import { Page } from 'tesseract.js'
 import { ocr as ipcOcr } from './ipc'
 
 import imageConfig, { padding } from './imageConfig'
@@ -94,15 +93,22 @@ export async function ocr(ret: SplitResults) {
     for (const i in ret) {
         if ({}.hasOwnProperty.call(ret, i)) {
             if (i === 'color') continue
-            const len = ocrpms.push(ipcOcr(ret[i].canvas.toDataURL()))
+            const ctx = ret[i].canvas.getContext('2d')
+            const imgData = ctx?.getImageData(0, 0, ret[i].canvas.width, ret[i].canvas.height)
+            const ocrData = {
+                width: ret[i].canvas.width,
+                height: ret[i].canvas.height,
+                data: Buffer.from(imgData?.data.buffer as ArrayBuffer),
+            }
+            const len = ocrpms.push(ipcOcr(ocrData))
             ocrpmk[len - 1] = i
         }
     }
     const ocrresArr = await Promise.all(ocrpms)
-    const ocrres: Record<string, Page | null> = {}
+    const ocrres: Record<string, any> = {}
     for (const i in ocrresArr) {
         if ({}.hasOwnProperty.call(ocrresArr, i)) {
-            ocrres[ocrpmk[i]] = ocrresArr[i].data || null
+            ocrres[ocrpmk[i]] = ocrresArr[i].data || ocrresArr[i] || null
         }
     }
     return ocrres

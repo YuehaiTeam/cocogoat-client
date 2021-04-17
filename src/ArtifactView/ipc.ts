@@ -1,7 +1,6 @@
 // @ts-ignore
 import { v4 as uuid } from 'uuid'
 import { ipcRenderer } from 'electron'
-import { RecognizeResult } from 'tesseract.js'
 export { getConfig } from '@/App/ipc'
 interface IactiveWindow {
     os: string
@@ -48,13 +47,13 @@ export async function getActiveWindow(): Promise<IactiveWindow> {
     ipcRenderer.send('getActiveWindow', { id })
     return <IactiveWindow>await p
 }
-export async function ocr(image: string): Promise<RecognizeResult> {
+export async function ocr(image: string | Record<string, any>): Promise<any> {
     const id = uuid()
     const p = new Promise((resolve) => {
         ipcRenderer.once(`ocr-${id}`, (result, data) => resolve(data))
     })
     ipcRenderer.send('ocr', { image, id })
-    return <RecognizeResult>await p
+    return <any>await p
 }
 export function close() {
     ipcRenderer.send('closeArtifactView')

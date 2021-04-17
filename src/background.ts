@@ -22,6 +22,7 @@ app.on('ready', async () => {
         await fsex.access(path.join(currentPath, 'cocogoat'))
         config.configDir = path.join(currentPath, 'cocogoat')
     } catch (e) {
+        console.log(e.message)
         config.configDir = path.join(appdataPath, 'config')
         await fsex.ensureDir(config.configDir)
     }
@@ -38,6 +39,14 @@ app.on('ready', async () => {
         config.build = { type: EBuild.DEV, timestamp: Date.now() }
     }
     config.version = app.getVersion()
+    const pathEnv =
+        `${process.env.path ? `${process.env.path};` : ''}` +
+        `${process.env.Path ? `${process.env.Path};` : ''}` +
+        `${process.env.PATH ? `${process.env.PATH};` : ''}` +
+        `${config.dataDir};${path.join(config.dataDir, 'paddleocr')};${path.join(config.dataDir, 'opencv')};`
+    for (const p of ['path', 'PATH', 'Path']) {
+        process.env[p] = pathEnv
+    }
     if (config.options.sendErrorReports && process.env.NODE_ENV !== 'development') {
         Sentry.init({
             dsn: process.env.VUE_APP_SENTRY,
