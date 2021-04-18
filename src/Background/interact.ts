@@ -4,7 +4,7 @@ import robot from 'robotjs'
 import ioHook from 'iohook'
 import { app, dialog, ipcMain, BrowserWindow } from 'electron'
 import { config } from '@/typings/config'
-import { windows, createArtifactView, createArtifactSwitch, createMapView } from './windows'
+import { windows, createArtifactView, createArtifactSwitch, createMapView, createMapScan } from './windows'
 // @ts-ignore
 import activeWindows from 'electron-active-window/build/Release/wm.node'
 robot.setMouseDelay(8)
@@ -54,6 +54,7 @@ export function interactInit() {
     ioHook.start()
     ipcMain.on('createArtifactView', createArtifactView)
     ipcMain.on('createMapView', createMapView)
+    ipcMain.on('createMapScan', createMapScan)
     ipcMain.on('createArtifactSwitch', createArtifactSwitch)
     ipcMain.on('readyArtifactSwitch', () => {
         windows.artifactSwitch && windows.artifactSwitch.show()
@@ -121,6 +122,10 @@ export function interactInit() {
         const t = robot.screen.capture(x, y, w, h)
         event.reply(`capture-${id}`, t.image)
     })
+    ipcMain.on('getPosition', (event, { id }) => {
+        const win = BrowserWindow.fromWebContents(event.sender)
+        win && event.reply(`getPosition-${id}`, win.getPosition())
+    })
     ipcMain.on('getArtifactViewPosition', (event, { id }) => {
         if (!windows.artifactView) return
         event.reply(`getArtifactViewPosition-${id}`, windows.artifactView.getPosition())
@@ -137,6 +142,9 @@ export function interactInit() {
     })
     ipcMain.on('getArtifactViewWindowId', (event, { id }) => {
         event.reply(`getArtifactViewWindowId-${id}`, windows.artifactView ? windows.artifactView.webContents.id : -1)
+    })
+    ipcMain.on('getMapViewWindowId', (event, { id }) => {
+        event.reply(`getMapViewWindowId-${id}`, windows.mapView ? windows.mapView.webContents.id : -1)
     })
     ipcMain.on(
         'mouseClick',

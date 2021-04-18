@@ -24,6 +24,11 @@ module.exports = {
             template: 'public/index.html',
             filename: 'MapView.html',
         },
+        MapScan: {
+            entry: 'src/MapScan/main.ts',
+            template: 'public/index.html',
+            filename: 'MapScan.html',
+        },
     },
     pluginOptions: {
         electronBuilder: {

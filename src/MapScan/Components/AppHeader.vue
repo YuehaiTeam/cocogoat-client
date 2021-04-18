@@ -1,5 +1,5 @@
 <script>
-import { devtools, openSync } from '../ipc'
+import { devtools } from '../ipc'
 import { bus } from '../bus'
 export default {
     emits: ['clickprocess'],
@@ -12,9 +12,11 @@ export default {
         runtimeDebug() {
             return bus.runtimeDebug
         },
+        ready() {
+            return bus.ready
+        },
     },
     methods: {
-        openSync,
         close() {
             window.close()
         },
@@ -40,13 +42,10 @@ export default {
 <template>
     <header>
         <div class="icon"></div>
-        <div class="title">大地图</div>
+        <div class="title">{{ ready ? '小地图' : '初始化' }}</div>
         <div class="actions">
             <button class="dump" :class="{ show: runtimeDebug }" @click="clickDebug" @contextmenu="ctxDebug">
                 <i class="el-icon-s-opportunity"></i>
-            </button>
-            <button class="sync" @click="openSync">
-                <i class="el-icon-aim"></i>
             </button>
             <button class="close" @click="close">
                 <i class="el-icon-close"></i>
@@ -80,7 +79,7 @@ header {
 
     .icon {
         display: inline-block;
-        width: 30px;
+        width: 10px;
         vertical-align: top;
     }
 

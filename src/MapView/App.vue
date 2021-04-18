@@ -2,20 +2,45 @@
 import { bus } from './bus'
 import { ipcRenderer } from 'electron'
 import AppHeader from './Components/AppHeader'
+import { watch } from 'vue'
 export default {
     components: {
         AppHeader,
     },
+    data() {
+        return {
+            ready: false,
+            mapUrl: `https://webstatic.mihoyo.com/app/ys-map-cn/index.html#/map/2?center=${bus.y},${bus.x}&zoom=${bus.zoom}`,
+        }
+    },
     computed: {
-        mapUrl() {
-            return `https://webstatic.mihoyo.com/app/ys-map-cn/index.html#/map/2?center=${bus.x},${bus.y}&zoom=${bus.zoom}`
+        hash() {
+            return `#/map/2?center=${bus.y},${bus.x}&zoom=${bus.zoom}`
         },
     },
     mounted() {
         ipcRenderer.send('ready')
+        this._updatePosition = this.updatePosition.bind(this)
+        ipcRenderer.on('position', this._updatePosition)
+        this.unwatch = watch([() => bus.x, () => bus.y, () => bus.zoom], (x, y, zoom) => {
+            const frame = this.$refs.mapFrame
+            frame.executeJavaScript(`location.hash='${this.hash}'`)
+        })
+        window.$vm = this
+    },
+    beforeUnmount() {
+        this.unwatch()
+        ipcRenderer.off('position', this._updatePosition)
     },
     methods: {
+        async updatePosition(event, data) {
+            // 米游社大地图与内置地图坐标转换
+            bus.x = (data.center.x * 5450) / 3000 + 1742 - 4845
+            bus.y = (data.center.y * 4850) / 2669 + 1742 - 2795
+        },
         onDomReady() {
+            if (this.ready) return
+            this.ready = true
             const frame = this.$refs.mapFrame
 
             frame.insertCSS(`body .announcement {

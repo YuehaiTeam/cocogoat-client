@@ -3,6 +3,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ocrInit, ocrStop } from './ocr'
 import path from 'path'
 import { config } from '@/typings/config'
+import { mapcvInit, mapcvStop } from './mapcv'
 export const windows = <Record<string, BrowserWindow | null>>{
     app: null,
     artifactView: null,
@@ -140,4 +141,36 @@ export async function createMapView() {
     } else {
         windows.mapView.loadURL('app://./MapView.html')
     }
+}
+export async function createMapScan() {
+    if (windows.mapScan) {
+        windows.mapScan.focus()
+        return
+    }
+    windows.mapScan = new BrowserWindow({
+        width: 125,
+        height: 165,
+        frame: false,
+        transparent: true,
+        alwaysOnTop: true,
+        maximizable: false,
+        webPreferences: {
+            // @ts-ignore
+            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+            contextIsolation: false,
+        },
+        show: false,
+    })
+    windows.mapScan.on('close', () => {
+        windows.mapScan = null
+        mapcvStop()
+    })
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+        await windows.mapScan.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}MapScan.html`)
+        if (!process.env.IS_TEST) windows.mapScan.webContents.openDevTools()
+    } else {
+        windows.mapScan.loadURL('app://./MapScan.html')
+    }
+
+    mapcvInit()
 }
