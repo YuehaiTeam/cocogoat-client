@@ -1,7 +1,7 @@
 import { ocr, SplitResults } from './imageProcess'
 import { Artifact, ArtifactParam } from '@/typings/Artifact'
 import { ArtifactNames, ArtifactParamTypes, ArtifactSubParamTypes } from '@/typings/ArtifactMap'
-import { detectStars, textChinese, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
+import { detectStars, textCNEN, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
 
 const ocrCorrectionMap = [
     ['莉力', '攻击力'],
@@ -31,7 +31,7 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ocrres.title || !ocrres.title.text) {
         throw new Error("Title cant't be empty")
     }
-    let name = textChinese(ocrres.title.text)
+    let name = textCNEN(ocrres.title.text)
     if (!ArtifactNames.includes(name)) {
         name = textBestmatch(name, ArtifactNames)
     }
@@ -40,13 +40,14 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ocrres.level || !ocrres.level.text) {
         throw new Error("Level cant't be empty")
     }
-    const level = Number(textNumber(ocrres.level.text))
+    let level = Number(textNumber(ocrres.level.text))
+    level = level > 20 ? 20 : level
 
     /* 主词条 */
     if (!ocrres.main || !ocrres.main.text) {
         throw new Error("Main cant't be empty")
     }
-    const [main, maybeError] = recognizeParams(ocrres.main.text.replace('\n', '+'), true)
+    const [main, maybeError] = recognizeParams(ocrres.main.text.replace(/\s/g, ''), true)
     if (maybeError) {
         potentialErrors.push(maybeError)
     }
@@ -54,9 +55,11 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ocrres.sub || !ocrres.sub.text) {
         throw new Error("Sub cant't be empty")
     }
-    const subTextArray = ocrres.sub.text.split('\n').filter((e: string) => {
-        return e.trim() !== ''
-    })
+    const subTextArray = santizeParamsArray(
+        ocrres.sub.text.split('\n').filter((e: string) => {
+            return e.trim() !== ''
+        }),
+    )
     const sub = []
     try {
         for (const i of subTextArray) {
@@ -90,26 +93,35 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         ocrres,
     ]
 }
+/**
+ * 对副词条数组可能出现加号丢失的情况进行预处理
+ * 若本行有加号，则本行及之前所有行都合法
+ * 若本行无加号，则暂不处理，等待后续判断
+ */
+function santizeParamsArray(input: string[]): string[] {
+    const array = [...input] // clone it
+    const result: Set<string> = new Set()
+    for (let i = 0; i < array.length; i++) {
+        array[i] = array[i].replace(/十/g, '+').replace(/\s/g, '')
+        if (array[i].includes('+')) {
+            for (let j = 0; j <= i; j++) {
+                result.add(array[j])
+            }
+        }
+    }
+    return [...result]
+}
 function recognizeParams(text: string, main = false): [ArtifactParam, string | null] {
-    /* OCR常见错误预修正 */
-    let newtext = text.replace(/\s/g, '').replace('十', '+')
-    if (!text.includes('+')) throw new Error(`${text} is not a vaild param`)
+    let newtext = text
     for (const i of ocrCorrectionMap) {
         newtext = newtext.replace(i[0], i[1])
     }
 
     let maybeError = null
-
-    const [rawName, rawValue] = newtext.split('+')
+    const rawName = textCNEN(newtext)
+    let value = textNumber(newtext)
     const toCompare = main ? ArtifactParamTypes : ArtifactSubParamTypes
     const name = textBestmatch(rawName, toCompare)
-    let value
-    try {
-        value = textNumber(rawValue)
-    } catch (e) {
-        console.log(newtext)
-        throw e
-    }
 
     /*
      * PaddleOCR会将逗号(,)识别成点(.)
@@ -153,15 +165,6 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
             value = value.substr(1)
             maybeError = value
         }
-    }
-    if (/[\u4E00-\u9FA5]+/.test(rawValue)) {
-        if (rawValue.includes('人')) {
-            console.log('检测到数字包含中文，已修改', rawValue, `1${value}`, value)
-            value = `1${value}`
-        } else {
-            console.log('检测到数字包含中文', rawValue, value)
-        }
-        maybeError = value
     }
     return [
         {

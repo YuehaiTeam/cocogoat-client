@@ -38,6 +38,9 @@ export function textChinese(t: string) {
     if (!str) throw new Error(`${t} doesn't contains chinese`)
     return str
 }
+export function textCNEN(t: string) {
+    return t.match(/[a-zA-Z\u4e00-\u9fa5]/g)?.join('') || ''
+}
 export function textNumber(t: string) {
     const str = t.replace(/[^\d.]/g, '')
     if (!str) throw new Error(`${t} doesn't contains number`)
