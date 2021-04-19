@@ -1,8 +1,6 @@
 import { App, reactive } from 'vue'
-// @ts-ignore
 import createi18n from './gettext'
-import en from './locales/en/index'
-const availableLocales: Record<string, any> = { en }
+import { availableLocales } from './availableLocales'
 
 const i18n = createi18n()
 for (const i in availableLocales) {
