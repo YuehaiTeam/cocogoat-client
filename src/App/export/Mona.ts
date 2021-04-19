@@ -164,16 +164,37 @@ const getStander = {
         雷元素伤害加成: 'thunderBonus',
     },
 }
-
+export type MonaArtifactTypeName = 'flower' | 'feather' | 'sand' | 'cup' | 'head'
+interface MonaArtifact {
+    setName: string // 套装名
+    detailName: string // 中文名
+    position: MonaArtifactTypeName // 位置, slot
+    mainTag: any // 主词条, main stat
+    normalTags: any[] // 副词条, sub stat
+    omit: boolean // 是否禁用该圣遗物, disabled or not
+    level: number // 等级，整数, integer
+    star: number // 星级，整数, integer
+}
+interface MonaInterface {
+    version?: string
+    cocogoat?: string
+    flower: MonaArtifact[]
+    feather: MonaArtifact[]
+    sand: MonaArtifact[]
+    cup: MonaArtifact[]
+    head: MonaArtifact[]
+}
 export function convertAsMona(artifacts: Artifact[], raw = false) {
     console.log(artifacts)
-    const json = <Record<string, {}[]>>{
+    const json = {
+        version: '1',
+        cocogoat: '1',
         flower: [],
         feather: [],
         sand: [],
         cup: [],
         head: [],
-    }
+    } as MonaInterface
     for (let i = 0; i < artifacts.length; i++) {
         const sub = []
         for (let j = 0; j < artifacts[i].sub.length; j++) {
@@ -191,7 +212,7 @@ export function convertAsMona(artifacts: Artifact[], raw = false) {
             })
         }
         try {
-            const tmp = {
+            const tmp = <MonaArtifact>{
                 setName: getStander.setName[artifacts[i].name][0],
                 detailName: artifacts[i].name,
                 position: getStander.setName[artifacts[i].name][1],
