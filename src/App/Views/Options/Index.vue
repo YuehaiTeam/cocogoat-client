@@ -97,6 +97,13 @@ export default {
                 ipcRenderer.send('devtoolsApp')
             }
         },
+        doClearWindowStates() {
+            bus.config.options.windowState = {}
+            ElNotification({
+                type: 'success',
+                title: this.__('窗口状态数据已清除'),
+            })
+        },
     },
 }
 </script>
@@ -173,6 +180,15 @@ export default {
                     >
                     </el-switch>
                 </div>
+                <br />
+                <el-form label-position="right" label-width="auto" size="small">
+                    <el-form-item :label="__('窗口状态数据')">
+                        <el-button @click="doClearWindowStates">
+                            {{ __('清除保存的窗口数据') }}
+                        </el-button>
+                        <div class="form-desc">{{ __('这在你找不到悬浮窗时或许有用。') }}</div>
+                    </el-form-item>
+                </el-form>
             </div>
         </article>
         <article>

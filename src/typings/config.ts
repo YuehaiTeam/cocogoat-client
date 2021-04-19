@@ -3,11 +3,18 @@ export interface IArtifactOptions {
     keepSameArtifacts: boolean
     autoSwitchDelay: number
 }
+export interface IwindowStates {
+    x?: number
+    y?: number
+    width: number
+    height: number
+}
 export interface IOptions {
     firstRun: boolean
     sendErrorReports: boolean
     sendWrongOCRReports: boolean
     artifacts: IArtifactOptions
+    windowStates: Record<string, IwindowStates>
 }
 export enum EBuild {
     'DEV' = 'DEV',
@@ -25,19 +32,23 @@ export interface IConfig {
     dataDir: string
     options: IOptions
 }
-export const config = <IConfig>{
-    version: '',
-    build: null,
-    configDir: '',
-    dataDir: '',
-    options: {
-        firstRun: true,
-        sendErrorReports: true,
-        sendWrongOCRReports: true,
-        artifacts: {
-            preserveSwitcher: false,
-            keepSameArtifacts: false,
-            autoSwitchDelay: 0.5,
+export function defaultConfig(): IConfig {
+    return {
+        version: '',
+        build: null,
+        configDir: '',
+        dataDir: '',
+        options: {
+            firstRun: true,
+            sendErrorReports: true,
+            sendWrongOCRReports: true,
+            artifacts: {
+                preserveSwitcher: false,
+                keepSameArtifacts: false,
+                autoSwitchDelay: 0.5,
+            },
+            windowStates: {},
         },
-    },
+    }
 }
+export const config = <IConfig>defaultConfig()

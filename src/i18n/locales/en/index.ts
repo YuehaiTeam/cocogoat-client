@@ -53,6 +53,10 @@ export default {
     '这些选项将在程序重启后生效。': 'The options below will take effects after a reload.',
     '发送错误日志，协助我们改进程序': 'Send error reports to help us fixing bugs',
     启用OCR识别错误反馈功能: 'Show feedback button on OCR page',
+    窗口状态数据: 'Window state data',
+    清除保存的窗口数据: 'Reset saved window size and position',
+    '这在你找不到悬浮窗时或许有用。': "May be useful when you can't find the overlay windows.",
+    窗口状态数据已清除: 'Successfully resetted window state data',
     '这些选项将在下次打开识别器或切换器时生效。':
         'The options below will take effects when you open recognizor or switcher next time.',
     保留重复识别: 'Keep same artifacts',

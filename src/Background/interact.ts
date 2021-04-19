@@ -2,7 +2,8 @@ import path from 'path'
 import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
-import { app, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { saveOptions } from './config'
 import { config } from '@/typings/config'
 import { windows, createArtifactView, createArtifactSwitch } from './windows'
 // @ts-ignore
@@ -11,8 +12,9 @@ robot.setMouseDelay(8)
 const getActiveWindow = activeWindows.getActiveWindow
 
 export function interactInit() {
-    ipcMain.on('ready', () => {
-        windows.app && windows.app.show()
+    ipcMain.on('ready', (event) => {
+        const win = BrowserWindow.fromWebContents(event.sender)
+        win && win.show()
     })
     ipcMain.on('minimizeApp', () => {
         windows.app && windows.app.minimize()
@@ -32,10 +34,9 @@ export function interactInit() {
     })
     ipcMain.on('saveOptions', async (event, options) => {
         config.options = options
-        await fsex.writeJSON(path.join(config.configDir, 'options.json'), config.options)
+        saveOptions()
     })
     ipcMain.on('readArtifacts', async (event, { id }) => {
-        console.log('readArtifacts')
         try {
             const artifacts = await fsex.readJSON(path.join(config.configDir, 'artifacts.json'))
             event.reply(`readArtifacts-${id}`, artifacts)

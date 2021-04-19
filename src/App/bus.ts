@@ -1,7 +1,7 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { Artifact } from '@/typings/Artifact'
-import { EBuild, IConfig } from '@/typings/config'
+import { defaultConfig, EBuild, IConfig } from '@/typings/config'
 import { reactive, watch } from 'vue'
 import { getConfig, readArtifacts } from './ipc'
 import { ipcRenderer } from 'electron'
@@ -17,22 +17,7 @@ interface IBusData {
     hasUpgrade: boolean
 }
 export const bus = reactive(<IBusData>{
-    config: {
-        version: '',
-        build: null,
-        dataDir: '',
-        configDir: '',
-        options: {
-            firstRun: true,
-            sendErrorReports: true,
-            sendWrongOCRReports: false,
-            artifacts: {
-                preserveSwitcher: false,
-                keepSameArtifacts: false,
-                autoSwitchDelay: 0.5,
-            },
-        },
-    },
+    config: defaultConfig(),
     artifacts: [],
     hasUpgrade: false,
 })
