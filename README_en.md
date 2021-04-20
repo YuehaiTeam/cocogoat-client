@@ -8,6 +8,9 @@ A toolbox for Genshin Impact with every line of code made by working overtime.
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/YuehaiTeam/cocogoat)
 [![Build Test](https://github.com/YuehaiTeam/cocogoat/actions/workflows/build-test.yml/badge.svg)](https://github.com/YuehaiTeam/cocogoat/actions/workflows/build-test.yml)
+![MIT License](https://shields.io/badge/license-MIT-green)
+[![POEditor - English](https://img.shields.io/poeditor/progress/434087/en?token=d0ebc6efc6db6d4c57aaa1103a0c4abd)](https://poeditor.com/join/project?hash=jZiEtV01OO)
+[![POEditor - Japanese](https://img.shields.io/poeditor/progress/434087/ja?token=d0ebc6efc6db6d4c57aaa1103a0c4abd)](https://poeditor.com/join/project?hash=jZiEtV01OO)
 
 </div>
 
