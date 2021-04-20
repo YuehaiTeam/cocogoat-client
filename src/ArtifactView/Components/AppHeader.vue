@@ -57,7 +57,7 @@ export default {
 <template>
     <header>
         <div class="icon"></div>
-        <div class="title">圣遗物 - 单击识别{{ auto ? '启用' : '禁用' }}</div>
+        <div class="title">{{ __('圣遗物') }} - {{ __(`单击识别${auto ? '启用' : '禁用'}`) }}</div>
         <div class="actions">
             <button class="dump" :class="{ show: runtimeDebug }" @click="clickDebug" @contextmenu="ctxDebug">
                 <i class="el-icon-s-opportunity"></i>
@@ -65,7 +65,7 @@ export default {
             <el-tooltip
                 class="item"
                 effect="light"
-                content="打开自动切换器"
+                :content="__('打开自动切换器')"
                 placement="bottom"
                 popper-class="titlebar-tip"
                 transition="none"
@@ -81,7 +81,7 @@ export default {
                 <el-tooltip
                     class="item"
                     effect="light"
-                    content="识别"
+                    :content="__('识别')"
                     placement="bottom"
                     popper-class="titlebar-tip"
                     transition="none"
@@ -97,7 +97,7 @@ export default {
                 <el-tooltip
                     class="item"
                     effect="light"
-                    :content="`${auto ? '关闭' : '开启'}单击识别`"
+                    :content="__(`${auto ? '关闭' : '开启'}单击识别`)"
                     placement="bottom"
                     popper-class="titlebar-tip"
                     transition="none"

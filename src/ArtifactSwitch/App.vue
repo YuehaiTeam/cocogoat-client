@@ -1,4 +1,5 @@
 <script>
+import { __ } from '@/i18n'
 import { ipcRenderer } from 'electron'
 import Actions from './Components/Actions'
 import AppHeader from './Components/AppHeader'
@@ -86,8 +87,8 @@ export default {
                 bus.status = STATUS.ERROR
                 ElMessageBox({
                     type: 'error',
-                    title: '检测失败',
-                    message: '请确保您已经使切换器窗口恰好包围圣遗物列表区域。如始终提示出错，请提交反馈',
+                    title: __('检测失败'),
+                    message: __('请确保您已经使切换器窗口恰好包围圣遗物列表区域。如始终提示出错，请提交反馈。'),
                 })
                 throw new Error()
             }
@@ -101,9 +102,10 @@ export default {
                     // 首屏不满，推断有丢
                     ElMessageBox({
                         type: 'error',
-                        title: '检测失败',
-                        message:
-                            '无法确认行列数量\n请确认圣遗物列表的顶部对齐某一行的顶端，且当前页不是最后一页，或换到暗处并重新打开背包。',
+                        title: __('检测失败'),
+                        message: __(
+                            '无法确认行列数量。请确认圣遗物列表的顶部对齐某一行的顶端，且当前页不是最后一页，或换到暗处并重新打开背包。',
+                        ),
                     })
                     bus.auto = false
                     bus.status = STATUS.ERROR

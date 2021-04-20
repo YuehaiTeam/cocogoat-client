@@ -7,10 +7,13 @@ export default {
     <section class="intro">
         <div class="left"></div>
         <div class="right">
-            请以窗口模式打开游戏背包圣遗物界面， 将本窗口拖动至游戏上方并调节大小，
-            使圣遗物每项属性恰好位于对应框内。完成调整后，请点击下方按钮或者使用热键（~）开始识别。
+            {{
+                __(
+                    '请以窗口模式打开游戏背包圣遗物界面， 将本窗口拖动至游戏上方并调节大小，使圣遗物每项属性恰好位于对应框内。完成调整后，请点击下方按钮或者使用热键（~）开始识别。',
+                )
+            }}
             <br />
-            <el-button @click="$emit('start')">开始</el-button>
+            <el-button @click="$emit('start')">{{ __('开始') }}</el-button>
         </div>
     </section>
 </template>

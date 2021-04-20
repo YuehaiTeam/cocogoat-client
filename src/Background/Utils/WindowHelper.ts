@@ -4,6 +4,7 @@ import { config, IwindowStates } from '@/typings/config'
 import { BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron'
 export function loadState(name: string, width: number, height: number) {
     const state: IwindowStates = config.options.windowStates[name] || { width, height }
+    console.log(state)
     if (state.x && state.y) {
         const currScreen = screen.getDisplayNearestPoint({ x: state.x, y: state.y })
         if (

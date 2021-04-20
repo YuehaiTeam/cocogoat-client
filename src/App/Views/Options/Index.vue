@@ -98,7 +98,7 @@ export default {
             }
         },
         doClearWindowStates() {
-            bus.config.options.windowState = {}
+            bus.config.options.windowStates = {}
             ElNotification({
                 type: 'success',
                 title: this.__('窗口状态数据已清除'),
@@ -134,7 +134,7 @@ export default {
         v-if="newVersion"
         v-model="showUpgrade"
         custom-class="upgrade-dialog"
-        :title="`新版本: v${newVersion.version}`"
+        :title="`${__('新版本:')} v${newVersion.version}`"
         width="400px"
     >
         <section class="version-details">
@@ -143,7 +143,7 @@ export default {
         </section>
         <template #footer>
             <span class="dialog-footer" @click="doUpgrade">
-                <el-button size="small" style="width: 100%" type="primary">更新</el-button>
+                <el-button size="small" style="width: 100%" type="primary">{{ __('更新') }}</el-button>
             </span>
         </template>
     </el-dialog>

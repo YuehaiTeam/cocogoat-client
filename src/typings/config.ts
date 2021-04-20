@@ -10,6 +10,7 @@ export interface IwindowStates {
     height: number
 }
 export interface IOptions {
+    lang: string
     firstRun: boolean
     sendErrorReports: boolean
     sendWrongOCRReports: boolean
@@ -39,6 +40,7 @@ export function defaultConfig(): IConfig {
         configDir: '',
         dataDir: '',
         options: {
+            lang: '',
             firstRun: true,
             sendErrorReports: true,
             sendWrongOCRReports: true,
