@@ -40,6 +40,8 @@
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.15.0",
+    "@types/ffi-napi": "^2.4.3",
+    "@types/ref-napi": "^1.4.1",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-babel": "~4.5.0",

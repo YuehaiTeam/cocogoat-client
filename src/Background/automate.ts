@@ -1,5 +1,4 @@
 import { ipcMain } from 'electron'
-// @ts-ignore
 import ffi from 'ffi-napi'
 const user32 = ffi.Library('user32', {
     mouse_event: ['void', ['int', 'int', 'int', 'int', 'int']],

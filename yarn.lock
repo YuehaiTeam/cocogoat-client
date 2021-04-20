@@ -1257,6 +1257,15 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/ffi-napi@^2.4.3":
+  version "2.4.3"
+  resolved "https://registry.npm.taobao.org/@types/ffi-napi/download/@types/ffi-napi-2.4.3.tgz#8e0194a47f1fc9a2d1e00dcae66c919ae97faa2d"
+  integrity sha1-jgGUpH8fyaLR4A3K5myRmul/qi0=
+  dependencies:
+    "@types/node" "*"
+    "@types/ref-napi" "*"
+    "@types/ref-struct-di" "*"
+
 "@types/fs-extra@^9.0.7":
   version "9.0.10"
   resolved "https://registry.npm.taobao.org/@types/fs-extra/download/@types/fs-extra-9.0.10.tgz?cache=0&sync_timestamp=1617393042797&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Ffs-extra%2Fdownload%2F%40types%2Ffs-extra-9.0.10.tgz#8023a72e3d06cf54929ea47ec7634e47f33f4046"
@@ -1353,6 +1362,20 @@
   version "1.2.3"
   resolved "https://registry.npm.taobao.org/@types/range-parser/download/@types/range-parser-1.2.3.tgz?cache=0&sync_timestamp=1613379868458&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Frange-parser%2Fdownload%2F%40types%2Frange-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha1-fuMwunyq+5gJC+zoal7kQRWQTCw=
+
+"@types/ref-napi@*", "@types/ref-napi@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.npm.taobao.org/@types/ref-napi/download/@types/ref-napi-1.4.1.tgz#cf5a5ae6a90f6cb2a1d4db21ad32ce0e7c59a6fb"
+  integrity sha1-z1pa5qkPbLKh1NshrTLODnxZpvs=
+  dependencies:
+    "@types/node" "*"
+
+"@types/ref-struct-di@*":
+  version "1.1.0"
+  resolved "https://registry.npm.taobao.org/@types/ref-struct-di/download/@types/ref-struct-di-1.1.0.tgz#4e7a20c8b2f25a6e4b3cb4a0d615835b61ab8d84"
+  integrity sha1-TnogyLLyWm5LPLSg1hWDW2GrjYQ=
+  dependencies:
+    "@types/ref-napi" "*"
 
 "@types/responselike@*", "@types/responselike@^1.0.0":
   version "1.0.0"

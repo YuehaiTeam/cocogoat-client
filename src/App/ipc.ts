@@ -45,3 +45,16 @@ export async function showSaveDialog(options: SaveDialogOptions) {
     ipcRenderer.send('showSaveDialog', { id, options })
     return <SaveDialogReturnValue>await p
 }
+export async function checkDwmIsCompositionEnabled(): Promise<boolean> {
+    const id = uuid()
+    const p = new Promise((resolve, reject) => {
+        ipcRenderer.once(`checkDwmIsCompositionEnabled-${id}`, (result, data) => {
+            if (data.error) {
+                return reject(new Error(`WinAPI Error: 0x${data.error.toString(16)}`))
+            }
+            resolve(data.enabled)
+        })
+    })
+    ipcRenderer.send('checkDwmIsCompositionEnabled', { id })
+    return <boolean>await p
+}

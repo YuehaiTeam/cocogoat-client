@@ -2,8 +2,8 @@
 import Artifact from './Components/Artifact.vue'
 import { Artifact as ArtifactType } from '@/typings/Artifact'
 import ArtifactEditPanel from './Components/EditPanel.vue'
-import { openArtifactView, showSaveDialog } from '../../ipc'
-import { ElNotification } from 'element-plus'
+import { openArtifactView, showSaveDialog, checkDwmIsCompositionEnabled } from '../../ipc'
+import { ElMessageBox, ElNotification } from 'element-plus'
 import { artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { clipboard } from 'electron'
@@ -43,7 +43,17 @@ export default defineComponent({
                 user: '',
             } as ArtifactType
         },
-        openArtifactView() {
+        async openArtifactView() {
+            try {
+                if (!(await checkDwmIsCompositionEnabled())) {
+                    await ElMessageBox.confirm(__('您的系统似乎没有启用Aero，识别功能可能无法正常使用。'), __('提示'), {
+                        confirmButtonText: __('确认'),
+                        cancelButtonText: __('仍然尝试'),
+                        type: 'warning',
+                    })
+                    return
+                }
+            } catch (e) {}
             ElNotification({
                 type: 'info',
                 title: __('正在打开圣遗物识别工具'),
