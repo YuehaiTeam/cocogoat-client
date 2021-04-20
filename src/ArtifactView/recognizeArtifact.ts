@@ -129,6 +129,7 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
      * 此处对点后3位及以上的把点去掉
      * 两位的把最后一位去掉
      */
+    value = value.replace(/\.\./g, '.')
     const [, b] = value.split('.')
     if (b && b.length >= 3) {
         value = value.replace(/\./g, '')
