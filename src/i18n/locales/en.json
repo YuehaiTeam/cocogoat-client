@@ -103,5 +103,7 @@
     "更新": "Upgrade",
     "您的系统似乎没有启用Aero，识别功能可能无法正常使用。": "Scanner may not work because Aero is not enabled.",
     "提示": "Tips",
-    "仍然尝试": "Continue anyway"
+    "仍然尝试": "Continue anyway",
+    "前往下载": "Proceed to download",
+    "您的系统似乎没有安装微软运行库 (下载地址：https://aka.ms/vs/16/release/vc_redist.x64.exe) ，识别功能将无法正常使用。": "Scanner may not work because Microsoft Visual C++ Redistributable (Link: https://aka.ms/vs/16/release/vc_redist.x64.exe) is not installed."
 }
