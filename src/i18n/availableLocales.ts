@@ -18,7 +18,7 @@ export const availableLocales: Record<string, any> = {
             language: 'jp',
             plurals: {
                 text: 'nplurals = 1; plural = 0',
-                func(n: number) {
+                func() {
                     return false
                 },
             },

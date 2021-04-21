@@ -11,6 +11,9 @@ export function openArtifactView() {
 export function upgrade(url: string, patch = false) {
     ipcRenderer.send('doUpgrade', { url, patch })
 }
+export function openExternal(url: string) {
+    ipcRenderer.send('openExternal', { url })
+}
 
 export async function getApphash(): Promise<IConfig> {
     const id = uuid()
@@ -56,5 +59,15 @@ export async function checkDwmIsCompositionEnabled(): Promise<boolean> {
         })
     })
     ipcRenderer.send('checkDwmIsCompositionEnabled', { id })
+    return <boolean>await p
+}
+export async function checkVCRedistInstalled(): Promise<boolean> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`checkVCRedistInstalled-${id}`, (result, data) => {
+            resolve(data)
+        })
+    })
+    ipcRenderer.send('checkVCRedistInstalled', { id })
     return <boolean>await p
 }

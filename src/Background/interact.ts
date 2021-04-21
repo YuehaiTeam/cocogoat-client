@@ -2,7 +2,7 @@ import path from 'path'
 import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { saveOptions } from './config'
 import { config } from '@/typings/config'
 import { windows, createArtifactView, createArtifactSwitch } from './windows'
@@ -35,6 +35,9 @@ export function interactInit() {
     ipcMain.on('saveOptions', async (event, options) => {
         config.options = options
         saveOptions()
+    })
+    ipcMain.on('openExternal', (event, { url }) => {
+        shell.openExternal(url)
     })
     ipcMain.on('readArtifacts', async (event, { id }) => {
         try {

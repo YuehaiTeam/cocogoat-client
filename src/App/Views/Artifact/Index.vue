@@ -2,7 +2,13 @@
 import Artifact from './Components/Artifact.vue'
 import { Artifact as ArtifactType } from '@/typings/Artifact'
 import ArtifactEditPanel from './Components/EditPanel.vue'
-import { openArtifactView, showSaveDialog, checkDwmIsCompositionEnabled } from '../../ipc'
+import {
+    openArtifactView,
+    showSaveDialog,
+    openExternal,
+    checkDwmIsCompositionEnabled,
+    checkVCRedistInstalled,
+} from '../../ipc'
 import { ElMessageBox, ElNotification } from 'element-plus'
 import { artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
@@ -44,6 +50,23 @@ export default defineComponent({
             } as ArtifactType
         },
         async openArtifactView() {
+            try {
+                if (!(await checkVCRedistInstalled())) {
+                    await ElMessageBox.confirm(
+                        __(
+                            '您的系统似乎没有安装微软运行库 (下载地址：https://aka.ms/vs/16/release/vc_redist.x64.exe) ，识别功能将无法正常使用。',
+                        ),
+                        __('提示'),
+                        {
+                            confirmButtonText: __('前往下载'),
+                            cancelButtonText: __('仍然尝试'),
+                            type: 'warning',
+                        },
+                    )
+                    openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe')
+                    return
+                }
+            } catch (e) {}
             try {
                 if (!(await checkDwmIsCompositionEnabled())) {
                     await ElMessageBox.confirm(__('您的系统似乎没有启用Aero，识别功能可能无法正常使用。'), __('提示'), {
