@@ -10,7 +10,7 @@ import {
     checkVCRedistInstalled,
 } from '../../ipc'
 import { ElMessageBox, ElNotification } from 'element-plus'
-import { artifactPush, bus } from '@/App/bus'
+import { artifactClear, artifactDelete, artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { clipboard } from 'electron'
 import { defineComponent } from 'vue'
@@ -86,13 +86,11 @@ export default defineComponent({
             openArtifactView()
         },
         doDelete(id: number) {
-            bus.artifacts = bus.artifacts.filter((e) => {
-                return e.id !== id
-            })
+            artifactDelete(id)
         },
         doDeleteSelected() {
-            bus.artifacts = bus.artifacts.filter((e) => {
-                return !this.selectedIds.includes(e.id)
+            this.selectedIds.forEach((id) => {
+                artifactDelete(id)
             })
             this.selectedIds = []
         },
@@ -115,7 +113,7 @@ export default defineComponent({
             this.showEdit = false
         },
         doClear() {
-            bus.artifacts = []
+            artifactClear()
             this.selectedIds = []
         },
         doSelect(id: number, status: boolean) {

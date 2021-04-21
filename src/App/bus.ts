@@ -1,7 +1,7 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { Artifact } from '@/typings/Artifact'
-import { defaultConfig, EBuild, IConfig } from '@/typings/config'
+import { config, defaultConfig, EBuild, IConfig } from '@/typings/config'
 import { reactive, watch } from 'vue'
 import { getConfig, readArtifacts } from './ipc'
 import { ipcRenderer } from 'electron'
@@ -16,6 +16,15 @@ interface IBusData {
     artifacts: Artifact[]
     hasUpgrade: boolean
 }
+
+// for deduplication
+const artifactsHashes = new Set<string>()
+function calculateArtifactHash(artifact: Artifact): string {
+    const prefix = `${artifact.name}-${artifact.level}-${artifact.main.name}-${artifact.main.value}-${artifact.stars}`
+    const subs = artifact.sub.map((s) => `${s.name}-${s.value}`)
+    return [prefix, ...subs].join('_')
+}
+
 export const bus = reactive(<IBusData>{
     config: defaultConfig(),
     artifacts: [],
@@ -24,7 +33,15 @@ export const bus = reactive(<IBusData>{
 export async function loadData() {
     bus.config = await getConfig()
     try {
-        bus.artifacts = await readArtifacts()
+        bus.artifacts = []
+        const artifacts = await readArtifacts()
+        for (const artifact of artifacts) {
+            const hash = calculateArtifactHash(artifact)
+            if (!artifactsHashes.has(hash)) {
+                artifactsHashes.add(hash)
+                bus.artifacts.push(artifact)
+            }
+        }
     } catch (e) {
         bus.artifacts = []
     }
@@ -33,9 +50,7 @@ export async function loadData() {
     })
 
     ipcRenderer.on('artifactDelete', (event, { id }: { id: number }) => {
-        bus.artifacts = bus.artifacts.filter((e) => {
-            return e.id !== id
-        })
+        artifactDelete(id)
     })
 
     watch(
@@ -72,7 +87,16 @@ export function artifactPush(artifact: Artifact) {
                 if (bus.artifacts[i].id === artifact.id) {
                     // ID重复，是修改。
                     isModify = true
-                    bus.artifacts[i] = artifact
+
+                    const oldHash = calculateArtifactHash(bus.artifacts[i])
+                    artifactsHashes.delete(oldHash)
+                    const newHash = calculateArtifactHash(artifact)
+                    if (!config.options.artifacts.keepSameArtifacts && artifactsHashes.has(newHash)) {
+                        // 改成和某个已有的圣遗物一样了。怎么办？去重模式下直接去掉
+                    } else {
+                        bus.artifacts[i] = artifact
+                        artifactsHashes.add(newHash)
+                    }
                     console.log('EDIT', artifact)
                     break
                 }
@@ -80,10 +104,28 @@ export function artifactPush(artifact: Artifact) {
         }
     }
     if (!isModify) {
-        bus.artifacts.push(artifact)
+        const hash = calculateArtifactHash(artifact)
+        if (config.options.artifacts.keepSameArtifacts || !artifactsHashes.has(hash)) {
+            bus.artifacts.push(artifact)
+            artifactsHashes.add(hash)
+        }
         console.log('PUSH', artifact)
     }
 }
+export function artifactDelete(id: number) {
+    bus.artifacts = bus.artifacts.filter((e) => {
+        const preserve = e.id !== id
+        if (!preserve) {
+            artifactsHashes.delete(calculateArtifactHash(e))
+        }
+        return preserve
+    })
+}
+export function artifactClear() {
+    bus.artifacts = []
+    artifactsHashes.clear()
+}
+
 watch(
     () => bus.artifacts,
     async (newValue) => {
