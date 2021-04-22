@@ -1,9 +1,9 @@
 import { createColorFilter } from './imageProcess'
 export const padding = 80
 export default <Record<string, string | false | ((ctx: CanvasRenderingContext2D, w: number, h: number) => void)>>{
-    title: 'invert(100%) brightness(180%) grayscale(100%) contrast(300%)',
+    title: '',
     color: false,
-    main: 'invert(100%) brightness(125%) grayscale(100%) contrast(700%)',
+    main: '',
     level: (ctx: CanvasRenderingContext2D, w: number, h: number) => {
         createColorFilter(48, 56, 66, 50, true)(ctx, w, h)
         const imageData = ctx.getImageData(0, 0, w, h)
@@ -42,6 +42,6 @@ export default <Record<string, string | false | ((ctx: CanvasRenderingContext2D,
         }
         ctx.putImageData(imageData, 0, 0)
     },
-    sub: 'brightness(110%) grayscale(100%) contrast(700%)',
-    user: 'brightness(110%) grayscale(100%) contrast(700%)',
+    sub: '',
+    user: '',
 }

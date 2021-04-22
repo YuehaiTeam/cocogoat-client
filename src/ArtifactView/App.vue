@@ -86,7 +86,7 @@ export default {
             if (status.status === STATUS.LOADING) return
             status.status = STATUS.LOADING
             try {
-                const [result] = await Promise.all([this.processOnce(), sleep(200)])
+                const [result] = await this.processOnce()
                 status.status = STATUS.SUCCESS
                 return result
             } catch (e) {

@@ -129,13 +129,14 @@ export default {
             setTransparent(true)
             const { x, y } = getBlockCenter(orig)
             await click(await toWindowPos(x, y))
-            await sleep(50)
+            await sleep(20)
             let time = 0
             while (true) {
                 if (!bus.auto) return
                 ipcRenderer.send('scrollTick', false)
-                await sleep(50)
                 time++
+                if (avgTimes && time < avgTimes * 0.45) continue
+                await sleep(20)
                 const canvas = await this.getCanvas()
                 const { blocks } = santizeBlocks(await getBlocks(canvas), canvas)
                 const curr = blocks[0]
@@ -172,7 +173,7 @@ export default {
                         await this.clickFirstLine()
                         const p = await this.nextPage(false, orig, avgTimes)
                         if (p > 0) {
-                            avgTimes = p
+                            if (!avgTimes) avgTimes = p
                         } else {
                             bus.isLastPage = true
                         }
