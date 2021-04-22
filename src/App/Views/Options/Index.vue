@@ -197,7 +197,10 @@ export default {
             <div class="content">
                 <el-form label-position="right" label-width="auto" size="small">
                     <el-form-item :label="__('保留重复识别')">
-                        <el-switch disabled :model-value="options.artifacts.keepSameArtifacts"></el-switch>
+                        <el-switch
+                            :model-value="options.artifacts.keepSameArtifacts"
+                            @update:model-value="opt('artifacts.keepSameArtifacts', $event)"
+                        ></el-switch>
                         <div class="form-desc">{{ __('得到两个完全一致的圣遗物的概率是多少呢？') }}</div>
                     </el-form-item>
                     <el-form-item :label="__('独立切换模式')">
