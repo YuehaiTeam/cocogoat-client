@@ -1,7 +1,7 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { Artifact } from '@/typings/Artifact'
-import { config, defaultConfig, EBuild, IConfig } from '@/typings/config'
+import { defaultConfig, EBuild, IConfig } from '@/typings/config'
 import { reactive, watch } from 'vue'
 import { getConfig, readArtifacts } from './ipc'
 import { ipcRenderer } from 'electron'
@@ -39,8 +39,8 @@ export async function loadData() {
             const hash = calculateArtifactHash(artifact)
             if (!artifactsHashes.has(hash)) {
                 artifactsHashes.add(hash)
-                bus.artifacts.push(artifact)
             }
+            bus.artifacts.push(artifact)
         }
     } catch (e) {
         bus.artifacts = []
@@ -91,12 +91,12 @@ export function artifactPush(artifact: Artifact) {
                     const oldHash = calculateArtifactHash(bus.artifacts[i])
                     artifactsHashes.delete(oldHash)
                     const newHash = calculateArtifactHash(artifact)
-                    if (!config.options.artifacts.keepSameArtifacts && artifactsHashes.has(newHash)) {
-                        // 改成和某个已有的圣遗物一样了。怎么办？去重模式下直接去掉
-                    } else {
-                        bus.artifacts[i] = artifact
-                        artifactsHashes.add(newHash)
-                    }
+                    // if (!bus.config.options.artifacts.keepSameArtifacts && artifactsHashes.has(newHash)) {
+                    //     // 改成和某个已有的圣遗物一样了。怎么办？去重模式下直接去掉
+                    // } else {
+                    bus.artifacts[i] = artifact
+                    artifactsHashes.add(newHash)
+                    // }
                     console.log('EDIT', artifact)
                     break
                 }
@@ -105,7 +105,7 @@ export function artifactPush(artifact: Artifact) {
     }
     if (!isModify) {
         const hash = calculateArtifactHash(artifact)
-        if (config.options.artifacts.keepSameArtifacts || !artifactsHashes.has(hash)) {
+        if (bus.config.options.artifacts.keepSameArtifacts || !artifactsHashes.has(hash)) {
             bus.artifacts.push(artifact)
             artifactsHashes.add(hash)
         }
