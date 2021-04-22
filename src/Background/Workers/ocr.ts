@@ -1,6 +1,7 @@
 import path from 'path'
 import { config } from './index'
 import { parentPort } from 'worker_threads'
+import { IocrResult } from '@/typings/ocr'
 let ppocr: any
 
 export function ocrWorkerInit(data: { rec: string; det: string; dic: string }) {
@@ -8,7 +9,19 @@ export function ocrWorkerInit(data: { rec: string; det: string; dic: string }) {
     const { rec, det, dic } = data
     const ppocrObjPath = path.join(config.dataDir, 'paddleocr', 'ppocr.node')
     ppocr = __non_webpack_require__(ppocrObjPath)
-    ppocr.load(det, rec, dic, false)
+    ppocr.load(det, rec, dic, {
+        use_gpu: false,
+        gpu_id: 0,
+        use_mkldnn: false,
+        use_tensorrt: false,
+        use_fp16: false,
+        gpu_mem: 4000,
+        cpu_math_library_num_threads: 10,
+        max_side_len: 1920,
+        det_db_unclip_ratio: 2.0,
+        det_db_box_thresh: 0.5,
+        det_db_thresh: 0.3,
+    })
     parentPort.postMessage({
         event: 'ready',
     })
@@ -21,23 +34,10 @@ export function ocrWorkerInit(data: { rec: string; det: string; dic: string }) {
         }
         if (event.event === 'ocr') {
             const { width, height, data } = event.message.image
-            const rawResult: string[] = ppocr.ocr(width, height, data)
-            const response = {
-                ppocr: true,
-                words: [] as any[],
-                text: '',
-            }
-            for (let i = 0; i < rawResult.length; i += 2) {
-                response.text += rawResult[i]
-                response.text += '\n'
-                response.words.push({
-                    confidence: parseFloat(rawResult[i + 1]) * 100,
-                    text: rawResult[i],
-                })
-            }
+            const result: IocrResult[] = ppocr.ocr(width, height, data)
             parentPort.postMessage({
                 event: 'reply',
-                message: response,
+                message: result,
                 reply: event.reply,
                 id: event.id,
             } as { event: string; message: any; reply?: any; id?: string })

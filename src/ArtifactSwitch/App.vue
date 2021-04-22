@@ -127,7 +127,6 @@ export default {
             const orig = rawOrig || bus.blocks[0]
             let middlePassed = false
             setTransparent(true)
-            await sleep(50)
             const { x, y } = getBlockCenter(orig)
             await click(await toWindowPos(x, y))
             await sleep(50)
@@ -169,7 +168,6 @@ export default {
                 const orig = bus.blocks[0]
                 while (bus.auto) {
                     bus.status = STATUS.CLICK
-                    await sleep(500)
                     if (!bus.isLastPage) {
                         await this.clickFirstLine()
                         const p = await this.nextPage(false, orig, avgTimes)
@@ -199,7 +197,7 @@ export default {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(100)
+                await sleep(50)
                 await tryocr()
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
@@ -211,7 +209,7 @@ export default {
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(100)
+                await sleep(50)
                 await tryocr()
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
             }
