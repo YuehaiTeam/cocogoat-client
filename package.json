@@ -32,6 +32,7 @@
     "lodash": "^4.17.21",
     "marked": "^2.0.2",
     "queue": "^6.0.2",
+    "ref-napi": "^3.0.2",
     "ref-struct-napi": "^1.1.1",
     "ref-union-napi": "^1.0.2",
     "robotjs": "^0.6.0",
