@@ -1,7 +1,7 @@
 import 'context-filter-polyfill'
 import { ocr as ipcOcr } from './ipc'
-
 import imageConfig, { padding } from './imageConfig'
+import { IocrResult } from '@/typings/ocr'
 
 export interface ISplitConfig {
     w: number
@@ -107,8 +107,15 @@ export async function ocr(ret: SplitResults) {
     const ocrresArr = await Promise.all(ocrpms)
     const ocrres: Record<string, any> = {}
     for (const i in ocrresArr) {
-        if ({}.hasOwnProperty.call(ocrresArr, i)) {
-            ocrres[ocrpmk[i]] = ocrresArr[i].data || ocrresArr[i] || null
+        if ({}.hasOwnProperty.call(ocrresArr, i) && ocrresArr[i]) {
+            const res: { words: IocrResult[]; text: string } = { words: [], text: '' }
+            const text: string[] = []
+            res.words = ocrresArr[i]
+            for (const i of res.words) {
+                text.push(i.text)
+            }
+            res.text = text.join('\n')
+            ocrres[ocrpmk[i]] = res
         }
     }
     return ocrres
