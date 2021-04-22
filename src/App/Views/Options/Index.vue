@@ -213,7 +213,7 @@ export default {
                     <el-form-item :label="__('自动切换延迟')">
                         <el-input-number
                             :modelValue="options.artifacts.autoSwitchDelay"
-                            :min="0.5"
+                            :min="0"
                             :precision="1"
                             :step="0.1"
                             :max="30"

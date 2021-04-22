@@ -85,7 +85,6 @@ export default {
         async processWithTimeout() {
             if (status.status === STATUS.LOADING) return
             status.status = STATUS.LOADING
-            await sleep(80)
             try {
                 const [result] = await Promise.all([this.processOnce(), sleep(200)])
                 status.status = STATUS.SUCCESS
