@@ -74,7 +74,7 @@ export default {
             }
             bus.status = STATUS.CAPTURE
             await this.$nextTick()
-            await sleep(50)
+            await sleep(20)
 
             const canvas = await this.getCanvas()
             /* 获取区块 */
@@ -129,16 +129,28 @@ export default {
             setTransparent(true)
             const { x, y } = getBlockCenter(orig)
             await click(await toWindowPos(x, y))
-            await sleep(20)
+            await sleep(10)
             let time = 0
             while (true) {
                 if (!bus.auto) return
                 ipcRenderer.send('scrollTick', false)
                 time++
-                if (avgTimes && time < avgTimes * 0.45) continue
-                await sleep(20)
-                const canvas = await this.getCanvas()
-                const { blocks } = santizeBlocks(await getBlocks(canvas), canvas)
+                if (avgTimes && time < avgTimes * 0.6) continue
+                await sleep(40)
+                const d2 = Date.now()
+                let blocks
+                const getImage = (async () => {
+                    const rawCanvas = await this.getCanvas()
+                    const canvas = document.createElement('canvas')
+                    canvas.width = (rawCanvas.width / bus.cols) * 2
+                    canvas.height = (rawCanvas.height / bus.rows) * 2
+                    const ctx = canvas.getContext('2d')
+                    ctx.drawImage(rawCanvas, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height)
+                    const { blocks: b } = santizeBlocks(await getBlocks(canvas), rawCanvas)
+                    blocks = b
+                })()
+                await getImage
+                console.log('d2', Date.now() - d2)
                 const curr = blocks[0]
                 if (!middlePassed && curr.y <= orig.y - orig.height - 1) {
                     middlePassed = true
@@ -198,8 +210,9 @@ export default {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(50)
+                const d1 = Date.now()
                 await tryocr()
+                console.log('d1', Date.now() - d1)
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
             }
@@ -210,7 +223,6 @@ export default {
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(50)
                 await tryocr()
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
             }

@@ -86,7 +86,7 @@ export default {
             if (status.status === STATUS.LOADING) return
             status.status = STATUS.LOADING
             try {
-                const [result] = await this.processOnce()
+                const result = await this.processOnce()
                 status.status = STATUS.SUCCESS
                 return result
             } catch (e) {
@@ -130,7 +130,9 @@ export default {
             }
 
             /* OCR、识别 */
+            const d1 = Date.now()
             const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ret)
+            console.log(Date.now() - d1)
             status.artifact = artifact
             status.potentialErrors = potentialErrors
 

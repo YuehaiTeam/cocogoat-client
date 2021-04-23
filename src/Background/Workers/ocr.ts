@@ -55,7 +55,7 @@ export async function ocrWorkerInit(data: { rec: string; det: string; dic: strin
         use_tensorrt: false,
         use_fp16: false,
         gpu_mem: 4000,
-        cpu_math_library_num_threads: 10,
+        cpu_math_library_num_threads: 16,
         max_side_len: 1920,
         det_db_unclip_ratio: 2.0,
         det_db_box_thresh: 0.5,
