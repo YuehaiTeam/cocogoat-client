@@ -99,6 +99,7 @@ export default {
             return split(canvas, posObj)
         },
         async processOnce() {
+            const d2 = Date.now()
             /* 计算窗口位置 */
             const p = window.devicePixelRatio
             let [x, y] = await getposition()
@@ -110,6 +111,7 @@ export default {
             /* 抓屏 */
             let canvas = await capture(x, y, w * p, h * p)
 
+            console.log('d2', Date.now() - d2)
             /* 高dpi缩放 */
             if (p !== 1) {
                 let srcCanvas = canvas
@@ -135,57 +137,59 @@ export default {
             console.log(Date.now() - d1)
             status.artifact = artifact
             status.potentialErrors = potentialErrors
-
-            const wrongReportData = JSON.parse(
-                JSON.stringify({
-                    artifact,
-                    screenshot: '',
-                    message: '',
-                    ocrResult: {},
-                    splitImages: {},
-                    version: status.version,
-                    build: status.build,
-                }),
-            )
-            console.log(artifact, ocrResult)
-            for (let i in ocrResult) {
-                if ({}.hasOwnProperty.call(ocrResult, i)) {
-                    for (let j of ocrResult[i].words) {
-                        delete j.line
-                        delete j.page
-                        delete j.block
-                        delete j.paragraph
-                    }
-                    wrongReportData.ocrResult[i] = ocrResult[i].words
-                }
-            }
-            const alt = {}
-            for (let i of [
-                'availHeight',
-                'availLeft',
-                'availTop',
-                'availWidth',
-                'width',
-                'height',
-                'pixelDepth',
-                'colorDepth',
-            ]) {
-                alt[i] = window.screen[i]
-            }
-            alt.angle = window.screen.orientation.angle
-            wrongReportData.screen = alt
-            wrongReportData.devicePixelRatio = window.devicePixelRatio
-            wrongReportData.windowWidth = window.innerWidth
-            wrongReportData.windowHeight = window.innerHeight
-            status.wrongReportData = wrongReportData
-            status.wrongReportData.screenshot = canvas.toDataURL('image/webp')
-            for (const i in ret) {
-                if ({}.hasOwnProperty.call(ret, i)) {
-                    if (i === 'color') continue
-                    status.wrongReportData.splitImages[i] = ret[i].canvas.toDataURL('image/webp')
-                }
-            }
             this.saveToMain()
+            console.log('dx', Date.now() - d2)
+            ;(async () => {
+                console.log(artifact, ocrResult)
+                const wrongReportData = JSON.parse(
+                    JSON.stringify({
+                        artifact,
+                        screenshot: '',
+                        message: '',
+                        ocrResult: {},
+                        splitImages: {},
+                        version: status.version,
+                        build: status.build,
+                    }),
+                )
+                for (let i in ocrResult) {
+                    if ({}.hasOwnProperty.call(ocrResult, i)) {
+                        for (let j of ocrResult[i].words) {
+                            delete j.line
+                            delete j.page
+                            delete j.block
+                            delete j.paragraph
+                        }
+                        wrongReportData.ocrResult[i] = ocrResult[i].words
+                    }
+                }
+                const alt = {}
+                for (let i of [
+                    'availHeight',
+                    'availLeft',
+                    'availTop',
+                    'availWidth',
+                    'width',
+                    'height',
+                    'pixelDepth',
+                    'colorDepth',
+                ]) {
+                    alt[i] = window.screen[i]
+                }
+                alt.angle = window.screen.orientation.angle
+                wrongReportData.screen = alt
+                wrongReportData.devicePixelRatio = window.devicePixelRatio
+                wrongReportData.windowWidth = window.innerWidth
+                wrongReportData.windowHeight = window.innerHeight
+                status.wrongReportData = wrongReportData
+                status.wrongReportData.screenshot = canvas.toDataURL('image/webp')
+                for (const i in ret) {
+                    if ({}.hasOwnProperty.call(ret, i)) {
+                        if (i === 'color') continue
+                        status.wrongReportData.splitImages[i] = ret[i].canvas.toDataURL('image/webp')
+                    }
+                }
+            })()
         },
         async saveToMain() {
             status.artifactBackup = JSON.parse(JSON.stringify(status.artifact))

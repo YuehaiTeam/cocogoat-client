@@ -33,6 +33,7 @@ export default {
             }
         },
         async getCanvas(ww, hh) {
+            await sleep(10)
             /* 计算窗口位置 */
             const p = window.devicePixelRatio
             let [x, y] = await getposition()
@@ -145,13 +146,12 @@ export default {
                 ipcRenderer.send('scrollTick', false)
             }
             // 延时等待抓屏
-            await sleep(40)
+            await sleep(30)
             while (true) {
                 time++
                 if (!bus.auto) {
                     return
                 }
-                const d2 = Date.now()
                 // 首次有上方首次延时，后面有opencv处理延迟填充，保证抓屏时界面展示已经完成
                 // 减少抓屏区域以提高效率
                 const canvas = await this.getCanvas(
@@ -163,8 +163,10 @@ export default {
                 ipcRenderer.send('scrollTick', false)
                 let blocks
                 const getImage = (async () => {
-                    blocks = santizeBlocks(await getBlocks(canvas), canvas).blocks
-                    console.log('d2', Date.now() - d2)
+                    blocks = santizeBlocks(await getBlocks(canvas), {
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                    }).blocks
                 })()
                 // 用opencv处理时间填充抓屏延迟
                 await Promise.all([getImage, sleep(40)])
@@ -174,12 +176,12 @@ export default {
                 if (!middlePassed && curr.y <= orig.y - orig.height - 1) {
                     middlePassed = true
                     bus.devmsg = 'paging:middle'
-                } else if (middlePassed && Math.abs(curr.y - orig.y) <= (orig.height * 2) / 3) {
+                } else if (middlePassed && Math.abs(curr.y - orig.y) <= Math.max(orig.height / 3, 10)) {
                     bus.devmsg = ''
                     // 由于预先发送滚轮，这里回头一次
                     ipcRenderer.send('scrollTick', true)
-                    // 等待滚轮响应
                     await sleep(30)
+                    // 等待滚轮响应
                     console.log('page done')
                     break
                 } else if (avgTimes > 0 && time >= avgTimes * 1.5) {
