@@ -208,7 +208,9 @@ export default {
                             :model-value="options.artifacts.fastScroll"
                             @update:model-value="opt('artifacts.fastScroll', $event)"
                         ></el-switch>
-                        <div class="form-desc">{{ __('如果翻页时出现滚动过快跳过行的情况，请关闭此项。') }}</div>
+                        <div class="form-desc">
+                            {{ __('如果出现翻页时滚动过快跳过行的情况，或您正在高延迟环境下使用云游戏，请关闭此项。') }}
+                        </div>
                     </el-form-item>
                     <el-form-item :label="__('独立切换模式')">
                         <el-switch

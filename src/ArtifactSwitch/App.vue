@@ -10,6 +10,7 @@ import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
 import { sleep } from '@/ArtifactView/utils'
 import { ElMessageBox } from 'element-plus'
+let sleepRatio = 1
 export default {
     components: {
         Actions,
@@ -21,6 +22,9 @@ export default {
         ipcRenderer.send('readyArtifactSwitch')
         ipcRenderer.on('keydown', this.onKeydown)
         setTransparent(false)
+        if (!bus.options.artifacts.fastScroll) {
+            sleepRatio = 2
+        }
     },
     beforeUnmount() {
         ipcRenderer.off('keydown', this.onKeydown)
@@ -33,7 +37,7 @@ export default {
             }
         },
         async getCanvas(ww, hh) {
-            await sleep(10)
+            await sleep(10 * sleepRatio)
             /* 计算窗口位置 */
             const p = window.devicePixelRatio
             let [x, y] = await getposition()
@@ -74,7 +78,7 @@ export default {
             }
             bus.status = STATUS.CAPTURE
             await this.$nextTick()
-            await sleep(20)
+            await sleep(20 * sleepRatio)
 
             const canvas = await this.getCanvas()
             /* 获取区块 */
@@ -131,7 +135,7 @@ export default {
             const { x, y } = getBlockCenter(orig)
             // 设置焦点
             await click(await toWindowPos(x, y))
-            await sleep(10)
+            await sleep(10 * sleepRatio)
             let time = 0
 
             // 按平均值先进行快速滚动
@@ -146,7 +150,7 @@ export default {
                 ipcRenderer.send('scrollTick', false)
             }
             // 延时等待抓屏
-            await sleep(30)
+            await sleep(30 * sleepRatio)
             while (true) {
                 time++
                 if (!bus.auto) {
@@ -169,24 +173,27 @@ export default {
                     }).blocks
                 })()
                 // 用opencv处理时间填充抓屏延迟
-                await Promise.all([getImage, sleep(40)])
+                await Promise.all([getImage, sleep(40 * sleepRatio)])
                 // 处理本次数据
                 const curr = blocks[0]
-                console.log(curr)
                 if (!middlePassed && curr.y <= orig.y - orig.height - 1) {
                     middlePassed = true
                     bus.devmsg = 'paging:middle'
-                } else if (middlePassed && Math.abs(curr.y - orig.y) <= Math.max(orig.height / 3, 10)) {
+                    console.log('paging:middle', curr)
+                } else if (middlePassed && Math.abs(curr.y - orig.y) <= (orig.height * 2) / 3) {
                     bus.devmsg = ''
                     // 由于预先发送滚轮，这里回头一次
                     ipcRenderer.send('scrollTick', true)
-                    await sleep(30)
+                    await sleep(30 * sleepRatio)
                     // 等待滚轮响应
-                    console.log('page done')
+                    console.log('page done', curr, orig)
                     break
-                } else if (avgTimes > 0 && time >= avgTimes * 1.5) {
+                } else if (avgTimes > 0 && time >= avgTimes * 2) {
                     // 1.5倍次数还没到，看来是到底了
+                    console.log('paging:last', curr)
                     return false
+                } else {
+                    console.log('paging:start', curr)
                 }
             }
             if (revertStatus) {
