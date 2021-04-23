@@ -30,7 +30,8 @@ export function mapcvWorkerInit() {
             const { width, height, data } = event.message.image
             fullMapMat = new cv.Mat(data, height, width, cv.CV_8UC4)
             fullMapMat = await fullMapMat.cvtColor(cv.COLOR_RGBA2RGB)
-            surf = new cv.SURFDetector(400)
+            surf = new cv.SURFDetector(150)
+            surf.upright = true
             fkeyPoints = await surf.detectAsync(fullMapMat)
             fullmapDet = await surf.computeAsync(fullMapMat, fkeyPoints)
             console.log('mapcv fullmap ready')
@@ -42,13 +43,29 @@ export function mapcvWorkerInit() {
             }
             // detect & compute small map
             const { width, height, data } = event.message.image
-            let smallMapMat = new cv.Mat(data, height, width, cv.CV_8UC4)
-            smallMapMat = await smallMapMat.cvtColor(cv.COLOR_RGBA2RGB)
+            const rawSmallMapMat = new cv.Mat(data, height, width, cv.CV_8UC4)
+            const smallMapMat = await rawSmallMapMat.cvtColor(cv.COLOR_RGBA2RGB)
+            rawSmallMapMat.release()
             const skeyPoints = await surf.detectAsync(smallMapMat)
             const smallmapDet = await surf.computeAsync(smallMapMat, skeyPoints)
-            const matches = await cv.matchFlannBasedAsync(fullmapDet, smallmapDet)
+            if (smallmapDet.empty) {
+                smallMapMat.release()
+                smallmapDet.release()
+                return reply(event, false)
+            }
+            const matches = await cv.matchKnnFlannBasedAsync(fullmapDet, smallmapDet, 2)
+
+            const ratio_thresh = 0.7
+            let bestMatches = []
+            for (const i of matches) {
+                if (i[0].distance < ratio_thresh * i[1].distance) {
+                    bestMatches.push(i[0])
+                }
+            }
+
+            // only keep good matches
             const bestN = 40
-            const bestMatches = matches
+            bestMatches = bestMatches
                 .sort((match1: any, match2: any) => match1.distance - match2.distance)
                 .slice(0, bestN)
 
@@ -66,14 +83,34 @@ export function mapcvWorkerInit() {
                 [[0, smallMapMat.rows]],
             ]
             const srcCorners = new cv.Mat(matData, cv.CV_32FC2)
-            const dstMap = srcCorners.perspectiveTransform(H.homography)
+            let dstMap
+            try {
+                dstMap = srcCorners.perspectiveTransform(H.homography)
+            } catch (e) {
+                smallMapMat.release()
+                smallmapDet.release()
+                srcCorners.release()
+                return reply(event, false)
+            }
             const dstArray = dstMap.getDataAsArray()
 
             const dstCorners = []
             for (let i = 0; i < dstArray.length; i++) {
                 dstCorners.push({ x: dstArray[i][0][0], y: dstArray[i][0][1] })
             }
-
+            const llr = Math.sqrt(
+                Math.pow(dstCorners[2].y - dstCorners[0].y, 2) + Math.pow(dstCorners[2].x - dstCorners[0].x, 2),
+            )
+            const lrl = Math.sqrt(
+                Math.pow(dstCorners[3].y - dstCorners[1].y, 2) + Math.pow(dstCorners[3].x - dstCorners[1].x, 2),
+            )
+            if (llr / lrl > 3 || lrl / llr > 3) {
+                // 对角线长度差超过3，大概率是没找到点，直接静止不动
+                smallMapMat.release()
+                smallmapDet.release()
+                srcCorners.release()
+                return reply(event, false)
+            }
             const klr = (dstCorners[2].y - dstCorners[0].y) / (dstCorners[2].x - dstCorners[0].x)
             const krl = (dstCorners[3].y - dstCorners[1].y) / (dstCorners[3].x - dstCorners[1].x)
             const cross = new cv.Point2(
@@ -84,6 +121,7 @@ export function mapcvWorkerInit() {
             smallMapMat.release()
             smallmapDet.release()
             srcCorners.release()
+            dstMap.release()
 
             reply(event, {
                 center: {

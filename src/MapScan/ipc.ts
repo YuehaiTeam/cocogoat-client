@@ -61,7 +61,5 @@ export async function sendToMapWindow(channel: string, data: any): Promise<void>
     })
     ipcRenderer.send('getMapViewWindowId', { id })
     const windowId = Number(await p)
-    console.log('get mapview window id:', windowId)
-    console.log(channel, data)
     ipcRenderer.sendTo(windowId, channel, data)
 }

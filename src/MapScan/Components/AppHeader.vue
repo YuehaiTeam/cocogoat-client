@@ -2,7 +2,7 @@
 import { devtools } from '../ipc'
 import { bus } from '../bus'
 export default {
-    emits: ['clickprocess'],
+    emits: ['auto'],
     data() {
         return {
             clickTimes: 0,
@@ -14,6 +14,9 @@ export default {
         },
         ready() {
             return bus.ready
+        },
+        auto() {
+            return bus.auto
         },
     },
     methods: {
@@ -42,12 +45,12 @@ export default {
 <template>
     <header>
         <div class="icon"></div>
-        <div class="title">{{ ready ? '小地图' : '初始化' }}</div>
+        <div class="title">{{ ready ? (auto ? '同步中' : '小地图') : '初始化' }}{{ runtimeDebug ? 'D' : '' }}</div>
         <div class="actions">
-            <button class="dump" :class="{ show: runtimeDebug }" @click="clickDebug" @contextmenu="ctxDebug">
-                <i class="el-icon-s-opportunity"></i>
+            <button class="auto" @contextmenu="clickDebug" @click="$emit('auto')">
+                <i class="el-icon-view"></i>
             </button>
-            <button class="close" @click="close">
+            <button class="close" @click="close" @contextmenu="ctxDebug">
                 <i class="el-icon-close"></i>
             </button>
         </div>

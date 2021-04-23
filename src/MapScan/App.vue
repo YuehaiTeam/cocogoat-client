@@ -12,23 +12,28 @@ export default {
     computed: {},
     async mounted() {
         ipcRenderer.send('ready')
-        setTimeout(async () => {
-            bus.ready = await mapcvInit(await this.loadMap())
-        }, 100)
+        bus.ready = await mapcvInit(await this.loadMap())
         window.$vm = this
     },
     methods: {
+        checkAuto() {
+            if (!bus.auto) {
+                this.auto()
+                return
+            }
+            bus.auto = false
+        },
         async auto() {
             bus.auto = true
             while (bus.auto) {
                 await Promise.all([sleep(200, this.processOnce())])
-                console.log('tick')
             }
         },
         async processOnce() {
             const res = await this.captureAndCompute()
-            console.log(res)
-            sendToMapWindow('position', res)
+            if (res) {
+                sendToMapWindow('position', res)
+            }
         },
         async captureAndCompute() {
             const canvas = await this.getCanvas()
@@ -91,14 +96,16 @@ export default {
                 ctx.imageSmoothingEnabled = true
                 ctx.drawImage(srcCanvas, 2, 30, w, h, 0, 0, w, h)
             }
-            new Image().src = canvas.toDataURL()
+            if (bus.runtimeDebug) {
+                new Image().src = canvas.toDataURL()
+            }
             return canvas
         },
     },
 }
 </script>
 <template>
-    <app-header />
+    <app-header @auto="checkAuto" />
 </template>
 <style lang="scss">
 @import '~@/styles/fonts.scss';
