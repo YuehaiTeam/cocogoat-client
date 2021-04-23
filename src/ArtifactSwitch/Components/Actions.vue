@@ -42,7 +42,7 @@ export default {
             </button>
             <div v-if="bus.auto" class="autotext">
                 <i class="el-icon-loading"></i>
-                {{ __(statusText) }}{{ __('，按热键(~)停止') }}
+                {{ bus.runtimeDebug && bus.devmsg ? bus.devmsg : __(statusText) }}{{ __('，按热键(~)停止') }}
             </div>
         </div>
         <div class="right-status">
