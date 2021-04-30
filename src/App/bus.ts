@@ -105,7 +105,44 @@ export function artifactPush(artifact: Artifact) {
     }
     if (!isModify) {
         const hash = calculateArtifactHash(artifact)
-        if (bus.config.options.artifacts.keepSameArtifacts || !artifactsHashes.has(hash)) {
+        let upgrade = false
+        if (bus.config.options.artifacts.upgradeArtifacts) {
+            for (const oldArtifact of bus.artifacts) {
+                let same = true
+                if (
+                    oldArtifact.main.name !== artifact.main.name ||
+                    Number(oldArtifact.main.value.replace('%', '')) > Number(artifact.main.value.replace('%', '')) ||
+                    oldArtifact.stars !== artifact.stars ||
+                    oldArtifact.name !== artifact.name
+                ) {
+                    same = false
+                    continue
+                }
+                const newSubs: Record<string, string> = {}
+                for (const newSub of artifact.sub) {
+                    newSubs[newSub.name] = newSub.value
+                }
+                for (const oldSub of oldArtifact.sub) {
+                    if (
+                        newSubs[oldSub.name] === undefined ||
+                        Number(newSubs[oldSub.name].replace('%', '')) < Number(oldSub.value.replace('%', ''))
+                    ) {
+                        same = false
+                        break
+                    }
+                }
+                if (same) {
+                    artifactsHashes.delete(calculateArtifactHash(oldArtifact))
+                    bus.artifacts.splice(bus.artifacts.indexOf(oldArtifact), 1)
+                    artifact.id = oldArtifact.id
+                    artifactsHashes.add(hash)
+                    bus.artifacts.push(artifact)
+                    upgrade = true
+                    break
+                }
+            }
+        }
+        if ((bus.config.options.artifacts.keepSameArtifacts || !artifactsHashes.has(hash)) && !upgrade) {
             bus.artifacts.push(artifact)
             artifactsHashes.add(hash)
         }

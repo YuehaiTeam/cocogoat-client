@@ -1,6 +1,7 @@
 export interface IArtifactOptions {
     preserveSwitcher: boolean
     keepSameArtifacts: boolean
+    upgradeArtifacts: boolean
     autoSwitchDelay: number
 }
 export interface IwindowStates {
@@ -47,6 +48,7 @@ export function defaultConfig(): IConfig {
             artifacts: {
                 preserveSwitcher: false,
                 keepSameArtifacts: false,
+                upgradeArtifacts: false,
                 autoSwitchDelay: 0.5,
             },
             windowStates: {},

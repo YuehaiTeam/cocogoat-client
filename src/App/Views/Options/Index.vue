@@ -203,6 +203,14 @@ export default {
                         ></el-switch>
                         <div class="form-desc">{{ __('得到两个完全一致的圣遗物的概率是多少呢？') }}</div>
                     </el-form-item>
+                    <el-form-item :label="__('升级智能判断')">
+                        <el-switch
+                            :model-value="options.artifacts.upgradeArtifacts"
+                            @update:model-value="opt('artifacts.upgradeArtifacts', $event)"
+                        ></el-switch>
+                        <div class="form-desc">{{ __('自动判断圣遗物升级(Beta)，但为什么总是女仆狂喜呢？') }}</div>
+                        <div class="form-desc">{{ __('（可能导致极少量圣遗物不入库）') }}</div>
+                    </el-form-item>
                     <el-form-item :label="__('独立切换模式')">
                         <el-switch
                             :model-value="options.artifacts.preserveSwitcher"
