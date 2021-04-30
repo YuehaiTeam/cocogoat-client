@@ -152,7 +152,6 @@ const getStander = {
         停摆之刻: ['paleFlame', 'sand'],
         超越之盏: ['paleFlame', 'cup'],
         嗤笑之面: ['paleFlame', 'head'],
-
     },
     tag: <Record<string, string>>{
         暴击率: 'critical',
@@ -212,9 +211,9 @@ export function convertAsMona(artifacts: Artifact[], raw = false) {
             sub.push({
                 name:
                     artifacts[i].sub[j].value.includes('%') ||
-                        (!artifacts[i].sub[j].name.includes('生命值') &&
-                            !artifacts[i].sub[j].name.includes('防御力') &&
-                            !artifacts[i].sub[j].name.includes('攻击力'))
+                    (!artifacts[i].sub[j].name.includes('生命值') &&
+                        !artifacts[i].sub[j].name.includes('防御力') &&
+                        !artifacts[i].sub[j].name.includes('攻击力'))
                         ? getStander.tag[artifacts[i].sub[j].name]
                         : getStander.tag['固定' + artifacts[i].sub[j].name],
                 value: artifacts[i].sub[j].value.includes('%')
@@ -230,9 +229,9 @@ export function convertAsMona(artifacts: Artifact[], raw = false) {
                 mainTag: {
                     name:
                         artifacts[i].main.value.includes('%') ||
-                            (!artifacts[i].main.name.includes('生命值') &&
-                                !artifacts[i].main.name.includes('防御力') &&
-                                !artifacts[i].main.name.includes('攻击力'))
+                        (!artifacts[i].main.name.includes('生命值') &&
+                            !artifacts[i].main.name.includes('防御力') &&
+                            !artifacts[i].main.name.includes('攻击力'))
                             ? getStander.tag[artifacts[i].main.name]
                             : getStander.tag['固定' + artifacts[i].main.name],
                     value: artifacts[i].main.value.includes('%')
