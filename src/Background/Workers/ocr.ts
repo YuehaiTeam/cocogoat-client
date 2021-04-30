@@ -74,6 +74,7 @@ export async function ocrWorkerInit(data: { rec: string; det: string; dic: strin
         if (event.event === 'ocr') {
             const { width, height, data } = event.message.image
             const result: IocrResult[] = ppocr.ocr(width, height, data)
+            result.reverse()
             parentPort.postMessage({
                 event: 'reply',
                 message: result,
