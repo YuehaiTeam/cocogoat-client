@@ -1,6 +1,6 @@
 {
   "name": "cocogoat",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "cocogoat, produces cocomilk.",
   "author": "月海亭YuehaiTeam",
   "private": true,
@@ -17,7 +17,6 @@
   "dependencies": {
     "@sentry/electron": "^2.4.0",
     "@sentry/integrations": "^6.2.5",
-    "@types/lodash": "^4.14.168",
     "color-diff": "^1.2.0",
     "context-filter-polyfill": "^0.2.4",
     "core-js": "^3.6.5",
@@ -43,6 +42,7 @@
     "xss": "^1.0.8"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.168",
     "@sentry/webpack-plugin": "^1.15.0",
     "@types/ffi-napi": "^2.4.3",
     "@types/ref-napi": "^1.4.1",
