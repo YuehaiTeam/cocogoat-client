@@ -246,9 +246,7 @@ export default {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                const d1 = Date.now()
                 await tryocr()
-                console.log('d1', Date.now() - d1)
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
             }

@@ -99,7 +99,6 @@ export default {
             return split(canvas, posObj)
         },
         async processOnce() {
-            const d2 = Date.now()
             /* 计算窗口位置 */
             const p = window.devicePixelRatio
             let [x, y] = await getposition()
@@ -111,7 +110,6 @@ export default {
             /* 抓屏 */
             let canvas = await capture(x, y, w * p, h * p)
 
-            console.log('d2', Date.now() - d2)
             /* 高dpi缩放 */
             if (p !== 1) {
                 let srcCanvas = canvas
@@ -132,13 +130,10 @@ export default {
             }
 
             /* OCR、识别 */
-            const d1 = Date.now()
             const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ret)
-            console.log(Date.now() - d1)
             status.artifact = artifact
             status.potentialErrors = potentialErrors
             this.saveToMain()
-            console.log('dx', Date.now() - d2)
             ;(async () => {
                 console.log(artifact, ocrResult)
                 const wrongReportData = JSON.parse(
