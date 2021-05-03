@@ -1,7 +1,7 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { Artifact } from '@/typings/Artifact'
-import { EBuild, IConfig } from '@/typings/config'
+import { defaultConfig, EBuild, IConfig } from '@/typings/config'
 import { reactive, watch } from 'vue'
 import { getConfig, readArtifacts } from './ipc'
 import { ipcRenderer } from 'electron'
@@ -16,30 +16,32 @@ interface IBusData {
     artifacts: Artifact[]
     hasUpgrade: boolean
 }
+
+// for deduplication
+const artifactsHashes = new Set<string>()
+function calculateArtifactHash(artifact: Artifact): string {
+    const prefix = `${artifact.name}-${artifact.level}-${artifact.main.name}-${artifact.main.value}-${artifact.stars}`
+    const subs = artifact.sub.map((s) => `${s.name}-${s.value}`)
+    return [prefix, ...subs].join('_')
+}
+
 export const bus = reactive(<IBusData>{
-    config: {
-        version: '',
-        build: null,
-        dataDir: '',
-        configDir: '',
-        options: {
-            firstRun: true,
-            sendErrorReports: true,
-            sendWrongOCRReports: false,
-            artifacts: {
-                preserveSwitcher: false,
-                keepSameArtifacts: false,
-                autoSwitchDelay: 0.5,
-            },
-        },
-    },
+    config: defaultConfig(),
     artifacts: [],
     hasUpgrade: false,
 })
 export async function loadData() {
     bus.config = await getConfig()
     try {
-        bus.artifacts = await readArtifacts()
+        bus.artifacts = []
+        const artifacts = await readArtifacts()
+        for (const artifact of artifacts) {
+            const hash = calculateArtifactHash(artifact)
+            if (!artifactsHashes.has(hash)) {
+                artifactsHashes.add(hash)
+            }
+            bus.artifacts.push(artifact)
+        }
     } catch (e) {
         bus.artifacts = []
     }
@@ -48,9 +50,7 @@ export async function loadData() {
     })
 
     ipcRenderer.on('artifactDelete', (event, { id }: { id: number }) => {
-        bus.artifacts = bus.artifacts.filter((e) => {
-            return e.id !== id
-        })
+        artifactDelete(id)
     })
 
     watch(
@@ -87,7 +87,16 @@ export function artifactPush(artifact: Artifact) {
                 if (bus.artifacts[i].id === artifact.id) {
                     // ID重复，是修改。
                     isModify = true
+
+                    const oldHash = calculateArtifactHash(bus.artifacts[i])
+                    artifactsHashes.delete(oldHash)
+                    const newHash = calculateArtifactHash(artifact)
+                    // if (!bus.config.options.artifacts.keepSameArtifacts && artifactsHashes.has(newHash)) {
+                    //     // 改成和某个已有的圣遗物一样了。怎么办？去重模式下直接去掉
+                    // } else {
                     bus.artifacts[i] = artifact
+                    artifactsHashes.add(newHash)
+                    // }
                     console.log('EDIT', artifact)
                     break
                 }
@@ -95,10 +104,65 @@ export function artifactPush(artifact: Artifact) {
         }
     }
     if (!isModify) {
-        bus.artifacts.push(artifact)
+        const hash = calculateArtifactHash(artifact)
+        let upgrade = false
+        if (bus.config.options.artifacts.upgradeArtifacts) {
+            for (const oldArtifact of bus.artifacts) {
+                let same = true
+                if (
+                    oldArtifact.main.name !== artifact.main.name ||
+                    Number(oldArtifact.main.value.replace('%', '')) > Number(artifact.main.value.replace('%', '')) ||
+                    oldArtifact.stars !== artifact.stars ||
+                    oldArtifact.name !== artifact.name
+                ) {
+                    same = false
+                    continue
+                }
+                const newSubs: Record<string, string> = {}
+                for (const newSub of artifact.sub) {
+                    newSubs[newSub.name] = newSub.value
+                }
+                for (const oldSub of oldArtifact.sub) {
+                    if (
+                        newSubs[oldSub.name] === undefined ||
+                        Number(newSubs[oldSub.name].replace('%', '')) < Number(oldSub.value.replace('%', ''))
+                    ) {
+                        same = false
+                        break
+                    }
+                }
+                if (same) {
+                    artifactsHashes.delete(calculateArtifactHash(oldArtifact))
+                    bus.artifacts.splice(bus.artifacts.indexOf(oldArtifact), 1)
+                    artifact.id = oldArtifact.id
+                    artifactsHashes.add(hash)
+                    bus.artifacts.push(artifact)
+                    upgrade = true
+                    break
+                }
+            }
+        }
+        if ((bus.config.options.artifacts.keepSameArtifacts || !artifactsHashes.has(hash)) && !upgrade) {
+            bus.artifacts.push(artifact)
+            artifactsHashes.add(hash)
+        }
         console.log('PUSH', artifact)
     }
 }
+export function artifactDelete(id: number) {
+    bus.artifacts = bus.artifacts.filter((e) => {
+        const preserve = e.id !== id
+        if (!preserve) {
+            artifactsHashes.delete(calculateArtifactHash(e))
+        }
+        return preserve
+    })
+}
+export function artifactClear() {
+    bus.artifacts = []
+    artifactsHashes.clear()
+}
+
 watch(
     () => bus.artifacts,
     async (newValue) => {

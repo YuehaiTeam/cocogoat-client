@@ -81,19 +81,19 @@ export default defineComponent({
             </div>
             <div class="image" :style="{ backgroundImage: getImg(artifact.name) }"></div>
             <div class="main">
-                <el-select v-model="artifact.main.name" size="small" placeholder="主词条名">
+                <el-select v-model="artifact.main.name" size="small" :placeholder="__('主词条名')">
                     <el-option v-for="(j, a) in ArtifactParamTypes" :key="a" :value="j" :label="j"></el-option>
                 </el-select>
-                <el-input v-model="artifact.main.value" size="small" placeholder="主词条值"> </el-input>
+                <el-input v-model="artifact.main.value" size="small" :placeholder="__('主词条值')"> </el-input>
             </div>
             <br />
             {{ __('副词条') }}<br />
-            <el-empty v-if="artifact.sub.length <= 0" :image-size="80" description="暂无副词条"></el-empty>
+            <el-empty v-if="artifact.sub.length <= 0" :image-size="80" :description="__('暂无副词条')"></el-empty>
             <ul v-else class="sub">
                 <li v-for="(i, a) in artifact.sub" :key="a">
-                    <el-input v-model="i.value" size="small" placeholder="属性值">
+                    <el-input v-model="i.value" size="small" :placeholder="__('属性值')">
                         <template #prepend>
-                            <el-select v-model="i.name" size="small" placeholder="属性名">
+                            <el-select v-model="i.name" size="small" :placeholder="__('属性名')">
                                 <el-option
                                     v-for="(j, a) in ArtifactSubParamTypes"
                                     :key="a"

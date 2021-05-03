@@ -1,9 +1,9 @@
 import { app, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ocrInit, ocrStop } from './ocr'
-import path from 'path'
 import { config } from '@/typings/config'
 import { mapcvInit, mapcvStop } from './mapcv'
+import { loadState, saveState, createTemplateWindow } from './Utils/windowHelper'
 export const windows = <Record<string, BrowserWindow | null>>{
     app: null,
     artifactView: null,
@@ -19,6 +19,7 @@ export async function createWindow() {
             webviewTag: true,
             // @ts-ignore
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+            contextIsolation: false,
         },
         show: false,
     })
@@ -34,143 +35,74 @@ export async function createWindow() {
     })
 }
 export async function createArtifactView() {
-    if (windows.artifactView) {
-        if (windows.artifactView) {
-            windows.artifactView.focus()
-        }
-        return
-    }
-    windows.artifactView = new BrowserWindow({
-        width: 410,
-        height: 810,
-        frame: false,
-        transparent: true,
-        alwaysOnTop: true,
-        maximizable: false,
-        webPreferences: {
-            // @ts-ignore
-            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+    createTemplateWindow(
+        'artifactView',
+        {
+            ...loadState('artifactView', 410, 810),
+            transparent: true,
+            alwaysOnTop: true,
+            maximizable: false,
         },
-        show: false,
-    })
-    windows.artifactView.on('close', () => {
-        windows.artifactView = null
-        if (windows.app && windows.app.isMinimized()) {
-            windows.app.restore()
-        }
-        if (!config.options.artifacts.preserveSwitcher && windows.artifactSwitch) {
-            windows.artifactSwitch.close()
-        }
-        ocrStop()
-    })
-    windows.artifactView.on('closed', () => {
-        windows.artifactView = null
-    })
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-        await windows.artifactView.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}ArtifactView.html`)
-        if (windows.app) {
-            windows.artifactView.webContents.executeJavaScript('window.creatorId = ' + windows.app.webContents.id + ';')
-        }
-        if (!process.env.IS_TEST) windows.artifactView.webContents.openDevTools()
-    } else {
-        windows.artifactView.loadURL('app://./ArtifactView.html')
-    }
+        () => {
+            saveState('artifactView')
+            windows.artifactView = null
+            if (windows.app && windows.app.isMinimized()) {
+                windows.app.restore()
+            }
+            if (!config.options.artifacts.preserveSwitcher && windows.artifactSwitch) {
+                windows.artifactSwitch.close()
+            }
+            ocrStop()
+        },
+    )
     ocrInit()
 }
 export async function createArtifactSwitch() {
-    if (windows.artifactSwitch) {
-        windows.artifactSwitch.focus()
-        return
-    }
-    windows.artifactSwitch = new BrowserWindow({
-        width: 888,
-        height: 810,
-        frame: false,
-        transparent: true,
-        alwaysOnTop: true,
-        maximizable: false,
-        webPreferences: {
-            // @ts-ignore
-            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+    createTemplateWindow(
+        'artifactSwitch',
+        {
+            ...loadState('artifactSwitch', 888, 810),
+            transparent: true,
+            alwaysOnTop: true,
+            maximizable: false,
         },
-        show: false,
-    })
-    windows.artifactSwitch.on('close', () => {
-        windows.artifactSwitch = null
-    })
-    windows.artifactSwitch.on('closed', () => {
-        windows.artifactSwitch = null
-    })
-    const params =
-        `dataDir=${encodeURIComponent(path.join(__dirname, '..', 'data'))}` +
-        `&windowAppId=${windows.app ? windows.app.webContents.id : -1}` +
-        `&windowArtifactViewId=${windows.artifactView ? windows.artifactView.webContents.id : -1}`
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-        await windows.artifactSwitch.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}ArtifactSwitch.html?${params}`)
-        if (!process.env.IS_TEST) windows.artifactSwitch.webContents.openDevTools()
-    } else {
-        windows.artifactSwitch.loadURL('app://./ArtifactSwitch.html?' + params)
-    }
+        () => {
+            saveState('artifactSwitch')
+        },
+    )
 }
 
 export async function createMapView() {
-    if (windows.mapView) {
-        windows.mapView.focus()
-        return
-    }
-    windows.mapView = new BrowserWindow({
-        width: 320,
-        height: 420,
-        frame: false,
-        alwaysOnTop: true,
-        maximizable: false,
-        webPreferences: {
-            // @ts-ignore
-            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-            contextIsolation: false,
-            webviewTag: true,
+    createTemplateWindow(
+        'mapView',
+        {
+            ...loadState('mapView', 320, 420),
+            transparent: false,
+            alwaysOnTop: true,
+            maximizable: true,
+            webPreferences: {
+                webviewTag: true,
+            },
         },
-        show: false,
-    })
-    windows.mapView.on('close', () => {
-        windows.mapView = null
-    })
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-        await windows.mapView.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}MapView.html`)
-        if (!process.env.IS_TEST) windows.mapView.webContents.openDevTools()
-    } else {
-        windows.mapView.loadURL('app://./MapView.html')
-    }
+        () => {
+            saveState('mapView')
+        },
+    )
 }
 export async function createMapScan() {
-    if (windows.mapScan) {
-        windows.mapScan.focus()
-        return
-    }
-    windows.mapScan = new BrowserWindow({
-        width: 125,
-        height: 165,
-        frame: false,
-        transparent: true,
-        alwaysOnTop: true,
-        maximizable: false,
-        webPreferences: {
-            // @ts-ignore
-            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-            contextIsolation: false,
+    createTemplateWindow(
+        'mapScan',
+        {
+            ...loadState('mapScan', 125, 165),
+            transparent: true,
+            alwaysOnTop: true,
+            maximizable: false,
         },
-        show: false,
-    })
-    windows.mapScan.on('close', () => {
-        windows.mapScan = null
-        mapcvStop()
-    })
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-        await windows.mapScan.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}MapScan.html`)
-        if (!process.env.IS_TEST) windows.mapScan.webContents.openDevTools()
-    } else {
-        windows.mapScan.loadURL('app://./MapScan.html')
-    }
-
+        () => {
+            saveState('mapScan')
+            windows.mapScan = null
+            mapcvStop()
+        },
+    )
     mapcvInit()
 }

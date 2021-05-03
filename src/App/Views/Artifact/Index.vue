@@ -2,9 +2,15 @@
 import Artifact from './Components/Artifact.vue'
 import { Artifact as ArtifactType } from '@/typings/Artifact'
 import ArtifactEditPanel from './Components/EditPanel.vue'
-import { openArtifactView, showSaveDialog } from '../../ipc'
-import { ElNotification } from 'element-plus'
-import { artifactPush, bus } from '@/App/bus'
+import {
+    openArtifactView,
+    showSaveDialog,
+    openExternal,
+    checkDwmIsCompositionEnabled,
+    checkVCRedistInstalled,
+} from '../../ipc'
+import { ElMessageBox, ElNotification } from 'element-plus'
+import { artifactClear, artifactDelete, artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { clipboard } from 'electron'
 import { defineComponent } from 'vue'
@@ -43,7 +49,34 @@ export default defineComponent({
                 user: '',
             } as ArtifactType
         },
-        openArtifactView() {
+        async openArtifactView() {
+            try {
+                if (!(await checkVCRedistInstalled())) {
+                    await ElMessageBox.confirm(
+                        __(
+                            '您的系统似乎没有安装微软运行库 (下载地址：https://aka.ms/vs/16/release/vc_redist.x64.exe) ，识别功能将无法正常使用。',
+                        ),
+                        __('提示'),
+                        {
+                            confirmButtonText: __('前往下载'),
+                            cancelButtonText: __('仍然尝试'),
+                            type: 'warning',
+                        },
+                    )
+                    openExternal('https://aka.ms/vs/16/release/vc_redist.x64.exe')
+                    return
+                }
+            } catch (e) {}
+            try {
+                if (!(await checkDwmIsCompositionEnabled())) {
+                    await ElMessageBox.confirm(__('您的系统似乎没有启用Aero，识别功能可能无法正常使用。'), __('提示'), {
+                        confirmButtonText: __('确认'),
+                        cancelButtonText: __('仍然尝试'),
+                        type: 'warning',
+                    })
+                    return
+                }
+            } catch (e) {}
             ElNotification({
                 type: 'info',
                 title: __('正在打开圣遗物识别工具'),
@@ -53,13 +86,11 @@ export default defineComponent({
             openArtifactView()
         },
         doDelete(id: number) {
-            bus.artifacts = bus.artifacts.filter((e) => {
-                return e.id !== id
-            })
+            artifactDelete(id)
         },
         doDeleteSelected() {
-            bus.artifacts = bus.artifacts.filter((e) => {
-                return !this.selectedIds.includes(e.id)
+            this.selectedIds.forEach((id) => {
+                artifactDelete(id)
             })
             this.selectedIds = []
         },
@@ -82,7 +113,7 @@ export default defineComponent({
             this.showEdit = false
         },
         doClear() {
-            bus.artifacts = []
+            artifactClear()
             this.selectedIds = []
         },
         doSelect(id: number, status: boolean) {

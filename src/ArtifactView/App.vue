@@ -1,5 +1,6 @@
 <script>
 import { watch } from 'vue'
+import { __ } from '@/i18n'
 import { sleep } from './utils'
 import { ipcRenderer } from 'electron'
 import { status, STATUS } from './status'
@@ -84,7 +85,6 @@ export default {
         async processWithTimeout() {
             if (status.status === STATUS.LOADING) return
             status.status = STATUS.LOADING
-            await sleep(80)
             try {
                 const [result] = await Promise.all([this.processOnce(), sleep(200)])
                 status.status = STATUS.SUCCESS
@@ -217,8 +217,8 @@ export default {
                 this.feedbackVisible = false
                 ElMessageBox({
                     type: 'success',
-                    title: '感谢您的反馈',
-                    message: `数据已提交，我们将尽快检查与改进。 ID：${id || 0}`,
+                    title: __('感谢您的反馈'),
+                    message: `${__('数据已提交，我们将尽快检查与改进。')} ID：${id || 0}`,
                 })
             } catch (e) {}
             this.feedbackLoading = false
@@ -240,24 +240,26 @@ export default {
         />
         <el-dialog v-model="feedbackVisible" title="反馈识别错误" width="90%">
             <div class="feedback-desc">
-                反馈识别信息将会发送以下内容到我们的服务器：
+                {{ __('反馈识别信息将会发送以下内容到我们的服务器：') }}
                 <ul>
-                    <li>- 本次抓取到的圣遗物图片</li>
-                    <li>- 您设备的屏幕分辨率和dpi</li>
-                    <li>- 本地ORC识别结果与纠错尝试</li>
-                    <li>- 您在下方填写的备注文字信息</li>
+                    <li>- {{ __('本次抓取到的圣遗物图片') }}</li>
+                    <li>- {{ __('您设备的屏幕分辨率和dpi') }}</li>
+                    <li>- {{ __('本地OCR识别结果与纠错尝试') }}</li>
+                    <li>- {{ __('您在下方填写的备注文字信息') }}</li>
                 </ul>
-                若您不主动向我们反馈，这些内容都会在识别下一个圣遗物后被删除。
+                {{ __('若您不主动向我们反馈，这些内容都会在识别下一个圣遗物后被删除。') }}
             </div>
             <el-input
                 v-model="feedbackContent"
                 type="textarea"
-                placeholder="有什么特别的备注吗？也可以留空。"
+                :placeholder="__('有什么特别的备注吗？也可以留空。')"
             ></el-input>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="feedbackVisible = false">取消</el-button>
-                    <el-button :loading="feedbackLoading" type="primary" @click="doFeedback">发送</el-button>
+                    <el-button @click="feedbackVisible = false">{{ __('取消') }}</el-button>
+                    <el-button :loading="feedbackLoading" type="primary" @click="doFeedback">
+                        {{ __('发送') }}
+                    </el-button>
                 </span>
             </template>
         </el-dialog>

@@ -97,6 +97,13 @@ export default {
                 ipcRenderer.send('devtoolsApp')
             }
         },
+        doClearWindowStates() {
+            bus.config.options.windowStates = {}
+            ElNotification({
+                type: 'success',
+                title: this.__('窗口状态数据已清除'),
+            })
+        },
     },
 }
 </script>
@@ -127,7 +134,7 @@ export default {
         v-if="newVersion"
         v-model="showUpgrade"
         custom-class="upgrade-dialog"
-        :title="`新版本: v${newVersion.version}`"
+        :title="`${__('新版本:')} v${newVersion.version}`"
         width="400px"
     >
         <section class="version-details">
@@ -136,7 +143,7 @@ export default {
         </section>
         <template #footer>
             <span class="dialog-footer" @click="doUpgrade">
-                <el-button size="small" style="width: 100%" type="primary">更新</el-button>
+                <el-button size="small" style="width: 100%" type="primary">{{ __('更新') }}</el-button>
             </span>
         </template>
     </el-dialog>
@@ -173,6 +180,15 @@ export default {
                     >
                     </el-switch>
                 </div>
+                <br />
+                <el-form label-position="right" label-width="auto" size="small">
+                    <el-form-item :label="__('窗口状态数据')">
+                        <el-button @click="doClearWindowStates">
+                            {{ __('清除保存的窗口数据') }}
+                        </el-button>
+                        <div class="form-desc">{{ __('这在你找不到悬浮窗时或许有用。') }}</div>
+                    </el-form-item>
+                </el-form>
             </div>
         </article>
         <article>
@@ -181,8 +197,19 @@ export default {
             <div class="content">
                 <el-form label-position="right" label-width="auto" size="small">
                     <el-form-item :label="__('保留重复识别')">
-                        <el-switch disabled :model-value="options.artifacts.keepSameArtifacts"></el-switch>
+                        <el-switch
+                            :model-value="options.artifacts.keepSameArtifacts"
+                            @update:model-value="opt('artifacts.keepSameArtifacts', $event)"
+                        ></el-switch>
                         <div class="form-desc">{{ __('得到两个完全一致的圣遗物的概率是多少呢？') }}</div>
+                    </el-form-item>
+                    <el-form-item :label="__('升级智能判断')">
+                        <el-switch
+                            :model-value="options.artifacts.upgradeArtifacts"
+                            @update:model-value="opt('artifacts.upgradeArtifacts', $event)"
+                        ></el-switch>
+                        <div class="form-desc">{{ __('自动判断圣遗物升级(Beta)，但为什么总是女仆狂喜呢？') }}</div>
+                        <div class="form-desc">{{ __('（可能导致极少量圣遗物不入库）') }}</div>
                     </el-form-item>
                     <el-form-item :label="__('独立切换模式')">
                         <el-switch
@@ -194,7 +221,7 @@ export default {
                     <el-form-item :label="__('自动切换延迟')">
                         <el-input-number
                             :modelValue="options.artifacts.autoSwitchDelay"
-                            :min="0.5"
+                            :min="0"
                             :precision="1"
                             :step="0.1"
                             :max="30"

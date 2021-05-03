@@ -38,6 +38,9 @@ export function textChinese(t: string) {
     if (!str) throw new Error(`${t} doesn't contains chinese`)
     return str
 }
+export function textCNEN(t: string) {
+    return t.match(/[a-zA-Z\u4e00-\u9fa5]/g)?.join('') || ''
+}
 export function textNumber(t: string) {
     const str = t.replace(/[^\d.]/g, '')
     if (!str) throw new Error(`${t} doesn't contains number`)
@@ -119,7 +122,7 @@ export function findBestMatch(mainString: string, targetStrings: string[]) {
 export function findLowConfidence(page: any, lowerThan: number, numberOnly = true) {
     const potentialErrors: string[] = []
     for (const i of page.words) {
-        if (i.confidence > 0 && i.confidence < lowerThan) {
+        if (i.confidence > 0 && i.confidence < lowerThan / 100) {
             // 置信度低于预期
             // 如果只判断数字
             if (numberOnly) {

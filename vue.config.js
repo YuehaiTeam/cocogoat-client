@@ -85,7 +85,6 @@ module.exports = {
                     '!**/zlibjs/**', // zlibjs is not used during runtime
                     '!**/node_modules/nan/**', // nan is not used during runtime
                     '!**/prebuild-install/**', // prebuild-install is not used during runtime
-                    '!**/ref-napi/docs/**', // docs is not needed
                 ],
             },
         },

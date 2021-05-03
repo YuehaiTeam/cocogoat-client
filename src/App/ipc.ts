@@ -11,6 +11,9 @@ export function openArtifactView() {
 export function upgrade(url: string, patch = false) {
     ipcRenderer.send('doUpgrade', { url, patch })
 }
+export function openExternal(url: string) {
+    ipcRenderer.send('openExternal', { url })
+}
 
 export async function getApphash(): Promise<IConfig> {
     const id = uuid()
@@ -44,4 +47,27 @@ export async function showSaveDialog(options: SaveDialogOptions) {
     })
     ipcRenderer.send('showSaveDialog', { id, options })
     return <SaveDialogReturnValue>await p
+}
+export async function checkDwmIsCompositionEnabled(): Promise<boolean> {
+    const id = uuid()
+    const p = new Promise((resolve, reject) => {
+        ipcRenderer.once(`checkDwmIsCompositionEnabled-${id}`, (result, data) => {
+            if (data.error) {
+                return reject(new Error(`WinAPI Error: 0x${data.error.toString(16)}`))
+            }
+            resolve(data.enabled)
+        })
+    })
+    ipcRenderer.send('checkDwmIsCompositionEnabled', { id })
+    return <boolean>await p
+}
+export async function checkVCRedistInstalled(): Promise<boolean> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`checkVCRedistInstalled-${id}`, (result, data) => {
+            resolve(data)
+        })
+    })
+    ipcRenderer.send('checkVCRedistInstalled', { id })
+    return <boolean>await p
 }

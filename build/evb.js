@@ -17,6 +17,7 @@ exports.default = async function (context) {
     const projDir = path.dirname(baseDir)
     const distDir = path.join(baseDir, 'win-unpacked')
     const ouptDir = path.join(projDir, 'dist')
+    const builDir = path.join(projDir, 'build')
     const packageJSON = await fsex.readJSON(path.join(projDir, 'package.json'))
     const build = dayjs().format('YYMMDDHHmm')
     const buildData = {
@@ -37,8 +38,29 @@ exports.default = async function (context) {
             if (name === 'cocogoat.exe') return false
             return true
         },
-        shareVirtualSystem: true,
+        evbOptions: {
+            compressFiles: false,
+        },
+        templatePath: {
+            project: path.join(builDir, 'evb-templates', 'project-template.xml'),
+            dir: path.join(builDir, 'evb-templates', 'dir-template.xml'),
+            file: path.join(builDir, 'evb-templates', 'file-template.xml'),
+        },
     })
+
+    /* 为虚拟路径创建占位符，并替换至evb文件中 */
+    const emptyFile = path.join(baseDir, 'empty')
+    await fsex.writeFile(emptyFile, '')
+    let evbContent = (
+        await fsex.readFile(evbFile, {
+            encoding: 'ucs2',
+        })
+    ).toString()
+    evbContent = evbContent.replace(/{{empty}}/g, emptyFile)
+    await fsex.writeFile(evbFile, evbContent, {
+        encoding: 'ucs2',
+    })
+
     console.log('start packaging ' + evbFile)
     const evbexe = evb.path('cli')
     const child = spawn(evbexe, [evbFile])

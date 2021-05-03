@@ -56,9 +56,9 @@ export default {
             </div>
         </div>
         <div class="main" :class="{ 'maybe-wrong': potentialErrors.includes(artifact.main.value) }">
-            <el-input v-model="artifact.main.value" size="small" placeholder="属性值">
+            <el-input v-model="artifact.main.value" size="small" :placeholder="__('主词条值')">
                 <template #prepend>
-                    <el-select v-model="artifact.main.name" size="small" placeholder="属性名">
+                    <el-select v-model="artifact.main.name" size="small" :placeholder="__('主词条名')">
                         <el-option v-for="(j, a) in ArtifactParamTypes" :key="a" :value="j" :label="j"></el-option>
                     </el-select>
                 </template>
@@ -69,9 +69,9 @@ export default {
         </div>
         <ul class="sub">
             <li v-for="(i, a) in artifact.sub" :key="a" :class="{ 'maybe-wrong': potentialErrors.includes(i.value) }">
-                <el-input v-model="i.value" size="small" placeholder="属性值">
+                <el-input v-model="i.value" size="small" :placeholder="__('属性值')">
                     <template #prepend>
-                        <el-select v-model="i.name" size="small" placeholder="属性名">
+                        <el-select v-model="i.name" size="small" :placeholder="__('属性名')">
                             <el-option
                                 v-for="(j, a) in ArtifactSubParamTypes"
                                 :key="a"

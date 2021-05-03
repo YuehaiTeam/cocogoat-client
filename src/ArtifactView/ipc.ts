@@ -1,6 +1,7 @@
 // @ts-ignore
 import { v4 as uuid } from 'uuid'
 import { ipcRenderer } from 'electron'
+import { IocrResult } from '@/typings/ocr'
 export { getConfig } from '@/App/ipc'
 interface IactiveWindow {
     os: string
@@ -47,13 +48,13 @@ export async function getActiveWindow(): Promise<IactiveWindow> {
     ipcRenderer.send('getActiveWindow', { id })
     return <IactiveWindow>await p
 }
-export async function ocr(image: string | Record<string, any>): Promise<any> {
+export async function ocr(image: string | Record<string, any>): Promise<IocrResult[]> {
     const id = uuid()
     const p = new Promise((resolve) => {
         ipcRenderer.once(`ocr-${id}`, (result, data) => resolve(data))
     })
     ipcRenderer.send('ocr', { image, id })
-    return <any>await p
+    return <IocrResult[]>await p
 }
 export function close() {
     ipcRenderer.send('closeArtifactView')

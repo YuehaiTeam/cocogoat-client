@@ -142,6 +142,16 @@ const getStander = {
         游医的怀钟: ['travelingDoctor', 'sand'],
         游医的药壶: ['travelingDoctor', 'cup'],
         游医的方巾: ['travelingDoctor', 'head'],
+        勋绩之花: ['tenacityOfTheMillelith', 'flower'],
+        昭武翎羽: ['tenacityOfTheMillelith', 'feather'],
+        金铜时晷: ['tenacityOfTheMillelith', 'sand'],
+        盟誓金爵: ['tenacityOfTheMillelith', 'cup'],
+        将帅兜鍪: ['tenacityOfTheMillelith', 'head'],
+        无垢之花: ['paleFlame', 'flower'],
+        贤医之羽: ['paleFlame', 'feather'],
+        停摆之刻: ['paleFlame', 'sand'],
+        超越之盏: ['paleFlame', 'cup'],
+        嗤笑之面: ['paleFlame', 'head'],
     },
     tag: <Record<string, string>>{
         暴击率: 'critical',
@@ -164,16 +174,37 @@ const getStander = {
         雷元素伤害加成: 'thunderBonus',
     },
 }
-
+export type MonaArtifactTypeName = 'flower' | 'feather' | 'sand' | 'cup' | 'head'
+interface MonaArtifact {
+    setName: string // 套装名
+    detailName: string // 中文名
+    position: MonaArtifactTypeName // 位置, slot
+    mainTag: any // 主词条, main stat
+    normalTags: any[] // 副词条, sub stat
+    omit: boolean // 是否禁用该圣遗物, disabled or not
+    level: number // 等级，整数, integer
+    star: number // 星级，整数, integer
+}
+interface MonaInterface {
+    version?: string
+    cocogoat?: string
+    flower: MonaArtifact[]
+    feather: MonaArtifact[]
+    sand: MonaArtifact[]
+    cup: MonaArtifact[]
+    head: MonaArtifact[]
+}
 export function convertAsMona(artifacts: Artifact[], raw = false) {
     console.log(artifacts)
-    const json = <Record<string, {}[]>>{
+    const json = {
+        version: '1',
+        cocogoat: '1',
         flower: [],
         feather: [],
         sand: [],
         cup: [],
         head: [],
-    }
+    } as MonaInterface
     for (let i = 0; i < artifacts.length; i++) {
         const sub = []
         for (let j = 0; j < artifacts[i].sub.length; j++) {
@@ -191,7 +222,7 @@ export function convertAsMona(artifacts: Artifact[], raw = false) {
             })
         }
         try {
-            const tmp = {
+            const tmp = <MonaArtifact>{
                 setName: getStander.setName[artifacts[i].name][0],
                 detailName: artifacts[i].name,
                 position: getStander.setName[artifacts[i].name][1],

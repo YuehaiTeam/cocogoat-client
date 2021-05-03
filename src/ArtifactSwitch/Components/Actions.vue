@@ -1,4 +1,5 @@
 <script>
+import { __ } from '@/i18n'
 import { bus, STATUS } from '../bus'
 export default {
     emits: ['pagedown', 'detectonce', 'startauto'],
@@ -17,6 +18,10 @@ export default {
                     return '准备中'
             }
         },
+        numberText() {
+            const translated = __('当前页 %1 个  总第 %2 / %3 个', bus.currentCount, bus.checkedCount, bus.totalCount)
+            return translated.split(/(\d+)/)
+        },
     },
 }
 </script>
@@ -25,27 +30,30 @@ export default {
         <div class="left-btn">
             <button v-if="bus.status === STATUS.CAPTURE && !bus.auto" size="mini">
                 <i class="el-icon-loading"></i>
-                检测中
+                {{ __('正在检测') }}
             </button>
             <button v-if="bus.status !== STATUS.CAPTURE && !bus.auto" size="mini" @click="$emit('detectonce')">
                 <i class="el-icon-location-information"></i>
-                尝试检测
+                {{ __('尝试检测') }}
             </button>
             <button v-if="!bus.intro && !bus.auto" size="mini" @click="$emit('startauto')">
                 <i class="el-icon-s-flag"></i>
-                开始切换
+                {{ __('开始切换') }}
             </button>
             <div v-if="bus.auto" class="autotext">
                 <i class="el-icon-loading"></i>
-                {{ statusText }}，按热键(~)停止
+                {{ __(statusText) }}{{ __('，按热键(~)停止') }}
             </div>
         </div>
         <div class="right-status">
-            <div v-if="bus.status === STATUS.ERROR" class="error">检测失败</div>
+            <div v-if="bus.status === STATUS.ERROR" class="error">{{ __('检测失败') }}</div>
             <div v-else>
-                当前页
-                <span class="num">{{ bus.currentCount }}</span> 个 &nbsp;&nbsp; 总第
-                <span class="num">{{ bus.checkedCount }}</span> / <span class="num">{{ bus.totalCount }}</span> 个
+                {{ numberText[0] }}
+                <span class="num">{{ numberText[1] }}</span>
+                {{ numberText[2].trim().replace('  ', '&nbsp;&nbsp;&nbsp;') }}
+                <span class="num">{{ numberText[3] }}</span
+                >{{ numberText[4] }}<span class="num">{{ numberText[5] }}</span
+                >{{ numberText[6] }}
             </div>
         </div>
     </div>
@@ -88,7 +96,7 @@ export default {
             width: 50vw;
         }
         button {
-            width: 125px;
+            width: 135px;
             outline: 0;
             background: transparent;
             color: #fff;

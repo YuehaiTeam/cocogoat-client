@@ -2,7 +2,8 @@ import path from 'path'
 import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
-import { app, dialog, ipcMain, BrowserWindow } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { saveOptions } from './config'
 import { config } from '@/typings/config'
 import { windows, createArtifactView, createArtifactSwitch, createMapView, createMapScan } from './windows'
 // @ts-ignore
@@ -33,10 +34,12 @@ export function interactInit() {
     })
     ipcMain.on('saveOptions', async (event, options) => {
         config.options = options
-        await fsex.writeJSON(path.join(config.configDir, 'options.json'), config.options)
+        saveOptions()
+    })
+    ipcMain.on('openExternal', (event, { url }) => {
+        shell.openExternal(url)
     })
     ipcMain.on('readArtifacts', async (event, { id }) => {
-        console.log('readArtifacts')
         try {
             const artifacts = await fsex.readJSON(path.join(config.configDir, 'artifacts.json'))
             event.reply(`readArtifacts-${id}`, artifacts)

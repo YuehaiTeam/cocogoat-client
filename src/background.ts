@@ -7,6 +7,7 @@ import { createWindow } from './Background/windows'
 import { config, EBuild } from './typings/config'
 import { automateInit } from './Background/automate'
 import { upgradeInit } from './Background/upgrade'
+import { systemCheckInit } from './Background/Utils/SystemCheck'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 protocol.registerSchemesAsPrivileged([
@@ -58,6 +59,7 @@ app.on('ready', async () => {
     createWindow()
     interactInit()
     automateInit()
+    systemCheckInit()
     upgradeInit()
 })
 if (isDevelopment) {

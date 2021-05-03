@@ -1257,6 +1257,15 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/ffi-napi@^2.4.3":
+  version "2.4.3"
+  resolved "https://registry.npm.taobao.org/@types/ffi-napi/download/@types/ffi-napi-2.4.3.tgz#8e0194a47f1fc9a2d1e00dcae66c919ae97faa2d"
+  integrity sha1-jgGUpH8fyaLR4A3K5myRmul/qi0=
+  dependencies:
+    "@types/node" "*"
+    "@types/ref-napi" "*"
+    "@types/ref-struct-di" "*"
+
 "@types/fs-extra@^9.0.7":
   version "9.0.10"
   resolved "https://registry.npm.taobao.org/@types/fs-extra/download/@types/fs-extra-9.0.10.tgz?cache=0&sync_timestamp=1617393042797&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Ffs-extra%2Fdownload%2F%40types%2Ffs-extra-9.0.10.tgz#8023a72e3d06cf54929ea47ec7634e47f33f4046"
@@ -1295,6 +1304,11 @@
   integrity sha1-5FpFMk/KnatxarEjDuJJyftSz6c=
   dependencies:
     "@types/node" "*"
+
+"@types/lodash@^4.14.168":
+  version "4.14.168"
+  resolved "https://registry.npm.taobao.org/@types/lodash/download/@types/lodash-4.14.168.tgz#fe24632e79b7ade3f132891afff86caa5e5ce008"
+  integrity sha1-/iRjLnm3rePxMoka//hsql5c4Ag=
 
 "@types/mime@^1":
   version "1.3.2"
@@ -1353,6 +1367,20 @@
   version "1.2.3"
   resolved "https://registry.npm.taobao.org/@types/range-parser/download/@types/range-parser-1.2.3.tgz?cache=0&sync_timestamp=1613379868458&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Frange-parser%2Fdownload%2F%40types%2Frange-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha1-fuMwunyq+5gJC+zoal7kQRWQTCw=
+
+"@types/ref-napi@*", "@types/ref-napi@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.npm.taobao.org/@types/ref-napi/download/@types/ref-napi-1.4.1.tgz#cf5a5ae6a90f6cb2a1d4db21ad32ce0e7c59a6fb"
+  integrity sha1-z1pa5qkPbLKh1NshrTLODnxZpvs=
+  dependencies:
+    "@types/node" "*"
+
+"@types/ref-struct-di@*":
+  version "1.1.0"
+  resolved "https://registry.npm.taobao.org/@types/ref-struct-di/download/@types/ref-struct-di-1.1.0.tgz#4e7a20c8b2f25a6e4b3cb4a0d615835b61ab8d84"
+  integrity sha1-TnogyLLyWm5LPLSg1hWDW2GrjYQ=
+  dependencies:
+    "@types/ref-napi" "*"
 
 "@types/responselike@*", "@types/responselike@^1.0.0":
   version "1.0.0"
@@ -3973,7 +4001,7 @@ dayjs@1.x, dayjs@^1.10.4:
   resolved "https://registry.npm.taobao.org/dayjs/download/dayjs-1.10.4.tgz#8e544a9b8683f61783f570980a8a80eaf54ab1e2"
   integrity sha1-jlRKm4aD9heD9XCYCoqA6vVKseI=
 
-debug@2.6.9, debug@^2.1.3, debug@^2.2.0, debug@^2.3.3, debug@^2.6.9:
+debug@2, debug@2.6.9, debug@^2.1.3, debug@^2.2.0, debug@^2.3.3, debug@^2.6.9:
   version "2.6.9"
   resolved "https://registry.npm.taobao.org/debug/download/debug-2.6.9.tgz?cache=0&sync_timestamp=1607566551397&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdebug%2Fdownload%2Fdebug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
   integrity sha1-XRKFFd8TT/Mn6QpMk/Tgd6U2NB8=
@@ -9233,7 +9261,16 @@ redent@^1.0.0:
     indent-string "^2.1.0"
     strip-indent "^1.0.1"
 
-"ref-napi@^2.0.1 || ^3.0.2":
+ref-napi@^1.4.2:
+  version "1.5.2"
+  resolved "https://registry.npm.taobao.org/ref-napi/download/ref-napi-1.5.2.tgz?cache=0&sync_timestamp=1616005506602&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fref-napi%2Fdownload%2Fref-napi-1.5.2.tgz#a29f9a0c1aff02f01e023199e4aa8fe7f11f25b9"
+  integrity sha1-op+aDBr/AvAeAjGZ5KqP5/EfJbk=
+  dependencies:
+    debug "^3.1.0"
+    node-addon-api "^2.0.0"
+    node-gyp-build "^4.2.1"
+
+"ref-napi@^2.0.1 || ^3.0.2", ref-napi@^3.0.2:
   version "3.0.2"
   resolved "https://registry.npm.taobao.org/ref-napi/download/ref-napi-3.0.2.tgz#fe71c2a09df654baa66649d783c6e5ab182c19cb"
   integrity sha1-/nHCoJ32VLqmZknXg8blqxgsGcs=
@@ -9249,6 +9286,22 @@ ref-struct-di@^1.1.0:
   integrity sha1-WCex07MjcgWPF3VHCT2x/hYC3BA=
   dependencies:
     debug "^3.1.0"
+
+ref-struct-napi@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npm.taobao.org/ref-struct-napi/download/ref-struct-napi-1.1.1.tgz#272a870a0ccb8244bd06ac851ffafbfc33dcd951"
+  integrity sha1-JyqHCgzLgkS9BqyFH/r7/DPc2VE=
+  dependencies:
+    debug "2"
+    ref-napi "^1.4.2"
+
+ref-union-napi@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.nlark.com/ref-union-napi/download/ref-union-napi-1.0.2.tgz#f25a8606b6ec1ecef1ac9c4e3c7f0cd53115a502"
+  integrity sha1-8lqGBrbsHs7xrJxOPH8M1TEVpQI=
+  dependencies:
+    debug "2"
+    ref-napi "^1.4.2"
 
 regenerate-unicode-properties@^8.2.0:
   version "8.2.0"

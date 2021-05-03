@@ -19,7 +19,7 @@ export default {
         <div class="loading" :class="{ show: status.status === STATUS.LOADING }">
             <div class="loading-wrapper">
                 <i class="el-icon-loading"></i>
-                识别中
+                {{ __('识别中') }}
             </div>
         </div>
         <div class="box">
@@ -27,28 +27,28 @@ export default {
                 v-if="status.status === STATUS.SUCCESS && status.potentialErrors.length <= 0"
                 class="status status-success"
             >
-                <i class="el-icon-success"></i> 识别成功
+                <i class="el-icon-success"></i> {{ __('识别成功') }}
             </div>
             <div v-if="status.status === STATUS.MODIFIED" class="status status-success">
-                <i class="el-icon-success"></i> 修改成功
+                <i class="el-icon-success"></i> {{ __('修改成功') }}
             </div>
             <div v-if="status.status === STATUS.DELETED" class="status status-success">
-                <i class="el-icon-success"></i> 删除成功
+                <i class="el-icon-success"></i> {{ __('删除成功') }}
             </div>
 
             <div
                 v-if="status.status === STATUS.SUCCESS && status.potentialErrors.length > 0"
                 class="status status-maybe-wrong"
             >
-                <i class="el-icon-question"></i> 疑似有误
+                <i class="el-icon-question"></i> {{ __('疑似有误') }}
             </div>
             <div v-if="status.status === STATUS.ERROR" class="status status-error">
-                <i class="el-icon-error"></i> 识别失败
+                <i class="el-icon-error"></i> {{ __('识别失败') }}
             </div>
             <div class="actions-btn">
-                <el-button @click="$emit('delete')"> 删除 </el-button>
-                <el-button @click="$emit('reset')"> 重置 </el-button>
-                <el-button @click="$emit('modify')"> 保存 </el-button>
+                <el-button @click="$emit('delete')"> {{ __('删除') }} </el-button>
+                <el-button @click="$emit('reset')"> {{ __('重置') }} </el-button>
+                <el-button @click="$emit('modify')"> {{ __('保存') }} </el-button>
             </div>
         </div>
     </section>

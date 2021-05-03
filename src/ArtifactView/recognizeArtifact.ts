@@ -1,13 +1,22 @@
 import { ocr, SplitResults } from './imageProcess'
 import { Artifact, ArtifactParam } from '@/typings/Artifact'
 import { ArtifactNames, ArtifactParamTypes, ArtifactSubParamTypes } from '@/typings/ArtifactMap'
-import { detectStars, textChinese, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
+import { detectStars, textCNEN, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
 
 const ocrCorrectionMap = [
     ['莉力', '攻击力'],
     ['医力', '攻击力'],
     ['鬼已装备', '魈已装备'],
     ['魁已装备', '魈已装备'],
+    ['宗室之邻', '宗室之翎'],
+    ['宗室之领', '宗室之翎'],
+    ['生花', '生之花'],
+    ['角斗士的耐醉', '角斗士的酣醉'],
+    ['角斗士的希翼', '角斗士的希冀'],
+    ['星罗圭壁之暑', '星罗圭璧之晷'],
+    ['宗室银瓷', '宗室银瓮'],
+    ['雷鸟的冷阀', '雷鸟的怜悯'],
+    ['雷灾的子遗', '雷灾的孑遗'],
 ]
 
 export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, string[], any]> {
@@ -22,7 +31,7 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ocrres.title || !ocrres.title.text) {
         throw new Error("Title cant't be empty")
     }
-    let name = textChinese(ocrres.title.text)
+    let name = textCNEN(ocrres.title.text)
     if (!ArtifactNames.includes(name)) {
         name = textBestmatch(name, ArtifactNames)
     }
@@ -31,13 +40,14 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ocrres.level || !ocrres.level.text) {
         throw new Error("Level cant't be empty")
     }
-    const level = Number(textNumber(ocrres.level.text))
+    let level = Number(textNumber(ocrres.level.text))
+    level = level > 20 ? 20 : level
 
     /* 主词条 */
     if (!ocrres.main || !ocrres.main.text) {
         throw new Error("Main cant't be empty")
     }
-    const [main, maybeError] = recognizeParams(ocrres.main.text.replace('\n', '+'), true)
+    const [main, maybeError] = recognizeParams(ocrres.main.text.replace(/\s/g, ''), true)
     if (maybeError) {
         potentialErrors.push(maybeError)
     }
@@ -45,9 +55,11 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     if (!ocrres.sub || !ocrres.sub.text) {
         throw new Error("Sub cant't be empty")
     }
-    const subTextArray = ocrres.sub.text.split('\n').filter((e: string) => {
-        return e.trim() !== ''
-    })
+    const subTextArray = santizeParamsArray(
+        ocrres.sub.text.split('\n').filter((e: string) => {
+            return e.trim() !== ''
+        }),
+    )
     const sub = []
     try {
         for (const i of subTextArray) {
@@ -62,10 +74,10 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     }
 
     /* 副词条低置信度检查 */
-    potentialErrors.push(...findLowConfidence(ocrres.sub, 45, true))
+    potentialErrors.push(...findLowConfidence(ocrres.sub, 80, true))
 
     /* 主词条低置信度检查 */
-    potentialErrors.push(...findLowConfidence(ocrres.main, 45, true))
+    potentialErrors.push(...findLowConfidence(ocrres.main, 80, true))
 
     return [
         {
@@ -81,34 +93,49 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         ocrres,
     ]
 }
+/**
+ * 对副词条数组可能出现加号丢失的情况进行预处理
+ * 若本行有加号，则本行及之前所有行都合法
+ * 若本行无加号，则暂不处理，等待后续判断
+ */
+function santizeParamsArray(input: string[]): string[] {
+    const array = [...input] // clone it
+    const result: Set<string> = new Set()
+    for (let i = 0; i < array.length; i++) {
+        array[i] = array[i].replace(/十/g, '+').replace(/\s/g, '')
+        if (array[i].includes('+')) {
+            for (let j = 0; j <= i; j++) {
+                result.add(array[j])
+            }
+        }
+    }
+    return [...result]
+}
 function recognizeParams(text: string, main = false): [ArtifactParam, string | null] {
-    /* OCR常见错误预修正 */
-    let newtext = text.replace(/\s/g, '').replace('十', '+')
-    if (!text.includes('+')) throw new Error(`${text} is not a vaild param`)
+    let newtext = text
     for (const i of ocrCorrectionMap) {
         newtext = newtext.replace(i[0], i[1])
     }
 
     let maybeError = null
-
-    const [rawName, rawValue] = newtext.split('+')
+    const rawName = textCNEN(newtext)
+    let value = textNumber(newtext)
     const toCompare = main ? ArtifactParamTypes : ArtifactSubParamTypes
     const name = textBestmatch(rawName, toCompare)
-    let value
-    try {
-        value = textNumber(rawValue)
-    } catch (e) {
-        console.log(newtext)
-        throw e
-    }
 
     /*
      * PaddleOCR会将逗号(,)识别成点(.)
-     * 此处对点后2位及以上的把点去掉
+     * 并且可能把百分号识别为数字
+     * 此处对点后3位及以上的把点去掉
+     * 两位的把最后一位去掉
      */
+    value = value.replace(/\.\./g, '.')
     const [, b] = value.split('.')
-    if (b && b.length >= 2) {
+    if (b && b.length >= 3) {
         value = value.replace(/\./g, '')
+    }
+    if (b && b.length === 2) {
+        value = value.substr(0, value.length - 1)
     }
 
     /*
@@ -139,15 +166,6 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
             value = value.substr(1)
             maybeError = value
         }
-    }
-    if (/[\u4E00-\u9FA5]+/.test(rawValue)) {
-        if (rawValue.includes('人')) {
-            console.log('检测到数字包含中文，已修改', rawValue, `1${value}`, value)
-            value = `1${value}`
-        } else {
-            console.log('检测到数字包含中文', rawValue, value)
-        }
-        maybeError = value
     }
     return [
         {

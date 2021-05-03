@@ -26,6 +26,14 @@ export default defineComponent({
                 }
                 .character-panel {
                     flex-wrap: wrap !important;
+                }
+                @media only screen and (min-width: 900px){
+                    html body .hidden-sm-and-down {
+                        display: block!important;
+                    }
+                    html body .hidden-md-and-up{
+                        display:none !important;
+                    }
                 }`)
                 frame.executeJavaScript(`monaAPI.updateAllArtifacts(${convertedJson})`)
                 this.loading = false

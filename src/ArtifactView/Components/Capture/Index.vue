@@ -60,7 +60,7 @@ export default {
             class="feedback"
             @click="$emit('feedback')"
         >
-            识别错了？点此反馈
+            {{ __('识别错了？点此反馈') }}
         </button>
     </section>
     <section class="actions">
