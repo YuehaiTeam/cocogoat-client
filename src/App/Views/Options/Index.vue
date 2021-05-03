@@ -211,6 +211,13 @@ export default {
                         <div class="form-desc">
                             {{ __('如果出现翻页时滚动过快跳过行的情况，或您正在高延迟环境下使用云游戏，请关闭此项。') }}
                         </div>
+                    <el-form-item :label="__('升级智能判断')">
+                        <el-switch
+                            :model-value="options.artifacts.upgradeArtifacts"
+                            @update:model-value="opt('artifacts.upgradeArtifacts', $event)"
+                        ></el-switch>
+                        <div class="form-desc">{{ __('自动判断圣遗物升级(Beta)，但为什么总是女仆狂喜呢？') }}</div>
+                        <div class="form-desc">{{ __('（可能导致极少量圣遗物不入库）') }}</div>
                     </el-form-item>
                     <el-form-item :label="__('独立切换模式')">
                         <el-switch
