@@ -65,14 +65,15 @@ export function devtools() {
 export function createArtifactSwitch() {
     ipcRenderer.send('createArtifactSwitch')
 }
+let winAppId: number = -1
 export async function sendToAppWindow(channel: string, data: any): Promise<void> {
     const id = uuid()
-    const p = new Promise((resolve) => {
-        ipcRenderer.once(`getAppWindowId-${id}`, (result, data) => resolve(data))
-    })
-    ipcRenderer.send('getAppWindowId', { id })
-    const windowId = Number(await p)
-    console.log('get app window id:', windowId)
-    console.log(channel, data)
-    ipcRenderer.sendTo(windowId, channel, data)
+    if (winAppId < 0) {
+        const p = new Promise((resolve) => {
+            ipcRenderer.once(`getAppWindowId-${id}`, (result, data) => resolve(data))
+        })
+        ipcRenderer.send('getAppWindowId', { id })
+        winAppId = Number(await p)
+    }
+    ipcRenderer.sendTo(winAppId, channel, data)
 }

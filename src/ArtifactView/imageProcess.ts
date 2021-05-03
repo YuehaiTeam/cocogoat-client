@@ -12,6 +12,7 @@ export interface ISplitConfig {
 export interface ISplitResult {
     canvas: HTMLCanvasElement
     config: ISplitConfig
+    imageConfig: any
 }
 export type SplitResults = Record<string, ISplitResult>
 export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitConfig>) {
@@ -30,18 +31,18 @@ export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitC
             if (!ctx) throw new Error('Canvas not supported')
 
             const currentImgConfig = imageConfig[i]
-            if (typeof currentImgConfig === 'string') {
-                ctx.filter = currentImgConfig
+            if (typeof currentImgConfig.handler === 'string') {
+                ctx.filter = currentImgConfig.handler
             }
 
             ctx.drawImage(canvas, config.x, config.y, config.w, config.h, 0, 0, config.w, config.h)
 
-            if (typeof currentImgConfig === 'function') {
-                currentImgConfig(ctx, config.w, config.h)
+            if (typeof currentImgConfig.handler === 'function') {
+                currentImgConfig.handler(ctx, config.w, config.h)
             }
 
             /* 白边填充 放大 锐化 */
-            if (currentImgConfig !== false) {
+            if (currentImgConfig.ignore !== true && currentImgConfig.singleLine !== true) {
                 ret[i].canvas = document.createElement('canvas')
                 const ctx2 = ret[i].canvas.getContext('2d')
                 if (!ctx2) throw new Error('Canvas not supported')
@@ -51,14 +52,10 @@ export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitC
                 ctx2.fillRect(0, 0, ret[i].canvas.width, ret[i].canvas.height)
                 ctx.imageSmoothingEnabled = false
                 ctx2.drawImage(canvas1, padding / 2, padding / 2, config.w * scale, config.h * scale)
-
-                /* 锐化 */
-                /* let imageData = ctx2.getImageData(0, 0, ret[i].canvas.width, ret[i].canvas.height)
-                imageData = convolute(imageData, [0, -1, 0, -1, 5, -1, 0, -1, 0])
-                ctx2.putImageData(imageData, 0, 0) */
             } else {
                 ret[i].canvas = canvas1
             }
+            ret[i].imageConfig = currentImgConfig
         }
     }
     return ret
@@ -99,6 +96,7 @@ export async function ocr(ret: SplitResults) {
                 width: ret[i].canvas.width,
                 height: ret[i].canvas.height,
                 data: Buffer.from(imgData?.data.buffer as ArrayBuffer),
+                det: ret[i].imageConfig.singleLine === true ? false : true,
             }
             const len = ocrpms.push(ipcOcr(ocrData))
             ocrpmk[len - 1] = i
