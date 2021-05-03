@@ -30,7 +30,7 @@ export function mapcvWorkerInit() {
             const { width, height, data } = event.message.image
             fullMapMat = new cv.Mat(data, height, width, cv.CV_8UC4)
             fullMapMat = await fullMapMat.cvtColor(cv.COLOR_RGBA2RGB)
-            surf = new cv.SURFDetector(150)
+            surf = new cv.SURFDetector(400)
             surf.upright = true
             fkeyPoints = await surf.detectAsync(fullMapMat)
             fullmapDet = await surf.computeAsync(fullMapMat, fkeyPoints)

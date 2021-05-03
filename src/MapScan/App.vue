@@ -3,7 +3,7 @@ import { bus } from './bus'
 import { ipcRenderer } from 'electron'
 import AppHeader from './Components/AppHeader'
 import { getposition, capture, mapcv, mapcvInit, sendToMapWindow } from './ipc'
-import map3k from '@/assets/map/genshin_map_w3000.webp'
+import map3k from '@/assets/map/genshin_map_w3000.jpg'
 import { sleep } from '@/ArtifactView/utils'
 export default {
     components: {
@@ -26,7 +26,7 @@ export default {
         async auto() {
             bus.auto = true
             while (bus.auto) {
-                await Promise.all([sleep(200, this.processOnce())])
+                await Promise.all([sleep(500, this.processOnce())])
             }
         },
         async processOnce() {
@@ -37,6 +37,9 @@ export default {
         },
         async captureAndCompute() {
             const canvas = await this.getCanvas()
+            if (!bus.auto) {
+                new Image().src = canvas.toDataURL()
+            }
             const ctx = canvas.getContext('2d')
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
             const mapImage = {
@@ -44,7 +47,35 @@ export default {
                 height: canvas.height,
                 data: Buffer.from(imageData.data.buffer),
             }
-            return await mapcv(mapImage)
+            const rawCV = await mapcv(mapImage)
+            return rawCV ? this.ensurePosition(rawCV) : false
+        },
+        async ensurePosition(data) {
+            const ratio = 5450 / 3000 // 地图缩放比
+            let { x, y } = data.center
+            let r
+            if (x <= 458 && y <= 330) {
+                // 蒙德城
+                r = this.convertAxis(x, y, ratio, 1599, 515)
+            } else if (x <= 497 && y <= 680) {
+                // 璃月港
+                r = this.convertAxis(x, y - 330, ratio, 1015, 2074)
+            }
+            if (r) {
+                return r
+            }
+            return {
+                x,
+                y,
+            }
+        },
+        async convertAxis(x, y, ratio, tX, tY) {
+            let pX = x / ratio
+            let pY = y / ratio
+            return {
+                x: tX + pX,
+                y: tY + pY,
+            }
         },
         async loadMap() {
             const imgEl = new Image()

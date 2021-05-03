@@ -22,7 +22,7 @@ export default {
         ipcRenderer.send('ready')
         this._updatePosition = this.updatePosition.bind(this)
         ipcRenderer.on('position', this._updatePosition)
-        this.unwatch = watch([() => bus.x, () => bus.y, () => bus.zoom], (x, y, zoom) => {
+        this.unwatch = watch([() => bus.x, () => bus.y, () => bus.zoom], () => {
             const frame = this.$refs.mapFrame
             frame.executeJavaScript(`location.hash='${this.hash}'`)
         })
@@ -35,8 +35,14 @@ export default {
     methods: {
         async updatePosition(event, data) {
             // 米游社大地图与内置地图坐标转换
-            bus.x = (data.center.x * 5450) / 3000 + 1742 - 4845
-            bus.y = (data.center.y * 4850) / 2669 + 1742 - 2795
+            bus.x = (data.x * 5450) / 3000 + 1742 - 4845
+            bus.y = (data.y * 4850) / 2669 + 1742 - 2795
+        },
+        onHashChange(event) {
+            bus.zoom = event.url.split('zoom=')[1].split('&')[0]
+            const center = event.url.split('center=')[1].split('&')[0].split(',')
+            bus.x = center[1]
+            bus.y = center[0]
         },
         onDomReady() {
             if (this.ready) return
@@ -88,7 +94,13 @@ export default {
 </script>
 <template>
     <app-header />
-    <webview ref="mapFrame" class="mapFrame" :src="mapUrl" @dom-ready="onDomReady" />
+    <webview
+        ref="mapFrame"
+        class="mapFrame"
+        :src="mapUrl"
+        @dom-ready="onDomReady"
+        @did-navigate-in-page="onHashChange"
+    />
 </template>
 <style lang="scss">
 @import '~@/styles/fonts.scss';
