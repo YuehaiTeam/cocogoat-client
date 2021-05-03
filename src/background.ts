@@ -1,5 +1,6 @@
 import path from 'path'
 import fsex from 'fs-extra'
+import { merge } from 'lodash'
 import { app, protocol } from 'electron'
 import * as Sentry from '@sentry/electron'
 import { interactInit } from './Background/interact'
@@ -28,7 +29,7 @@ app.on('ready', async () => {
         await fsex.ensureDir(config.configDir)
     }
     try {
-        config.options = Object.assign(config.options, await fsex.readJSON(path.join(config.configDir, 'options.json')))
+        config.options = merge(config.options, await fsex.readJSON(path.join(config.configDir, 'options.json')))
     } catch (e) {
         await fsex.writeJSON(path.join(config.configDir, 'options.json'), config.options)
     }

@@ -3,6 +3,7 @@ export interface IArtifactOptions {
     keepSameArtifacts: boolean
     upgradeArtifacts: boolean
     autoSwitchDelay: number
+    fastScroll: boolean
 }
 export interface IwindowStates {
     x?: number
@@ -50,6 +51,7 @@ export function defaultConfig(): IConfig {
                 keepSameArtifacts: false,
                 upgradeArtifacts: false,
                 autoSwitchDelay: 0.5,
+                fastScroll: true,
             },
             windowStates: {},
         },

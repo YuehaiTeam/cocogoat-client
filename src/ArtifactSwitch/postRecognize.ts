@@ -4,7 +4,7 @@ interface Block {
     width: number
     height: number
 }
-export function santizeBlocks(origBlocks: Block[], canvas: HTMLCanvasElement) {
+export function santizeBlocks(origBlocks: Block[], canvas: HTMLCanvasElement | { width: number; height: number }) {
     let blocks = origBlocks.slice()
     /* 过滤窗体区块 */
     blocks = blocks.filter((e) => {

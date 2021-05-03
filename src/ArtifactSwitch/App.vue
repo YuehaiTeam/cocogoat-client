@@ -10,6 +10,7 @@ import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
 import { sleep } from '@/ArtifactView/utils'
 import { ElMessageBox } from 'element-plus'
+let sleepRatio = 1
 export default {
     components: {
         Actions,
@@ -21,6 +22,9 @@ export default {
         ipcRenderer.send('readyArtifactSwitch')
         ipcRenderer.on('keydown', this.onKeydown)
         setTransparent(false)
+        if (!bus.options.artifacts.fastScroll) {
+            sleepRatio = 2
+        }
     },
     beforeUnmount() {
         ipcRenderer.off('keydown', this.onKeydown)
@@ -32,14 +36,15 @@ export default {
                 setTransparent(false)
             }
         },
-        async getCanvas() {
+        async getCanvas(ww, hh) {
+            await sleep(10 * sleepRatio)
             /* 计算窗口位置 */
             const p = window.devicePixelRatio
             let [x, y] = await getposition()
             x = x * p
             y = y * p
-            const w = window.innerWidth
-            const h = window.innerHeight
+            const w = ww || window.innerWidth
+            const h = hh || window.innerHeight
 
             /* 抓屏 */
             let canvas = await capture(x, y, w * p, h * p)
@@ -51,7 +56,6 @@ export default {
                 canvas.width = w
                 canvas.height = h
                 const ctx = canvas.getContext('2d')
-                ctx.imageSmoothingEnabled = true
                 ctx.drawImage(srcCanvas, 0, 0, w, h)
             }
             /* 裁剪 */
@@ -74,7 +78,7 @@ export default {
             }
             bus.status = STATUS.CAPTURE
             await this.$nextTick()
-            await sleep(50)
+            await sleep(20 * sleepRatio)
 
             const canvas = await this.getCanvas()
             /* 获取区块 */
@@ -126,26 +130,70 @@ export default {
             bus.status = STATUS.PAGING
             const orig = rawOrig || bus.blocks[0]
             let middlePassed = false
+            bus.devmsg = 'paging:start'
             setTransparent(true)
             const { x, y } = getBlockCenter(orig)
+            // 设置焦点
             await click(await toWindowPos(x, y))
-            await sleep(50)
+            await sleep(10 * sleepRatio)
             let time = 0
-            while (true) {
-                if (!bus.auto) return
-                ipcRenderer.send('scrollTick', false)
-                await sleep(50)
+
+            // 按平均值先进行快速滚动
+            if (avgTimes && bus.options.artifacts.fastScroll) {
+                while (time < avgTimes * 0.6) {
+                    time++
+                    ipcRenderer.send('scrollTick', false)
+                }
+            } else {
+                // 否则只发送一次
                 time++
-                const canvas = await this.getCanvas()
-                const { blocks } = santizeBlocks(await getBlocks(canvas), canvas)
+                ipcRenderer.send('scrollTick', false)
+            }
+            // 延时等待抓屏
+            await sleep(30 * sleepRatio)
+            while (true) {
+                time++
+                if (!bus.auto) {
+                    return
+                }
+                // 首次有上方首次延时，后面有opencv处理延迟填充，保证抓屏时界面展示已经完成
+                // 减少抓屏区域以提高效率
+                const canvas = await this.getCanvas(
+                    (window.innerWidth / bus.cols) * 2 + 4,
+                    (window.innerHeight / bus.rows) * 2 + 84,
+                )
+                new Image().src = canvas.toDataURL()
+                // 抓图成功后马上发送下一次
+                ipcRenderer.send('scrollTick', false)
+                let blocks
+                const getImage = (async () => {
+                    blocks = santizeBlocks(await getBlocks(canvas), {
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                    }).blocks
+                })()
+                // 用opencv处理时间填充抓屏延迟
+                await Promise.all([getImage, sleep(40 * sleepRatio)])
+                // 处理本次数据
                 const curr = blocks[0]
                 if (!middlePassed && curr.y <= orig.y - orig.height - 1) {
                     middlePassed = true
-                } else if (middlePassed && Math.abs(curr.y - orig.y) <= 10) {
+                    bus.devmsg = 'paging:middle'
+                    console.log('paging:middle', curr)
+                } else if (middlePassed && Math.abs(curr.y - orig.y) <= (orig.height * 2) / 3) {
+                    bus.devmsg = ''
+                    // 由于预先发送滚轮，这里回头一次
+                    ipcRenderer.send('scrollTick', true)
+                    await sleep(30 * sleepRatio)
+                    // 等待滚轮响应
+                    console.log('page done', curr, orig)
                     break
-                } else if (avgTimes > 0 && time >= avgTimes * 1.5) {
+                } else if (avgTimes > 0 && time >= avgTimes * 2) {
                     // 1.5倍次数还没到，看来是到底了
+                    console.log('paging:last', curr)
                     return false
+                } else {
+                    console.log('paging:start', curr)
                 }
             }
             if (revertStatus) {
@@ -172,7 +220,7 @@ export default {
                         await this.clickFirstLine()
                         const p = await this.nextPage(false, orig, avgTimes)
                         if (p > 0) {
-                            avgTimes = p
+                            if (!avgTimes) avgTimes = p
                         } else {
                             bus.isLastPage = true
                         }
@@ -187,6 +235,7 @@ export default {
                 bus.auto = false
                 bus.status = bus.READY
             } catch (e) {
+                console.log(e)
                 bus.auto = false
                 bus.status = bus.ERROR
             }
@@ -197,7 +246,6 @@ export default {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(50)
                 await tryocr()
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
@@ -209,7 +257,6 @@ export default {
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 bus.checkedCount++
-                await sleep(50)
                 await tryocr()
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
             }

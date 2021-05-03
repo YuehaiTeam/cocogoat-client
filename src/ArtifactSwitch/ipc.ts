@@ -29,17 +29,14 @@ export async function getArtifactViewWindowId(): Promise<number> {
         ipcRenderer.once(`getArtifactViewWindowId-${id}`, (result, data) => resolve(data))
     })
     ipcRenderer.send('getArtifactViewWindowId', { id })
-    const windowId = Number(await p)
-    console.log('getArtifactViewWindowId:', windowId)
-    return windowId
+    const winAppId = Number(await p)
+    return winAppId
 }
 
 export async function tryocr(): Promise<void> {
     const artifactViewWindowId = await getArtifactViewWindowId()
     if (artifactViewWindowId < 0) {
-        console.log('圣遗物识别器未打开')
         return
-        // throw new Error('圣遗物识别器未打开')
     }
     const id = uuid()
     const p = new Promise((resolve) => {
