@@ -58,7 +58,7 @@ export default defineComponent({
         <webview
             id="mona-frame"
             ref="monaFrame"
-            src="https://genshin.art/"
+            src="https://mona-uranai.com/"
             style="width: 100%; height: 100%; margin: 0"
         ></webview>
     </div>
