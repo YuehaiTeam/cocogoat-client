@@ -220,6 +220,15 @@ header {
         right: 0;
     }
 }
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
+    header .actions button {
+        width: 20px;
+        padding: 0;
+        padding-top: 2px;
+        font-size: 14px;
+    }
+}
 </style>
 <style>
 .titlebar-tip {

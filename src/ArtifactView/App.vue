@@ -115,7 +115,7 @@ export default {
 
             /* 调试写入图片文件 */
             if (status.runtimeDebug) {
-                await imageDump(canvas, ret)
+                imageDump(canvas, ret)
             }
 
             /* OCR、识别 */
@@ -262,15 +262,21 @@ export default {
     overflow: hidden;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.2) {
-    .float,
-    .actions {
+    .float {
         zoom: 0.85;
+        font-size: 12px;
+    }
+    .title {
+        font-size: 12px;
     }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
-    .float,
-    .actions {
+    .float {
         zoom: 0.72;
+        font-size: 13px;
+    }
+    .title {
+        font-size: 12px;
     }
 }
 .el-overlay {

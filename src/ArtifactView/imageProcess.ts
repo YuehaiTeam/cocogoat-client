@@ -17,6 +17,7 @@ export interface ISplitResult {
 export type SplitResults = Record<string, ISplitResult>
 export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitConfig>, pixelRatio: number) {
     const ret: SplitResults = {}
+    console.log(posList)
     for (const i in posList) {
         if ({}.hasOwnProperty.call(posList, i)) {
             ret[i] = ret[i] || {}
@@ -31,6 +32,8 @@ export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitC
             const currentImgConfig = imageConfig[i]
             if (typeof currentImgConfig.handler === 'string') {
                 ctx.filter = currentImgConfig.handler
+            } else {
+                ctx.filter = ''
             }
 
             ctx.drawImage(

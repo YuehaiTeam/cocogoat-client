@@ -22,7 +22,8 @@ export default <
     },
     level: {
         singleLine: true,
-        handler: (ctx: CanvasRenderingContext2D, w: number, h: number) => {
+        handler: 'invert(100%)',
+        oldHandler: (ctx: CanvasRenderingContext2D, w: number, h: number) => {
             createColorFilter(48, 56, 66, 50, true)(ctx, w, h)
             const imageData = ctx.getImageData(0, 0, w, h)
             /* 搜索左上角 */
