@@ -210,6 +210,8 @@ let initInterval = setInterval(() => {
 }, 500)
 
 function initUI() {
+    document.querySelector('.layer-control__copyright').innerHTML +=
+        ' • cocogoat • Enhancement by <a href="https://seelie.inmagi.com/?ref=cocogoat" target="_blank">Seelie</a>'
     let features = document.createElement('div')
     features.classList.add('seelie-features')
     features.style.display = 'none'
