@@ -67,7 +67,6 @@ export async function ocrWorkerInit(data: { rec: string; det: string; dic: strin
     parentPort.on('message', (event) => {
         if (!parentPort) return
         if (event.event === 'exit') {
-            ppocr.unload()
             console.log('Worker exit')
             process.exit()
         }

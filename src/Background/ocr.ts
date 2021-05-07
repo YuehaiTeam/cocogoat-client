@@ -8,13 +8,16 @@ let ocrWorker: Worker[] = []
 let workerReadyPms: Promise<void>[] = []
 let ocrReady: Promise<any> | null
 let workerPtr: number = 0
-const workerCount = 1
+let ocrRunning = false
+const workerCount = 8
 const q = Queue({
     concurrency: workerCount,
     autostart: true,
     timeout: 10e3,
 })
 export async function ocrInit() {
+    if (ocrRunning) return
+    ocrRunning = true
     workerPtr = 0
     ocrWorker = []
     workerReadyPms = []
@@ -102,6 +105,7 @@ export async function ocrInit() {
 }
 export async function ocrStop() {
     await ocrReady
+    ocrRunning = false
     const p = []
     for (const i of ocrWorker) {
         i.postMessage({ event: 'exit' })
