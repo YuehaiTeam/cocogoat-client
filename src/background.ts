@@ -1,4 +1,5 @@
 import path from 'path'
+import dayjs from 'dayjs'
 import fsex from 'fs-extra'
 import { merge } from 'lodash'
 import { app, protocol } from 'electron'
@@ -9,6 +10,7 @@ import { config, EBuild } from './typings/config'
 import { automateInit } from './Background/automate'
 import { upgradeInit } from './Background/upgrade'
 import { systemCheckInit } from './Background/Utils/SystemCheck'
+import { logHook } from './Background/Utils/LogHook'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 protocol.registerSchemesAsPrivileged([
@@ -20,14 +22,17 @@ app.on('window-all-closed', () => {
 app.on('ready', async () => {
     const currentPath = path.dirname(app.getPath('exe'))
     const appdataPath = app.getPath('userData')
+    config.version = app.getVersion()
     try {
         await fsex.access(path.join(currentPath, 'cocogoat'))
         config.configDir = path.join(currentPath, 'cocogoat')
     } catch (e) {
-        console.log(e.message)
         config.configDir = path.join(appdataPath, 'config')
         await fsex.ensureDir(config.configDir)
     }
+    logHook(path.join(config.configDir, 'cocogoat.log'))
+    console.log(`cocogoat v${config.version}`)
+    console.log('confd = ' + config.configDir)
     try {
         config.options = merge(config.options, await fsex.readJSON(path.join(config.configDir, 'options.json')))
     } catch (e) {
@@ -37,10 +42,11 @@ app.on('ready', async () => {
         config.dataDir = path.join(path.dirname(app.getAppPath()), 'data')
         config.build = await fsex.readJSON(path.join(config.dataDir, 'build.json'))
     } catch (e) {
-        console.log(e)
         config.build = { type: EBuild.DEV, timestamp: Date.now() }
     }
-    config.version = app.getVersion()
+    if (config.build) {
+        console.log(`build = ${config.build.type}${dayjs(config.build.timestamp).format('YYMMDDHHmm')}`)
+    }
     const pathEnv =
         `${process.env.path ? `${process.env.path};` : ''}` +
         `${process.env.Path ? `${process.env.Path};` : ''}` +

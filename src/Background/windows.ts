@@ -15,6 +15,7 @@ export async function createWindow() {
         height: 720,
         frame: false,
         webPreferences: {
+            contextIsolation: false,
             webviewTag: true,
             // @ts-ignore
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,

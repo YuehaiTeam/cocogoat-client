@@ -28,6 +28,7 @@
     "flyio": "^0.6.14",
     "fs-extra": "^9.1.0",
     "got": "^11.8.2",
+    "hook-std": "^2.0.0",
     "iohook": "^0.9.0",
     "lodash": "^4.17.21",
     "marked": "^2.0.2",
@@ -42,9 +43,9 @@
     "xss": "^1.0.8"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.168",
     "@sentry/webpack-plugin": "^1.15.0",
     "@types/ffi-napi": "^2.4.3",
+    "@types/lodash": "^4.14.168",
     "@types/ref-napi": "^1.4.1",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
