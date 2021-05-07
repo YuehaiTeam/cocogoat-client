@@ -1,8 +1,11 @@
 <script>
+import path from 'path'
+import fsex from 'fs-extra'
 import { bus } from './bus'
 import { ipcRenderer } from 'electron'
 import AppHeader from './Components/AppHeader'
 import { watch } from 'vue'
+let seeliePlugin = ''
 export default {
     components: {
         AppHeader,
@@ -18,7 +21,7 @@ export default {
             return `#/map/2?center=${bus.y},${bus.x}&zoom=${bus.zoom}`
         },
     },
-    mounted() {
+    async mounted() {
         ipcRenderer.send('ready')
         this._updatePosition = this.updatePosition.bind(this)
         ipcRenderer.on('position', this._updatePosition)
@@ -44,11 +47,10 @@ export default {
             bus.x = center[1]
             bus.y = center[0]
         },
-        onDomReady() {
+        async onDomReady() {
             if (this.ready) return
             this.ready = true
             const frame = this.$refs.mapFrame
-
             frame.insertCSS(`body .announcement {
                 display: none !important;
             }
@@ -68,24 +70,29 @@ export default {
                 display: none;
             }
 
-            body .mhy-user {
-                right: .09rem !important;
-                left: auto !important;
-                top: .08rem !important;
-            }
+            @media only screen and (max-width: 900px) {
+                body .mhy-user {
+                    right: .09rem !important;
+                    left: auto !important;
+                    top: .08rem !important;
+                }
 
-            body .mhy-map__add-custom {
-                width: .38rem;
-                height: .38rem !important;
-                padding: 0 !important;
-                box-sizing: border-box;
-                text-indent: -9999px;
-                right: .07rem !important;
-                left: auto !important;
-                bottom: auto !important;
-                top: 1.6rem;
-                position: fixed !important;
+                body .mhy-map__add-custom {
+                    width: .38rem;
+                    height: .38rem !important;
+                    padding: 0 !important;
+                    box-sizing: border-box;
+                    text-indent: -9999px;
+                    left: auto !important;
+                    bottom: auto !important;
+                    position: fixed !important;
+                    top: 0.08rem;
+                    right: 0.55rem !important;
+                }
             }`)
+            seeliePlugin =
+                seeliePlugin || (await fsex.readFile(path.join(bus.dataDir, 'seelie', 'seelie-map.js'))).toString()
+            frame.executeJavaScript(seeliePlugin)
             // @ts-ignore
             window.frame = frame
         },
@@ -97,6 +104,7 @@ export default {
     <webview
         ref="mapFrame"
         class="mapFrame"
+        partition="persist:mihoyoMap"
         :src="mapUrl"
         @dom-ready="onDomReady"
         @did-navigate-in-page="onHashChange"

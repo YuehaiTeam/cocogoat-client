@@ -104,6 +104,18 @@ export default {
                 title: this.__('窗口状态数据已清除'),
             })
         },
+        doClearStorage() {
+            ipcRenderer.send('clearStorageData', {
+                name: 'persist:mihoyoMap',
+                options: {
+                    origin: 'https://webstatic.mihoyo.com',
+                },
+            })
+            ElNotification({
+                type: 'success',
+                title: this.__('登录信息已清除'),
+            })
+        },
     },
 }
 </script>
@@ -187,6 +199,12 @@ export default {
                             {{ __('清除保存的窗口数据') }}
                         </el-button>
                         <div class="form-desc">{{ __('这在你找不到悬浮窗时或许有用。') }}</div>
+                    </el-form-item>
+                    <el-form-item :label="__('登录信息数据')">
+                        <el-button @click="doClearStorage">
+                            {{ __('清除保存的登录信息') }}
+                        </el-button>
+                        <div class="form-desc">{{ __('这将清除大地图的登录信息和本地标点等') }}</div>
                     </el-form-item>
                 </el-form>
             </div>

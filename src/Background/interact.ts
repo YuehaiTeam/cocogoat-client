@@ -2,7 +2,7 @@ import path from 'path'
 import fsex from 'fs-extra'
 import robot from 'robotjs'
 import ioHook from 'iohook'
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell, session } from 'electron'
 import { saveOptions } from './config'
 import { config } from '@/typings/config'
 import { windows, createArtifactView, createArtifactSwitch, createMapView, createMapScan } from './windows'
@@ -38,6 +38,10 @@ export function interactInit() {
     })
     ipcMain.on('openExternal', (event, { url }) => {
         shell.openExternal(url)
+    })
+    ipcMain.on('clearStorageData', (event, { name, options }) => {
+        const sess = session.fromPartition(name)
+        sess.clearStorageData(options)
     })
     ipcMain.on('readArtifacts', async (event, { id }) => {
         try {
