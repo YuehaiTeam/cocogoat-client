@@ -8,6 +8,7 @@ export default {
         return {
             STATUS,
             clickTimes: 0,
+            noTooltip: false,
         }
     },
     computed: {
@@ -87,9 +88,14 @@ export default {
                     transition="none"
                     :enterable="false"
                     :hide-after="0"
-                    :disabled="status === STATUS.LOADING"
+                    :disabled="status === STATUS.LOADING || noTooltip"
                 >
-                    <button class="store" @click="$emit('clickprocess')">
+                    <button
+                        class="store"
+                        @mousedown="noTooltip = true"
+                        @mouseout="noTooltip = false"
+                        @click="$emit('clickprocess') && (noTooltip = false)"
+                    >
                         <i class="el-icon-aim"></i>
                     </button>
                 </el-tooltip>
