@@ -8,6 +8,7 @@ export default {
         return {
             STATUS,
             clickTimes: 0,
+            noTooltip: false,
         }
     },
     computed: {
@@ -87,9 +88,14 @@ export default {
                     transition="none"
                     :enterable="false"
                     :hide-after="0"
-                    :disabled="status === STATUS.LOADING"
+                    :disabled="status === STATUS.LOADING || noTooltip"
                 >
-                    <button class="store" @click="$emit('clickprocess')">
+                    <button
+                        class="store"
+                        @mousedown="noTooltip = true"
+                        @mouseout="noTooltip = false"
+                        @click="$emit('clickprocess') && (noTooltip = false)"
+                    >
                         <i class="el-icon-aim"></i>
                     </button>
                 </el-tooltip>
@@ -212,6 +218,15 @@ header {
         bottom: 0;
         left: 0;
         right: 0;
+    }
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
+    header .actions button {
+        width: 20px;
+        padding: 0;
+        padding-top: 2px;
+        font-size: 14px;
     }
 }
 </style>

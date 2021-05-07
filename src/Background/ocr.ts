@@ -4,17 +4,26 @@ import { Worker } from 'worker_threads'
 import { dialog, ipcMain, webContents } from 'electron'
 import { config } from '@/typings/config'
 import Queue from 'queue'
+import util from 'util'
+import stream from 'stream'
+const pipeline = util.promisify(stream.pipeline)
+function copy(fr: string, to: string) {
+    return pipeline(fsex.createReadStream(fr), fsex.createWriteStream(to))
+}
 let ocrWorker: Worker[] = []
 let workerReadyPms: Promise<void>[] = []
 let ocrReady: Promise<any> | null
 let workerPtr: number = 0
-const workerCount = 1
+let ocrRunning = false
+const workerCount = 8
 const q = Queue({
     concurrency: workerCount,
     autostart: true,
     timeout: 10e3,
 })
 export async function ocrInit() {
+    if (ocrRunning) return
+    ocrRunning = true
     workerPtr = 0
     ocrWorker = []
     workerReadyPms = []
@@ -33,6 +42,41 @@ export async function ocrInit() {
         ocrData = ocrUserData
     } catch (e) {}
     console.log('OCR Datadir is ', ocrData)
+    let rec = path.join(ocrData, 'rec')
+    let det = path.join(ocrData, 'det')
+    let dic = path.join(ocrData, 'dic.txt')
+    /* 包含非ASCII字符时才使用虚拟路径，减少正常情况下损失 */
+    if (/[^\x00-\x7F]/.test(dic)) {
+        try {
+            console.log('non-ascii characters found in path, creating virtual folder')
+            /*
+             * 这个虚拟文件夹和里面与OCR模型对应的虚拟文件会由enigma virtual box（打包工具）在运行时创建，配置位于build/evb-templates
+             * 如果存在这个文件夹，即认为正在单文件运行，此时将模型复制到虚拟文件夹以解决PaddleOCR不支持中文路径模型的问题
+             * 若过程出错或者不是单文件运行，则依然直接读取模型文件
+             */
+            const virtualPath = 'C:\\cocogoat'
+            await fsex.access(virtualPath)
+            const vrec = path.join(virtualPath, 'rec')
+            const vdet = path.join(virtualPath, 'det')
+            const vdic = path.join(virtualPath, 'dic.txt')
+
+            /* 此处依次处理，同时复制偶尔会导致enigmavb崩溃 */
+            await copy(path.join(det, 'inference.pdmodel'), path.join(vdet, 'inference.pdmodel'))
+            await copy(path.join(det, 'inference.pdiparams'), path.join(vdet, 'inference.pdiparams'))
+            await copy(path.join(rec, 'inference.pdmodel'), path.join(vrec, 'inference.pdmodel'))
+            await copy(path.join(rec, 'inference.pdiparams'), path.join(vrec, 'inference.pdiparams'))
+            await copy(dic, vdic)
+
+            rec = vrec
+            det = vdet
+            dic = vdic
+            console.log('virtual folder created', rec)
+        } catch (e) {
+            console.log('enigmavb copy error or not found, fallback to read model directly', e)
+        }
+    } else {
+        console.log('no non-ascii characters in path, read model directly')
+    }
 
     for (let i = 0; i < workerCount; i++) {
         workerReadyPms.push(
@@ -43,9 +87,9 @@ export async function ocrInit() {
                         workerData: {
                             worker: 'ppocr',
                             data: {
-                                rec: path.join(ocrData, 'rec'),
-                                det: path.join(ocrData, 'det'),
-                                dic: path.join(ocrData, 'dic.txt'),
+                                rec,
+                                det,
+                                dic,
                             },
                             config,
                         },
@@ -102,6 +146,7 @@ export async function ocrInit() {
 }
 export async function ocrStop() {
     await ocrReady
+    ocrRunning = false
     const p = []
     for (const i of ocrWorker) {
         i.postMessage({ event: 'exit' })

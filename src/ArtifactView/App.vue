@@ -94,9 +94,9 @@ export default {
                 status.status = STATUS.ERROR
             }
         },
-        splitImages(canvas) {
+        splitImages(canvas, scale) {
             const posObj = this.$refs.captureDom.getPosition()
-            return split(canvas, posObj)
+            return split(canvas, posObj, scale)
         },
         async processOnce() {
             /* 计算窗口位置 */
@@ -110,23 +110,12 @@ export default {
             /* 抓屏 */
             let canvas = await capture(x, y, w * p, h * p)
 
-            /* 高dpi缩放 */
-            if (p !== 1) {
-                let srcCanvas = canvas
-                canvas = document.createElement('canvas')
-                canvas.width = w
-                canvas.height = h
-                const ctx = canvas.getContext('2d')
-                ctx.imageSmoothingEnabled = true
-                ctx.drawImage(srcCanvas, 0, 0, w, h)
-            }
-
             /* 拆分、预处理 */
-            let ret = this.splitImages(canvas)
+            let ret = this.splitImages(canvas, p)
 
             /* 调试写入图片文件 */
             if (status.runtimeDebug) {
-                await imageDump(canvas, ret)
+                imageDump(canvas, ret)
             }
 
             /* OCR、识别 */
@@ -273,15 +262,21 @@ export default {
     overflow: hidden;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.2) {
-    .float,
-    .actions {
+    .float {
         zoom: 0.85;
+        font-size: 12px;
+    }
+    .title {
+        font-size: 12px;
     }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5) {
-    .float,
-    .actions {
+    .float {
         zoom: 0.72;
+        font-size: 13px;
+    }
+    .title {
+        font-size: 12px;
     }
 }
 .el-overlay {

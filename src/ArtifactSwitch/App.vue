@@ -245,6 +245,8 @@ export default {
             for (let i = 0; i < bus.cols; i++) {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
+                // 延时等待抓屏
+                await sleep(30 * sleepRatio)
                 bus.checkedCount++
                 await tryocr()
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
@@ -256,6 +258,8 @@ export default {
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
+                // 延时等待抓屏
+                await sleep(30 * sleepRatio)
                 bus.checkedCount++
                 await tryocr()
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)

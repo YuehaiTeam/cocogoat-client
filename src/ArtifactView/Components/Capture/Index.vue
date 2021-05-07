@@ -102,9 +102,11 @@ export default {
 }
 .overlay-color {
     top: 2%;
-    right: 8%;
+    right: 12%;
     width: 2%;
     height: 1.3%;
+    border: 2px solid;
+    border-color: transparent !important;
 }
 .overlay-user {
     left: 0;
