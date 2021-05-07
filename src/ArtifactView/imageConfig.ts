@@ -1,5 +1,4 @@
 import { createColorFilter } from './imageProcess'
-export const padding = 0
 export default <
     Record<
         string,

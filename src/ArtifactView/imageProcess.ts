@@ -1,6 +1,6 @@
 import 'context-filter-polyfill'
 import { ocr as ipcOcr } from './ipc'
-import imageConfig, { padding } from './imageConfig'
+import imageConfig from './imageConfig'
 import { IocrResult } from '@/typings/ocr'
 
 export interface ISplitConfig {
@@ -15,9 +15,7 @@ export interface ISplitResult {
     imageConfig: any
 }
 export type SplitResults = Record<string, ISplitResult>
-export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitConfig>) {
-    const scale = 500 / canvas.width
-    console.log('scale:', scale)
+export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitConfig>, pixelRatio: number) {
     const ret: SplitResults = {}
     for (const i in posList) {
         if ({}.hasOwnProperty.call(posList, i)) {
@@ -25,8 +23,8 @@ export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitC
             const config = posList[i]
             ret[i].config = config
             const canvas1 = document.createElement('canvas')
-            canvas1.width = config.w
-            canvas1.height = config.h
+            canvas1.width = config.w * pixelRatio
+            canvas1.height = config.h * pixelRatio
             const ctx = canvas1.getContext('2d')
             if (!ctx) throw new Error('Canvas not supported')
 
@@ -35,26 +33,22 @@ export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitC
                 ctx.filter = currentImgConfig.handler
             }
 
-            ctx.drawImage(canvas, config.x, config.y, config.w, config.h, 0, 0, config.w, config.h)
+            ctx.drawImage(
+                canvas,
+                config.x * pixelRatio,
+                config.y * pixelRatio,
+                config.w * pixelRatio,
+                config.h * pixelRatio,
+                0,
+                0,
+                config.w * pixelRatio,
+                config.h * pixelRatio,
+            )
 
             if (typeof currentImgConfig.handler === 'function') {
-                currentImgConfig.handler(ctx, config.w, config.h)
+                currentImgConfig.handler(ctx, config.w * pixelRatio, config.h * pixelRatio)
             }
-
-            /* 白边填充 放大 锐化 */
-            if (currentImgConfig.ignore !== true && currentImgConfig.singleLine !== true) {
-                ret[i].canvas = document.createElement('canvas')
-                const ctx2 = ret[i].canvas.getContext('2d')
-                if (!ctx2) throw new Error('Canvas not supported')
-                ret[i].canvas.width = config.w * scale + padding
-                ret[i].canvas.height = config.h * scale + padding
-                ctx2.fillStyle = '#fff'
-                ctx2.fillRect(0, 0, ret[i].canvas.width, ret[i].canvas.height)
-                ctx.imageSmoothingEnabled = false
-                ctx2.drawImage(canvas1, padding / 2, padding / 2, config.w * scale, config.h * scale)
-            } else {
-                ret[i].canvas = canvas1
-            }
+            ret[i].canvas = canvas1
             ret[i].imageConfig = currentImgConfig
         }
     }
