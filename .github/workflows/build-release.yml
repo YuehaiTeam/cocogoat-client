@@ -37,4 +37,10 @@ jobs:
         with:
           name: cocogoat-unpacked
           path: dist_electron/win-unpacked/
+      - name: Make noavx version
+        run: node build/noavx.js
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cocogoat-unpacked-noavx
+          path: dist_electron/win-unpacked/
     
