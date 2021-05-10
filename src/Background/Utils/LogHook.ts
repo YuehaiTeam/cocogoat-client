@@ -16,17 +16,19 @@ export function logHook(output?: string) {
     // @ts-ignore
     console._error = console.error
     console.log = (...args: any) => {
-        process.stdout.write(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}][LOG]${prefix} `)
+        let buffer = ''
+        buffer += `[${dayjs().format('YYYY-MM-DD HH:mm:ss')}][LOG]${prefix} `
         for (const i of args) {
-            process.stdout.write(typeof i === 'string' ? i : inspect(i) + ' ')
+            buffer += typeof i === 'string' ? i : inspect(i) + ' '
         }
-        process.stdout.write('\n')
+        process.stdout.write(buffer + '\r\n')
     }
     console.error = (...args: any) => {
-        process.stdout.write(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}][ERR]${prefix} `)
+        let buffer = ''
+        buffer += `[${dayjs().format('YYYY-MM-DD HH:mm:ss')}][ERR]${prefix} `
         for (const i of args) {
-            process.stdout.write(typeof i === 'string' ? i : inspect(i) + ' ')
+            buffer += typeof i === 'string' ? i : inspect(i) + ' '
         }
-        process.stdout.write('\n')
+        process.stdout.write(buffer + '\r\n')
     }
 }

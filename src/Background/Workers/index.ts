@@ -4,7 +4,7 @@ import { ocrWorkerInit } from './ocr'
 import { logHook } from '../Utils/LogHook'
 logHook()
 export const config: IConfig = workerData.config
-console.log('Worker started :', workerData.worker)
+console.log('Worker started')
 switch (workerData.worker) {
     case 'ppocr':
         ocrWorkerInit(workerData.data)
