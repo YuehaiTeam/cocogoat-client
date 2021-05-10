@@ -8,7 +8,16 @@ export async function ocrWorkerInit(data: { rec: string; det: string; dic: strin
     const { rec, det, dic } = data
 
     const ppocrObjPath = path.join(config.dataDir, 'paddleocr', 'ppocr.node')
-    ppocr = __non_webpack_require__(ppocrObjPath)
+    try {
+        ppocr = __non_webpack_require__(ppocrObjPath)
+    } catch (e) {
+        console.error(e)
+        parentPort.postMessage({
+            event: 'error',
+            message: e.messgae,
+        })
+        process.exit()
+    }
     ppocr.load(det, rec, dic, {
         use_gpu: false,
         gpu_id: 0,

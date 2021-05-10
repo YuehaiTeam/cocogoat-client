@@ -86,6 +86,7 @@ export async function ocrInit() {
                     {
                         workerData: {
                             worker: 'ppocr',
+                            name: `ocr-${i}`,
                             data: {
                                 rec,
                                 det,
@@ -109,12 +110,26 @@ export async function ocrInit() {
                                 console.log('Window', win, 'not found')
                             }
                         }
+                        if (event === 'error') {
+                            dialog.showMessageBox({
+                                type: 'error',
+                                title: 'OCR模块加载失败',
+                                message: `错误信息：${message}。如果你不知道发生了什么，请联系开发者。`,
+                                buttons: ['好的'],
+                            })
+                            ocrStop()
+                            return
+                        }
                     },
                 )
                 worker.on('error', reject)
                 ocrWorker.push(worker)
             }),
         )
+        if (i === 0) {
+            await workerReadyPms[0]
+            console.log('first worker loadd successfully')
+        }
     }
     ipcMain.on('ocr', async (event, { image, id }: { image: string; id: string }) => {
         await ocrReady
@@ -145,7 +160,9 @@ export async function ocrInit() {
     })
 }
 export async function ocrStop() {
-    await ocrReady
+    if (ocrReady) {
+        await ocrReady
+    }
     ocrRunning = false
     const p = []
     for (const i of ocrWorker) {
