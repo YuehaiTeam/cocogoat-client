@@ -32,6 +32,11 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         throw new Error("Title cant't be empty")
     }
     let name = textCNEN(ocrres.title.text)
+
+    for (const i of ocrCorrectionMap) {
+        name = name.replace(i[0], i[1])
+    }
+
     if (!ArtifactNames.includes(name)) {
         name = textBestmatch(name, ArtifactNames)
     }
