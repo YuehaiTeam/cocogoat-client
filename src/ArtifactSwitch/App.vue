@@ -199,7 +199,9 @@ export default {
             if (revertStatus) {
                 bus.status = STATUS.WAITING
                 setTransparent(false)
-                this.detectOnce()
+                try {
+                    this.detectOnce()
+                } catch (e) {}
             }
             return time
         },
@@ -266,7 +268,9 @@ export default {
             }
         },
         async onDetect() {
-            await this.detectOnce()
+            try {
+                await this.detectOnce()
+            } catch (e) {}
             bus.intro = false
         },
         async onAuto() {
