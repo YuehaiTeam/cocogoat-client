@@ -25,6 +25,8 @@ module.exports = {
             externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi'],
             nodeIntegration: true,
             chainWebpackMainProcess: (config) => {
+                // source map
+                config.devtool('sourcemap')
                 // worker entry
                 config.entry('background_worker').add('./src/background_worker.ts').end()
                 // Chain webpack config for electron main process only
@@ -37,6 +39,24 @@ module.exports = {
                     'electron-active-window/build/Release/wm.node':
                         'commonjs2 electron-active-window/build/Release/wm.node',
                 })
+                /* Sentry: source map uploading */
+                if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {
+                    config.plugin('sentry').use(SentryPlugin, [
+                        {
+                            url: process.env.SENTRY_URL,
+                            authToken: process.env.SENTRY_KEY,
+                            org: 'yuehaiteam',
+                            project: 'cocogoat',
+                            ignore: ['node_modules'],
+                            include: './dist_electron/bundled',
+                            release: packageJSON.version,
+                            setCommits: {
+                                auto: true,
+                            },
+                            urlPrefix: '~/',
+                        },
+                    ])
+                }
             },
             builderOptions: {
                 appId: 'work.cocogoat',
@@ -98,23 +118,5 @@ module.exports = {
                 }
                 return options
             })
-        /* Sentry: source map uploading */
-        if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {
-            config.plugin('sentry').use(SentryPlugin, [
-                {
-                    url: process.env.SENTRY_URL,
-                    authToken: process.env.SENTRY_KEY,
-                    org: 'yuehaiteam',
-                    project: 'cocogoat',
-                    ignore: ['node_modules'],
-                    include: './dist_electron/bundled',
-                    release: packageJSON.version,
-                    setCommits: {
-                        auto: true,
-                    },
-                    urlPrefix: '~/',
-                },
-            ])
-        }
     },
 }

@@ -2,7 +2,7 @@ import { IConfig, EBuild } from '@/typings/config'
 import { workerData } from 'worker_threads'
 import { ocrWorkerInit } from './ocr'
 import { logHook } from '../Utils/LogHook'
-import * as Sentry from '@sentry/electron'
+import * as Sentry from '@sentry/node'
 logHook()
 export const config: IConfig = workerData.config
 if (config.options.sendErrorReports && process.env.NODE_ENV !== 'development') {

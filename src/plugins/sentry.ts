@@ -18,6 +18,7 @@ export function initSentry(config: IConfig, app: App) {
                     Vue: app,
                     attachProps: true,
                 }),
+                // @ts-ignore
                 new Integrations.BrowserTracing(),
             ],
             tracesSampleRate: 1.0,
