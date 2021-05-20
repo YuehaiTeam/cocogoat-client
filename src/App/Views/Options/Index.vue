@@ -2,6 +2,7 @@
 import xss from 'xss'
 import dayjs from 'dayjs'
 import marked from 'marked'
+import fsex from 'fs-extra'
 import $set from 'lodash/set'
 import { upgrade, getApphash } from '../../ipc'
 import { bus } from '@/App/bus'
@@ -63,6 +64,24 @@ export default {
             this.upgradeButtonLoading = false
         },
         async doUpgrade() {
+            if (bus.config.build.type === 'DEV') {
+                ElNotification({
+                    type: 'info',
+                    title: this.__('开发模式无法自动更新'),
+                })
+                return
+            }
+            try {
+                const virtualPath = 'C:\\cocogoat'
+                await fsex.access(virtualPath)
+            } catch (e) {
+                /* 虚拟路径不存在，即当前为非单文件运行，此时不支持自动更新 */
+                ElNotification({
+                    type: 'info',
+                    title: this.__('该版本暂不支持自动更新'),
+                })
+                return
+            }
             this.showUpgrade = false
             const l = ElLoading.service({ fullscreen: true, text: this.__('趴在草地上，能听见大地的心跳...') })
             const hash = await getApphash()
@@ -76,14 +95,6 @@ export default {
                 console.log(e)
             }
             console.log('hasPatch=', hasPatch, patchUrl)
-            if (bus.config.build.type === 'DEV') {
-                ElNotification({
-                    type: 'info',
-                    title: this.__('开发模式无法自动更新'),
-                })
-                l.close()
-                return
-            }
             upgrade(hasPatch ? patchUrl : this.newVersion.url.fullPackage, hasPatch)
         },
         clickVersion() {
