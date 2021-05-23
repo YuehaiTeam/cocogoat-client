@@ -48,10 +48,10 @@ app.on('ready', async () => {
         console.log(`build = ${config.build.type}${dayjs(config.build.timestamp).format('YYMMDDHHmm')}`)
     }
     const pathEnv =
+        `${config.dataDir};${path.join(config.dataDir, 'paddleocr')};${path.join(config.dataDir, 'opencv')};` +
         `${process.env.path ? `${process.env.path};` : ''}` +
         `${process.env.Path ? `${process.env.Path};` : ''}` +
-        `${process.env.PATH ? `${process.env.PATH};` : ''}` +
-        `${config.dataDir};${path.join(config.dataDir, 'paddleocr')};${path.join(config.dataDir, 'opencv')};`
+        `${process.env.PATH ? `${process.env.PATH};` : ''}`
     for (const p of ['path', 'PATH', 'Path']) {
         process.env[p] = pathEnv
     }
