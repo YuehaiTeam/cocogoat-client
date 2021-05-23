@@ -12,6 +12,11 @@ if (config.options.sendErrorReports && process.env.NODE_ENV !== 'development') {
         release: config.build && config.build.type === EBuild.REL ? config.version : 'dev',
     })
 }
+export function captureError(e: any) {
+    if (config.options.sendErrorReports && process.env.NODE_ENV !== 'development') {
+        Sentry.captureException(e)
+    }
+}
 console.log('Worker started :', workerData.worker)
 console.log('Worker started')
 switch (workerData.worker) {

@@ -6,6 +6,7 @@ import { config } from '@/typings/config'
 import Queue from 'queue'
 import util from 'util'
 import stream from 'stream'
+import { windows } from './windows'
 const pipeline = util.promisify(stream.pipeline)
 function copy(fr: string, to: string) {
     return pipeline(fsex.createReadStream(fr), fsex.createWriteStream(to))
@@ -77,7 +78,7 @@ export async function ocrInit() {
     } else {
         console.log('no non-ascii characters in path, read model directly')
     }
-
+    let noavx = false
     for (let i = 0; i < workerCount; i++) {
         workerReadyPms.push(
             new Promise((resolve, reject) => {
@@ -91,6 +92,7 @@ export async function ocrInit() {
                                 rec,
                                 det,
                                 dic,
+                                noavx,
                             },
                             config,
                         },
@@ -100,6 +102,7 @@ export async function ocrInit() {
                     'message',
                     ({ event, message, reply, id }: { event: string; message: any; reply?: any; id?: string }) => {
                         if (event === 'ready') {
+                            noavx = message.noavx
                             resolve()
                         }
                         if (event === 'reply' && id && reply) {
@@ -114,10 +117,10 @@ export async function ocrInit() {
                             dialog.showMessageBox({
                                 type: 'error',
                                 title: 'OCR模块加载失败',
-                                message: `错误信息：${message}。如果你不知道发生了什么，请联系开发者。`,
+                                message: `如果你不知道发生了什么，请联系开发者。错误信息：${message}`,
                                 buttons: ['好的'],
                             })
-                            ocrStop()
+                            windows.artifactView && windows.artifactView.close()
                             return
                         }
                     },
