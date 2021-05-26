@@ -26,7 +26,7 @@
  - 支持所有服务器(天空岛、世界树、外服)  
  - 支持大部分游戏分辨率、部分云游戏平台  
  - 目前暂时仅支持识别中文  
- - 可以导出到[莫娜占卜铺](https://www.mona-uranai.com/)进行最大伤害计算、自动配装等
+ - 可以导出到[莫娜占卜铺](https://www.mona-uranai.com/) [Mingyulab](https://genshin.mingyulab.com/) [genshin-optimizer](https://frzyc.github.io/genshin-optimizer/)进行最大伤害计算、自动配装等
 
 ### 圣遗物自动切换
  - 使用`opencv`自动检测圣遗物列表，并自动点击和切换
