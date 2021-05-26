@@ -976,6 +976,11 @@
   dependencies:
     cross-spawn "^7.0.1"
 
+"@mr-quin/mona_to_go@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.nlark.com/@mr-quin/mona_to_go/download/@mr-quin/mona_to_go-1.0.3.tgz#395895455dfdcee43d406058d4dfb78e6be5a02c"
+  integrity sha1-OViVRV39zuQ9QGBY1N+3jmvloCw=
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.npm.taobao.org/@mrmlnc/readdir-enhanced/download/@mrmlnc/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
