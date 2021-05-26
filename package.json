@@ -40,6 +40,7 @@
     "ref-union-napi": "^1.0.2",
     "robotjs": "^0.6.0",
     "uuid": "^8.3.2",
+    "vigemclient": "^1.2.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "xss": "^1.0.8"

@@ -29,4 +29,19 @@ export function systemCheckInit() {
             console.log('Find VCRedist Error', e)
         }
     })
+    ipcMain.on('checkViGEmInstalled', (event, { id }) => {
+        try {
+            const vcKey = new RegKey(
+                windef.HKEY.HKEY_LOCAL_MACHINE,
+                'SOFTWARE\\Nefarius Software Solutions e.U.\\ViGEm Bus Driver',
+                windef.KEY_ACCESS.KEY_READ,
+            )
+            vcKey.close()
+            console.log('ViGEm Found')
+            event.reply(`checkViGEmInstalled-${id}`, true)
+        } catch (e) {
+            event.reply(`checkViGEmInstalled-${id}`, false)
+            console.log('ViGEm Not Found', e)
+        }
+    })
 }

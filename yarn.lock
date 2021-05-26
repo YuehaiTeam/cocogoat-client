@@ -7823,7 +7823,7 @@ node-abi@^2.13.0, node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
-node-addon-api@^1.6.3, node-addon-api@^1.7.1:
+node-addon-api@^1.6.3, node-addon-api@^1.7.1, node-addon-api@^1.7.2:
   version "1.7.2"
   resolved "https://registry.npm.taobao.org/node-addon-api/download/node-addon-api-1.7.2.tgz#3df30b95720b53c24e59948b49532b662444f54d"
   integrity sha1-PfMLlXILU8JOWZSLSVMrZiRE9U0=
@@ -11337,6 +11337,13 @@ version-range@^1.0.0:
   integrity sha1-HCMwZCAu50KvydVuIdo7LhUmCs8=
   dependencies:
     version-compare "^1.0.0"
+
+vigemclient@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.nlark.com/vigemclient/download/vigemclient-1.2.1.tgz#3da5763472b0728d5ce6955076d4ced8cbcb3fa0"
+  integrity sha1-PaV2NHKwco1c5pVQdtTO2MvLP6A=
+  dependencies:
+    node-addon-api "^1.7.2"
 
 vm-browserify@^1.0.1:
   version "1.1.2"

@@ -46,7 +46,14 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         throw new Error("Level cant't be empty")
     }
     let level = Number(
-        textNumber(ocrres.level.text.toLowerCase().replace(/o/g, '0').replace(/古/g, '0').replace(/土/g, '1')),
+        textNumber(
+            ocrres.level.text
+                .toLowerCase()
+                .replace(/o/g, '0')
+                .replace(/古/g, '0')
+                .replace(/土/g, '1')
+                .replace(/吉/g, '10'),
+        ),
     )
     level = level > 20 ? 20 : level
 

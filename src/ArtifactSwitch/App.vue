@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron'
 import Actions from './Components/Actions'
 import AppHeader from './Components/AppHeader'
 import TransparentArea from './Components/TransparentArea'
-import { getposition, capture, setTransparent, tryocr, click } from './ipc'
+import { getposition, capture, setTransparent, tryocr, click, joystickStatus, joystickNext } from './ipc'
 import { bus, STATUS } from './bus'
 import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
@@ -206,6 +206,39 @@ export default {
             return time
         },
         async auto() {
+            if (await joystickStatus()) {
+                return await this.autoByJoystick()
+            } else {
+                return await this.autoByMouse()
+            }
+        },
+        async autoByJoystick() {
+            bus.status = STATUS.JOYSTICK
+            try {
+                bus.auto = true
+                bus.totalCount = 0
+                bus.isLastPage = 0
+                bus.checkedCount = 0
+                bus.currentCount = 0
+                setTransparent(true)
+                // 设置焦点
+                await click(await toWindowPos(100, 100))
+                setTransparent(false)
+                while (bus.auto) {
+                    await joystickNext()
+                    await sleep(60 * sleepRatio)
+                    bus.checkedCount++
+                    await tryocr()
+                }
+                bus.auto = false
+                bus.status = bus.READY
+            } catch (e) {
+                console.log(e)
+                bus.auto = false
+                bus.status = bus.ERROR
+            }
+        },
+        async autoByMouse() {
             try {
                 bus.auto = true
                 bus.totalCount = 0

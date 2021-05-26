@@ -1,6 +1,7 @@
 import { IConfig, EBuild } from '@/typings/config'
 import { workerData } from 'worker_threads'
 import { ocrWorkerInit } from './ocr'
+import { joystickWorkerInit } from './joystick'
 import { logHook } from '../Utils/LogHook'
 import * as Sentry from '@sentry/node'
 logHook()
@@ -22,6 +23,9 @@ console.log('Worker started')
 switch (workerData.worker) {
     case 'ppocr':
         ocrWorkerInit(workerData.data)
+        break
+    case 'joystick':
+        joystickWorkerInit()
         break
     default:
         console.log('unknown worker')

@@ -8,6 +8,7 @@ import { config } from '@/typings/config'
 import { windows, createArtifactView, createArtifactSwitch } from './windows'
 // @ts-ignore
 import activeWindows from 'electron-active-window/build/Release/wm.node'
+import { joystickInit, joystickStatus, joystickStop } from './joystick'
 robot.setMouseDelay(8)
 const getActiveWindow = activeWindows.getActiveWindow
 
@@ -55,6 +56,11 @@ export function interactInit() {
         windows.artifactView && windows.artifactView.webContents.send('mouseup', event)
     })
     ioHook.start()
+    ipcMain.on('joystickInit', joystickInit)
+    ipcMain.on('joystickStop', joystickStop)
+    ipcMain.on('joystickStatus', (event, { id }) => {
+        event.reply(`joystickStatus-${id}`, joystickStatus())
+    })
     ipcMain.on('createArtifactView', createArtifactView)
     ipcMain.on('createArtifactSwitch', createArtifactSwitch)
     ipcMain.on('readyArtifactSwitch', () => {

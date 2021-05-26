@@ -11,6 +11,7 @@ export default {
                 case STATUS.CAPTURE:
                     return '正在检测'
                 case STATUS.CLICK:
+                case STATUS.JOYSTICK:
                     return '正在切换'
                 case STATUS.PAGING:
                     return '正在翻页'
@@ -48,12 +49,18 @@ export default {
         <div class="right-status">
             <div v-if="bus.status === STATUS.ERROR" class="error">{{ __('检测失败') }}</div>
             <div v-else>
-                {{ numberText[0] }}
-                <span class="num">{{ numberText[1] }}</span>
-                {{ numberText[2].trim().replace('  ', '&nbsp;&nbsp;&nbsp;') }}
-                <span class="num">{{ numberText[3] }}</span
-                >{{ numberText[4] }}<span class="num">{{ numberText[5] }}</span
-                >{{ numberText[6] }}
+                <div v-if="bus.status === STATUS.JOYSTICK">
+                    {{ __('手柄模式') }} {{ __('已识别') }} <span class="num">{{ numberText[3] }}</span>
+                    {{ numberText[6] }}
+                </div>
+                <div v-else>
+                    {{ numberText[0] }}
+                    <span class="num">{{ numberText[1] }}</span>
+                    {{ numberText[2].trim().replace('  ', '&nbsp;&nbsp;&nbsp;') }}
+                    <span class="num">{{ numberText[3] }}</span
+                    >{{ numberText[4] }}<span class="num">{{ numberText[5] }}</span
+                    >{{ numberText[6] }}
+                </div>
             </div>
         </div>
     </div>
