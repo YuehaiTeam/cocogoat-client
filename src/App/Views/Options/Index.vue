@@ -125,10 +125,10 @@ export default {
             })
         },
         async doSetJoystick(val) {
-            this.joystick = val
             if (val) {
                 if (await checkViGEmInstalled()) {
                     ipcRenderer.send('joystickInit')
+                    this.joystick = true
                 } else {
                     await ElMessageBox.confirm(
                         __('请下载并安装ViGEm驱动 (https://vigem.org/) 以使用手柄模拟功能。'),
@@ -144,6 +144,7 @@ export default {
                 }
             } else {
                 ipcRenderer.send('joystickStop')
+                this.joystick = false
             }
         },
     },
