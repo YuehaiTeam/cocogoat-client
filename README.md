@@ -9,6 +9,8 @@
 ![MIT License](https://shields.io/badge/license-MIT-green)
 [![POEditor - English](https://img.shields.io/poeditor/progress/434087/en?token=d0ebc6efc6db6d4c57aaa1103a0c4abd)](https://poeditor.com/join/project?hash=jZiEtV01OO)
 [![POEditor - Japanese](https://img.shields.io/poeditor/progress/434087/ja?token=d0ebc6efc6db6d4c57aaa1103a0c4abd)](https://poeditor.com/join/project?hash=jZiEtV01OO)
+[![POEditor - Portuguese (BR)](https://img.shields.io/poeditor/progress/434087/pt-br?token=d0ebc6efc6db6d4c57aaa1103a0c4abd)](https://poeditor.com/join/project?hash=jZiEtV01OO)
+[![POEditor - Russian](https://img.shields.io/poeditor/progress/434087/ru?token=d0ebc6efc6db6d4c57aaa1103a0c4abd)](https://poeditor.com/join/project?hash=jZiEtV01OO)
 
 </div>
 

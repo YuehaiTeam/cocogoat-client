@@ -25,4 +25,34 @@ export const availableLocales: Record<string, any> = {
         },
         ...require('./locales/jp.json'),
     },
+    pt: {
+        __name: 'Portuguese',
+        '': {
+            language: 'pt',
+            plurals: {
+                text: 'nplurals = 2; plural = (n !== 1)',
+                func(n: number) {
+                    return n !== 1
+                },
+            },
+        },
+        ...require('./locales/pt.json'),
+    },
+    ru: {
+        __name: 'Russian',
+        '': {
+            language: 'ru',
+            plurals: {
+                text: 'nplurals = 3; plural = (n % 10 === 1 && n % 100 !== 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2)',
+                func(n: number) {
+                    return n % 10 === 1 && n % 100 !== 11
+                        ? 0
+                        : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+                        ? 1
+                        : 2
+                },
+            },
+        },
+        ...require('./locales/ru.json'),
+    },
 }

@@ -23,6 +23,10 @@ export default {
             const translated = __('当前页 %1 个  总第 %2 / %3 个', bus.currentCount, bus.checkedCount, bus.totalCount)
             return translated.split(/(\d+)/)
         },
+        numberTextHandle() {
+            const translated = __('已识别 %1 个', bus.checkedCount)
+            return translated.split(/(\d+)/)
+        },
     },
 }
 </script>
@@ -50,8 +54,8 @@ export default {
             <div v-if="bus.status === STATUS.ERROR" class="error">{{ __('检测失败') }}</div>
             <div v-else>
                 <div v-if="bus.status === STATUS.JOYSTICK">
-                    {{ __('手柄模式') }} {{ __('已识别') }} <span class="num">{{ numberText[3] }}</span>
-                    {{ numberText[6] }}
+                    {{ __('手柄模式') }}: {{ numberTextHandle[0] }} <span class="num">{{ numberTextHandle[1] }}</span>
+                    {{ numberTextHandle[2] }}
                 </div>
                 <div v-else>
                     {{ numberText[0] }}

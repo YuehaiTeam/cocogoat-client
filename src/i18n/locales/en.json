@@ -105,5 +105,21 @@
     "提示": "Tips",
     "仍然尝试": "Continue anyway",
     "前往下载": "Proceed to download",
-    "您的系统似乎没有安装微软运行库 (下载地址：https://aka.ms/vs/16/release/vc_redist.x64.exe) ，识别功能将无法正常使用。": "Scanner may not work because Microsoft Visual C++ Redistributable (Link: https://aka.ms/vs/16/release/vc_redist.x64.exe) is not installed."
+    "您的系统似乎没有安装微软运行库 (下载地址：https://aka.ms/vs/16/release/vc_redist.x64.exe) ，识别功能将无法正常使用。": "Scanner may not work because Microsoft Visual C++ Redistributable (Link: https://aka.ms/vs/16/release/vc_redist.x64.exe) is not installed.",
+    "加速滚动": "Speedup Scrolling",
+    "如果出现翻页时滚动过快跳过行的情况，或您正在高延迟环境下使用云游戏，请关闭此项。": "Please disable this if some lines are skipped because of scrolling too fast or you're using cloud gaming platforms with a high latency.",
+    "升级智能判断": "Upgrade detection",
+    "自动判断圣遗物升级(Beta)，但为什么总是女仆狂喜呢？": "Automatically replace upgraded artifacts.",
+    "（可能导致极少量圣遗物不入库）": "(May cause a very few number of artifacts skipped.)",
+    "手柄模拟": "Joystick simulating",
+    "启用手柄模拟": "Enable joystick simulating",
+    "启用后，程序将模拟一个Xbox手柄。圣遗物切换器将使用模拟的手柄进行切换。": "The program will simulate a Xbox Controller when this option is enabled, which will be used in the artifact switcher.",
+    "您需要先启用此功能再启动游戏，而后在游戏内设置控制模式为手柄。": "You need to enable this before starting the game. Then, set the \"Control Type\" to \"Controller\" in the game.",
+    "为提供简单操作的能力，以下按键映射将被启用：ABXY为键盘的对应按键，左右肩键为PageUP与PageDown，Esc可打开派蒙菜单，摇杆由键盘方向键控制。": "To prevent loss of control of the game, these key mappings will be enabled:\nA: A, B: B, X:X, Y:Y, LT: Page Up; RT: Page Down; Menu: ESC; Joystick: Arrow Keys",
+    "复制": "Copy",
+    "手柄模式": "Joystick mode",
+    "已识别 %1 个": "%1 scanned",
+    "该版本暂不支持自动更新": "Auto upgrade is not supported in this wersion.",
+    "请下载并安装ViGEm驱动 (https://vigem.org/) 以使用手柄模拟功能。": "Please download and install the ViGem Driver (https://vigem.org/)  to enable joystick simulation.",
+    "关闭": "Close"
 }
