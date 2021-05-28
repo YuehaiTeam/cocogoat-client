@@ -1,7 +1,7 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { Worker } from 'worker_threads'
-import { dialog, ipcMain, webContents } from 'electron'
+import { dialog, ipcMain, webContents, IpcMainEvent } from 'electron'
 import { config } from '@/typings/config'
 import Queue from 'queue'
 import util from 'util'
@@ -16,6 +16,7 @@ let workerReadyPms: Promise<void>[] = []
 let ocrReady: Promise<any> | null
 let workerPtr: number = 0
 let ocrRunning = false
+let onOcrEvent: any
 const workerCount = 8
 const q = Queue({
     concurrency: workerCount,
@@ -134,7 +135,7 @@ export async function ocrInit() {
             console.log('first worker loadd successfully')
         }
     }
-    ipcMain.on('ocr', async (event, { image, id }: { image: string; id: string }) => {
+    onOcrEvent = async (event: IpcMainEvent, { image, id }: { image: string; id: string }) => {
         await ocrReady
         let workerId = workerPtr++ % workerCount
         if (workerId > workerCount - 1) workerId = 0
@@ -156,7 +157,8 @@ export async function ocrInit() {
                 cb()
             })
         })
-    })
+    }
+    ipcMain.on('ocr', onOcrEvent)
     ocrReady = Promise.all(workerReadyPms)
     ocrReady.then(() => {
         console.log('ocr ready')
@@ -167,6 +169,7 @@ export async function ocrStop() {
         await ocrReady
     }
     ocrRunning = false
+    ipcMain.off('ocr', onOcrEvent)
     const p = []
     for (const i of ocrWorker) {
         i.postMessage({ event: 'exit' })

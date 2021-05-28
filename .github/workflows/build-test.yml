@@ -18,9 +18,11 @@ jobs:
           timezoneWindows: "China Standard Time"
       - uses: c-hive/gha-yarn-cache@v1
       - name: Replace registry
-        run: (Get-content yarn.lock) | Foreach-Object {$_ -replace "registry.npm.taobao.org", "r.cnpmjs.org"} | Set-Content yarn.lock
+        run: (Get-content yarn.lock) | Foreach-Object {$_ -replace "registry.nlark.com", "r.cnpmjs.org"} | Set-Content yarn.lock
       - name: Install dependencies
-        run: yarn
+        run: yarn --ignore-scripts
+      - name: Build native modules
+        run: npm rebuild --verbose --force
       - name: Build
         run: yarn electron:build
       - uses: actions/upload-artifact@v2

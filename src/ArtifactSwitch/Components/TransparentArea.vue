@@ -11,7 +11,7 @@ export default {
             return bus.blocks
         },
         showBlocks() {
-            return bus.status !== STATUS.CAPTURE && bus.status !== STATUS.PAGING
+            return bus.status !== STATUS.CAPTURE && bus.status !== STATUS.PAGING && bus.status !== STATUS.JOYSTICK
         },
     },
     methods: {

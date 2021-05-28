@@ -22,7 +22,7 @@ module.exports = {
     },
     pluginOptions: {
         electronBuilder: {
-            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi'],
+            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi', 'vigemclient'],
             nodeIntegration: true,
             chainWebpackMainProcess: (config) => {
                 // source map
@@ -34,6 +34,7 @@ module.exports = {
                     robotjs: 'commonjs2 robotjs',
                     bindings: 'commonjs2 bindings',
                     iohook: 'commonjs2 iohook',
+                    vigemclient: 'commonjs2 vigemclient',
                     'ffi-napi': 'commonjs2 ffi-napi',
                     'ref-napi': 'commonjs2 ref-napi',
                     'electron-active-window/build/Release/wm.node':
@@ -73,6 +74,7 @@ module.exports = {
                     'node_modules/iohook',
                     'node_modules/ref-napi',
                     'node_modules/ffi-napi',
+                    'node_modules/vigemclient',
                     'node_modules/electron-active-window',
                     'background_worker.js',
                 ],

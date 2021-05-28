@@ -4,14 +4,22 @@ import dayjs from 'dayjs'
 import marked from 'marked'
 import fsex from 'fs-extra'
 import $set from 'lodash/set'
-import { upgrade, getApphash } from '../../ipc'
+import { upgrade, getApphash, checkViGEmInstalled, openExternal } from '../../ipc'
 import { bus } from '@/App/bus'
 import { ipcRenderer } from 'electron'
 import { latestRelease, checkPatch } from '@/api/upgrade'
-import { ElLoading, ElNotification } from 'element-plus'
+import { ElLoading, ElMessageBox, ElNotification } from 'element-plus'
 import { version_compare } from '@/plugins/version_compare'
 import { EBuild } from '@/typings/config'
+import { joystickStatus } from '@/ArtifactSwitch/ipc'
+import { __ } from '@/i18n'
 export default {
+    async beforeRouteEnter(to, fr, next) {
+        const joystick = await joystickStatus()
+        next((vm) => {
+            vm.joystick = joystick
+        })
+    },
     data() {
         return {
             clickTimes: 0,
@@ -20,6 +28,7 @@ export default {
             newVersion: false,
             versionHTML: '',
             upgradeButtonLoading: false,
+            joystick: false,
         }
     },
     computed: {
@@ -83,7 +92,7 @@ export default {
                 return
             }
             this.showUpgrade = false
-            const l = ElLoading.service({ fullscreen: true, text: this.__('趴在草地上，能听见大地的心跳...') })
+            ElLoading.service({ fullscreen: true, text: this.__('趴在草地上，能听见大地的心跳...') })
             const hash = await getApphash()
             console.log('appHash=', hash)
             let hasPatch = false
@@ -114,6 +123,29 @@ export default {
                 type: 'success',
                 title: this.__('窗口状态数据已清除'),
             })
+        },
+        async doSetJoystick(val) {
+            if (val) {
+                if (await checkViGEmInstalled()) {
+                    ipcRenderer.send('joystickInit')
+                    this.joystick = true
+                } else {
+                    await ElMessageBox.confirm(
+                        __('请下载并安装ViGEm驱动 (https://vigem.org/) 以使用手柄模拟功能。'),
+                        __('提示'),
+                        {
+                            confirmButtonText: __('前往下载'),
+                            cancelButtonText: __('关闭'),
+                            type: 'warning',
+                        },
+                    )
+                    openExternal('https://vigem.org/')
+                    return
+                }
+            } else {
+                ipcRenderer.send('joystickStop')
+                this.joystick = false
+            }
         },
     },
 }
@@ -252,6 +284,31 @@ export default {
                             {{ __('圣遗物切换器每次点击（并识别完成）后切换到下一个的间隔。') }}
                             <br />
                             {{ __('可用于人工检查识别准确性，或关闭识别器窗口并配合其他工具使用。') }}
+                        </div>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </article>
+        <article>
+            <h3>
+                {{ __('手柄模拟') }}
+            </h3>
+            <div class="content">
+                <el-form label-position="right" label-width="auto" size="small">
+                    <el-form-item :label="__('启用手柄模拟')">
+                        <el-switch :model-value="joystick" @update:model-value="doSetJoystick"></el-switch>
+                        <div class="form-desc">
+                            {{ __('启用后，程序将模拟一个Xbox手柄。圣遗物切换器将使用模拟的手柄进行切换。') }}
+                        </div>
+                        <div class="form-desc">
+                            {{ __('您需要先启用此功能再启动游戏，而后在游戏内设置控制模式为手柄。') }}
+                        </div>
+                        <div class="form-desc">
+                            {{
+                                __(
+                                    '为提供简单操作的能力，以下按键映射将被启用：ABXY为键盘的对应按键，左右肩键为PageUP与PageDown，Esc可打开派蒙菜单，摇杆由键盘方向键控制。',
+                                )
+                            }}
                         </div>
                     </el-form-item>
                 </el-form>

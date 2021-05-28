@@ -71,3 +71,14 @@ export async function checkVCRedistInstalled(): Promise<boolean> {
     ipcRenderer.send('checkVCRedistInstalled', { id })
     return <boolean>await p
 }
+
+export async function checkViGEmInstalled(): Promise<boolean> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`checkViGEmInstalled-${id}`, (result, data) => {
+            resolve(data)
+        })
+    })
+    ipcRenderer.send('checkViGEmInstalled', { id })
+    return <boolean>await p
+}
