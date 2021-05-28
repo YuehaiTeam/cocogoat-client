@@ -29,7 +29,7 @@
  - 可以导出到其他工具进行最大伤害计算、自动配装等。目前支持的格式如下：
    - [莫娜占卜铺](https://www.mona-uranai.com/)
    - [Mingyulab](https://genshin.mingyulab.com/)
-   - [genshin-optimizer](https://frzyc.github.-io/genshin-optimizer/)
+   - [genshin-optimizer](https://frzyc.github.io/genshin-optimizer/)
 
 ### 圣遗物自动切换
  - 使用`opencv`自动检测圣遗物列表，并自动点击和切换
