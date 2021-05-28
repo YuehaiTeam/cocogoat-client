@@ -12,9 +12,12 @@ import {
 import { ElMessageBox, ElNotification } from 'element-plus'
 import { artifactClear, artifactDelete, artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
+import { convertAsMingyulab } from '../../export/Mingyulab'
+import monaToGO from '@mr-quin/mona_to_go'
 import { clipboard } from 'electron'
 import { defineComponent } from 'vue'
 import fsex from 'fs-extra'
+
 import { __ } from '@/i18n'
 export default defineComponent({
     components: {
@@ -123,23 +126,36 @@ export default defineComponent({
                 this.selectedIds = this.selectedIds.filter((e) => e !== id)
             }
         },
-        doExport() {
-            const convertedJson = convertAsMona(JSON.parse(JSON.stringify(bus.artifacts)))
-            clipboard.writeText(convertedJson)
+        getExport(format: string) {
+            let artifacts = JSON.parse(JSON.stringify(bus.artifacts))
+            if (this.selectedIds.length > 0) {
+                artifacts = artifacts.filter((e: ArtifactType) => this.selectedIds.includes(e.id))
+            }
+            switch (format) {
+                case 'GO':
+                    return JSON.stringify(monaToGO(convertAsMona(artifacts), 0, 3), null, 4)
+                case 'Mingyulab':
+                    return JSON.stringify(convertAsMingyulab(artifacts), null, 4)
+                default:
+                    return JSON.stringify(convertAsMona(artifacts), null, 4)
+            }
+        },
+        doExport(format: string) {
+            clipboard.writeText(this.getExport(format))
             ElNotification({
                 type: 'success',
                 title: __('导出成功'),
                 message: __('已复制到剪贴板'),
             })
         },
-        async doExportToFile() {
+        async doExportToFile(format: string) {
             try {
                 const { filePath, canceled } = await showSaveDialog({
                     title: __('导出'),
                     filters: [{ name: 'JSON Files', extensions: ['json'] }],
                 })
                 if (canceled || !filePath) return
-                const convertedJson = convertAsMona(JSON.parse(JSON.stringify(bus.artifacts)))
+                const convertedJson = this.getExport(format)
                 await fsex.writeFile(filePath, convertedJson)
                 ElNotification({
                     type: 'success',
@@ -157,10 +173,24 @@ export default defineComponent({
     <teleport to="#app-actions">
         <div class="actions">
             <el-dropdown class="header-plain-dropdown" size="mini" split-button @click="doExport">
-                {{ __('导出') }}
+                {{ __(selectedIds.length > 0 ? '导出选中' : '导出') }}
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item @click="doExportToFile">{{ __('到文件') }}</el-dropdown-item>
+                        <el-dropdown-item disabled class="export-title">
+                            {{ __('莫娜占卜铺') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item @click="doExport('Mona')">{{ __('复制') }}</el-dropdown-item>
+                        <el-dropdown-item @click="doExportToFile('Mona')">{{ __('到文件') }}</el-dropdown-item>
+                        <el-dropdown-item divided disabled class="export-title">
+                            {{ __('Mingyulab') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item @click="doExport('Mingyulab')">{{ __('复制') }}</el-dropdown-item>
+                        <el-dropdown-item @click="doExportToFile('Mingyulab')">{{ __('到文件') }}</el-dropdown-item>
+                        <el-dropdown-item divided disabled class="export-title">
+                            {{ __('Genshin Optimizer') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item @click="doExport('GO')">{{ __('复制') }}</el-dropdown-item>
+                        <el-dropdown-item @click="doExportToFile('GO')">{{ __('到文件') }}</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -225,5 +255,8 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.export-title {
+    cursor: default !important;
 }
 </style>

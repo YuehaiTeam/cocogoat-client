@@ -32,9 +32,11 @@ module.exports = {
     },
     pluginOptions: {
         electronBuilder: {
-            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi'],
+            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi', 'vigemclient'],
             nodeIntegration: true,
             chainWebpackMainProcess: (config) => {
+                // source map
+                config.devtool('sourcemap')
                 // worker entry
                 config.entry('background_worker').add('./src/background_worker.ts').end()
                 // Chain webpack config for electron main process only
@@ -42,11 +44,30 @@ module.exports = {
                     robotjs: 'commonjs2 robotjs',
                     bindings: 'commonjs2 bindings',
                     iohook: 'commonjs2 iohook',
+                    vigemclient: 'commonjs2 vigemclient',
                     'ffi-napi': 'commonjs2 ffi-napi',
                     'ref-napi': 'commonjs2 ref-napi',
                     'electron-active-window/build/Release/wm.node':
                         'commonjs2 electron-active-window/build/Release/wm.node',
                 })
+                /* Sentry: source map uploading */
+                if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {
+                    config.plugin('sentry').use(SentryPlugin, [
+                        {
+                            url: process.env.SENTRY_URL,
+                            authToken: process.env.SENTRY_KEY,
+                            org: 'yuehaiteam',
+                            project: 'cocogoat',
+                            ignore: ['node_modules'],
+                            include: './dist_electron/bundled',
+                            release: packageJSON.version,
+                            setCommits: {
+                                auto: true,
+                            },
+                            urlPrefix: '~/',
+                        },
+                    ])
+                }
             },
             builderOptions: {
                 appId: 'work.cocogoat',
@@ -63,6 +84,7 @@ module.exports = {
                     'node_modules/iohook',
                     'node_modules/ref-napi',
                     'node_modules/ffi-napi',
+                    'node_modules/vigemclient',
                     'node_modules/electron-active-window',
                     'background_worker.js',
                 ],
@@ -108,23 +130,5 @@ module.exports = {
                 }
                 return options
             })
-        /* Sentry: source map uploading */
-        if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {
-            config.plugin('sentry').use(SentryPlugin, [
-                {
-                    url: process.env.SENTRY_URL,
-                    authToken: process.env.SENTRY_KEY,
-                    org: 'yuehaiteam',
-                    project: 'cocogoat',
-                    ignore: ['node_modules'],
-                    include: './dist_electron/bundled',
-                    release: packageJSON.version,
-                    setCommits: {
-                        auto: true,
-                    },
-                    urlPrefix: '~/',
-                },
-            ])
-        }
     },
 }

@@ -1,6 +1,8 @@
 // @ts-ignore
 import { v4 as uuid } from 'uuid'
 import { ipcRenderer } from 'electron'
+import { sleep } from '@/ArtifactView/utils'
+import { Artifact } from '@/typings/Artifact'
 export { getConfig } from '@/App/ipc'
 export { capture } from '@/ArtifactView/ipc'
 export function close() {
@@ -33,18 +35,17 @@ export async function getArtifactViewWindowId(): Promise<number> {
     return winAppId
 }
 
-export async function tryocr(): Promise<void> {
+export async function tryocr(): Promise<Artifact | null> {
     const artifactViewWindowId = await getArtifactViewWindowId()
     if (artifactViewWindowId < 0) {
-        return
+        return null
     }
     const id = uuid()
     const p = new Promise((resolve) => {
         ipcRenderer.once(`tryocr-${id}`, (result, data) => resolve(data))
     })
     ipcRenderer.sendTo(artifactViewWindowId, 'tryocr', { id })
-    await p
-    return
+    return <Artifact>await p
 }
 
 export async function click({ x, y }: { x: number; y: number }) {
@@ -54,5 +55,20 @@ export async function click({ x, y }: { x: number; y: number }) {
     })
     ipcRenderer.send('mouseClick', { x, y, id })
     await p
+    return
+}
+
+export async function joystickStatus(): Promise<Boolean> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`joystickStatus-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('joystickStatus', { id })
+    return <Boolean>await p
+}
+export async function joystickNext() {
+    ipcRenderer.send('joystick', { event: 'keydown', data: { rawcode: 39 } })
+    await sleep(50)
+    ipcRenderer.send('joystick', { event: 'keyup', data: { rawcode: 39 } })
     return
 }

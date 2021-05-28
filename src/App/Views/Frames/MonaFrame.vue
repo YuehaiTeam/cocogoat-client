@@ -10,7 +10,7 @@ export default defineComponent({
         }
     },
     mounted() {
-        const convertedJson = convertAsMona(JSON.parse(JSON.stringify(bus.artifacts)), true)
+        const convertedJson = JSON.stringify(convertAsMona(JSON.parse(JSON.stringify(bus.artifacts))))
         const frame: any = this.$refs.monaFrame
         // @ts-ignore
         window.monaFrame = frame

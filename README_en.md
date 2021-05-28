@@ -23,6 +23,9 @@ A toolbox for Genshin Impact with every line of code made by working overtime.
  - Recognize artifacts by OCR using [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
  - Auto switching artifacts by simulating clicking and scrolling
  - Export data to calculating websites for more usage.
+   - [Mona-uranai](https://www.mona-uranai.com/) (Chinese only)
+   - [Mingyulab](https://genshin.mingyulab.com/)  
+   - [genshin-optimizer](https://frzyc.github.io/genshin-optimizer/)  
 
 ## FAQs
  - Q: Why the overlays are not transparent?  

@@ -176,6 +176,7 @@ const getStander = {
 }
 export type MonaArtifactTypeName = 'flower' | 'feather' | 'sand' | 'cup' | 'head'
 interface MonaArtifact {
+    id: number // ID
     setName: string // 套装名
     detailName: string // 中文名
     position: MonaArtifactTypeName // 位置, slot
@@ -194,8 +195,8 @@ interface MonaInterface {
     cup: MonaArtifact[]
     head: MonaArtifact[]
 }
-export function convertAsMona(artifacts: Artifact[], raw = false) {
-    console.log(artifacts)
+
+export function convertAsMona(artifacts: Artifact[]) {
     const json = {
         version: '1',
         cocogoat: '1',
@@ -249,8 +250,5 @@ export function convertAsMona(artifacts: Artifact[], raw = false) {
             console.log(e)
         }
     }
-    if (raw) {
-        return JSON.stringify(json)
-    }
-    return JSON.stringify(json, null, 4)
+    return json
 }

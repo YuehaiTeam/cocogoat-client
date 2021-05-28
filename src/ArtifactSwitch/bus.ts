@@ -8,8 +8,7 @@ export enum STATUS {
     'PAGING',
     'SUCCESS',
     'ERROR',
-    'MODIFIED',
-    'DELETED',
+    'JOYSTICK',
 }
 interface IArtifactSwitchBus {
     intro: boolean

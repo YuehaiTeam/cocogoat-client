@@ -16,19 +16,31 @@ jobs:
           timezoneLinux: "Asia/Shanghai"
           timezoneMacos: "Asia/Shanghai"
           timezoneWindows: "China Standard Time"
-      - uses: c-hive/gha-yarn-cache@v1
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
       - name: Replace registry
-        run: (Get-content yarn.lock) | Foreach-Object {$_ -replace "registry.npm.taobao.org", "r.cnpmjs.org"} | Set-Content yarn.lock
+        run: (Get-content yarn.lock) | Foreach-Object {$_ -replace "registry.nlark.com", "r.cnpmjs.org"} | Set-Content yarn.lock
       - name: Install dependencies
-        run: yarn
+        run: yarn --ignore-scripts
+      - name: Build native modules
+        run: npm rebuild --force
       - name: Build
         run: yarn electron:build
-      - uses: actions/upload-artifact@v2
+      - name: Upload package
+        uses: actions/upload-artifact@v2
         with:
           name: cocogoat
           path: dist/*.gz
-      - uses: actions/upload-artifact@v2
+      - name: Upload unpacked
+        uses: actions/upload-artifact@v2
         with:
           name: cocogoat-unpacked
           path: dist_electron/win-unpacked/
-    

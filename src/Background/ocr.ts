@@ -1,11 +1,12 @@
 import path from 'path'
 import fsex from 'fs-extra'
 import { Worker } from 'worker_threads'
-import { dialog, ipcMain, webContents } from 'electron'
+import { dialog, ipcMain, webContents, IpcMainEvent } from 'electron'
 import { config } from '@/typings/config'
 import Queue from 'queue'
 import util from 'util'
 import stream from 'stream'
+import { windows } from './windows'
 const pipeline = util.promisify(stream.pipeline)
 function copy(fr: string, to: string) {
     return pipeline(fsex.createReadStream(fr), fsex.createWriteStream(to))
@@ -15,6 +16,7 @@ let workerReadyPms: Promise<void>[] = []
 let ocrReady: Promise<any> | null
 let workerPtr: number = 0
 let ocrRunning = false
+let onOcrEvent: any
 const workerCount = 8
 const q = Queue({
     concurrency: workerCount,
@@ -77,7 +79,7 @@ export async function ocrInit() {
     } else {
         console.log('no non-ascii characters in path, read model directly')
     }
-
+    let noavx = false
     for (let i = 0; i < workerCount; i++) {
         workerReadyPms.push(
             new Promise((resolve, reject) => {
@@ -86,10 +88,12 @@ export async function ocrInit() {
                     {
                         workerData: {
                             worker: 'ppocr',
+                            name: `ocr-${i}`,
                             data: {
                                 rec,
                                 det,
                                 dic,
+                                noavx,
                             },
                             config,
                         },
@@ -99,6 +103,7 @@ export async function ocrInit() {
                     'message',
                     ({ event, message, reply, id }: { event: string; message: any; reply?: any; id?: string }) => {
                         if (event === 'ready') {
+                            noavx = message.noavx
                             resolve()
                         }
                         if (event === 'reply' && id && reply) {
@@ -109,14 +114,28 @@ export async function ocrInit() {
                                 console.log('Window', win, 'not found')
                             }
                         }
+                        if (event === 'error') {
+                            dialog.showMessageBox({
+                                type: 'error',
+                                title: 'OCR模块加载失败',
+                                message: `如果你不知道发生了什么，请联系开发者。错误信息：${message}`,
+                                buttons: ['好的'],
+                            })
+                            windows.artifactView && windows.artifactView.close()
+                            return
+                        }
                     },
                 )
                 worker.on('error', reject)
                 ocrWorker.push(worker)
             }),
         )
+        if (i === 0) {
+            await workerReadyPms[0]
+            console.log('first worker loadd successfully')
+        }
     }
-    ipcMain.on('ocr', async (event, { image, id }: { image: string; id: string }) => {
+    onOcrEvent = async (event: IpcMainEvent, { image, id }: { image: string; id: string }) => {
         await ocrReady
         let workerId = workerPtr++ % workerCount
         if (workerId > workerCount - 1) workerId = 0
@@ -138,15 +157,19 @@ export async function ocrInit() {
                 cb()
             })
         })
-    })
+    }
+    ipcMain.on('ocr', onOcrEvent)
     ocrReady = Promise.all(workerReadyPms)
     ocrReady.then(() => {
         console.log('ocr ready')
     })
 }
 export async function ocrStop() {
-    await ocrReady
+    if (ocrReady) {
+        await ocrReady
+    }
     ocrRunning = false
+    ipcMain.off('ocr', onOcrEvent)
     const p = []
     for (const i of ocrWorker) {
         i.postMessage({ event: 'exit' })
