@@ -2,6 +2,7 @@
 import { v4 as uuid } from 'uuid'
 import { ipcRenderer } from 'electron'
 import { sleep } from '@/ArtifactView/utils'
+import { Artifact } from '@/typings/Artifact'
 export { getConfig } from '@/App/ipc'
 export { capture } from '@/ArtifactView/ipc'
 export function close() {
@@ -34,18 +35,17 @@ export async function getArtifactViewWindowId(): Promise<number> {
     return winAppId
 }
 
-export async function tryocr(): Promise<void> {
+export async function tryocr(): Promise<Artifact | null> {
     const artifactViewWindowId = await getArtifactViewWindowId()
     if (artifactViewWindowId < 0) {
-        return
+        return null
     }
     const id = uuid()
     const p = new Promise((resolve) => {
         ipcRenderer.once(`tryocr-${id}`, (result, data) => resolve(data))
     })
     ipcRenderer.sendTo(artifactViewWindowId, 'tryocr', { id })
-    await p
-    return
+    return <Artifact>await p
 }
 
 export async function click({ x, y }: { x: number; y: number }) {

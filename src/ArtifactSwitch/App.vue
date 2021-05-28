@@ -10,6 +10,7 @@ import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
 import { sleep } from '@/ArtifactView/utils'
 import { ElMessageBox } from 'element-plus'
+import { sendToAppWindow } from '@/ArtifactView/ipc'
 let sleepRatio = 1
 export default {
     components: {
@@ -224,11 +225,40 @@ export default {
                 // 设置焦点
                 await click(await toWindowPos(100, 100))
                 setTransparent(false)
+                const cache = []
+                const cacheIds = []
                 while (bus.auto) {
+                    bus.checkedCount++
+                    const artifact = await tryocr()
                     await joystickNext()
                     await sleep(60 * sleepRatio)
-                    bus.checkedCount++
-                    await tryocr()
+                    try {
+                        const prefix = `${artifact.name}-${artifact.level}-${artifact.main.name}-${artifact.main.value}-${artifact.stars}`
+                        const subs = artifact.sub.map((s) => `${s.name}-${s.value}`)
+                        cache.push([prefix, ...subs].join('_'))
+                        cacheIds.push(artifact.id)
+                    } catch (e) {}
+                    while (cache.length > 4) {
+                        cache.shift()
+                        cacheIds.shift()
+                    }
+
+                    if (cache.length < 4) {
+                        continue
+                    }
+                    const set = new Set(cache)
+                    if (set.size <= 1) {
+                        // 连续四次检测只有1种结果 可以认为是结束了
+                        if (bus.options.artifacts.keepSameArtifacts) {
+                            // 若保留重复，需要删掉多出来的
+                            for (let i = 1; i < cacheIds.length; i++) {
+                                console.log('del', cacheIds[i])
+                                sendToAppWindow('artifactDelete', { id: cacheIds[i] })
+                                bus.checkedCount--
+                            }
+                        }
+                        break
+                    }
                 }
                 bus.auto = false
                 bus.status = bus.READY

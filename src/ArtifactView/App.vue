@@ -44,8 +44,8 @@ export default {
         )
         ipcRenderer.send('readyArtifactView')
         ipcRenderer.on('tryocr', async (event, { id }) => {
-            await this.processWithTimeout()
-            ipcRenderer.sendTo(event.senderId, `tryocr-${id}`)
+            const result = await this.processWithTimeout()
+            ipcRenderer.sendTo(event.senderId, `tryocr-${id}`, result)
         })
     },
     beforeUnmount() {
@@ -174,6 +174,7 @@ export default {
                     }
                 }
             })()
+            return artifact
         },
         async saveToMain() {
             status.artifactBackup = JSON.parse(JSON.stringify(status.artifact))
