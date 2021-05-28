@@ -298,10 +298,17 @@ export default {
                     <el-form-item :label="__('启用手柄模拟')">
                         <el-switch :model-value="joystick" @update:model-value="doSetJoystick"></el-switch>
                         <div class="form-desc">
-                            {{ __('启用后，我们将用键盘简易模拟一个Xbox手柄。圣遗物切换器将使用模拟的手柄进行切换。') }}
+                            {{ __('启用后，程序将模拟一个Xbox手柄。圣遗物切换器将使用模拟的手柄进行切换。') }}
                         </div>
                         <div class="form-desc">
-                            {{ __('ABXY键为键盘的ABXY，左右肩键为PageUP与PageDown，摇杆由键盘方向键控制。') }}
+                            {{ __('您需要先启用此功能再启动游戏，而后在游戏内设置控制模式为手柄。') }}
+                        </div>
+                        <div class="form-desc">
+                            {{
+                                __(
+                                    '为提供简单操作的能力，以下按键映射将被启用：ABXY为键盘的对应按键，左右肩键为PageUP与PageDown，Esc可打开派蒙菜单，摇杆由键盘方向键控制。',
+                                )
+                            }}
                         </div>
                     </el-form-item>
                 </el-form>
