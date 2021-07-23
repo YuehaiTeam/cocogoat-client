@@ -19,6 +19,16 @@ module.exports = {
             template: 'public/index.html',
             filename: 'ArtifactSwitch.html',
         },
+        MapView: {
+            entry: 'src/MapView/main.ts',
+            template: 'public/index.html',
+            filename: 'MapView.html',
+        },
+        MapScan: {
+            entry: 'src/MapScan/main.ts',
+            template: 'public/index.html',
+            filename: 'MapScan.html',
+        },
     },
     pluginOptions: {
         electronBuilder: {

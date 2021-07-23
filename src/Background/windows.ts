@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ocrInit, ocrStop } from './ocr'
 import { config } from '@/typings/config'
+import { mapcvInit, mapcvStop } from './mapcv'
 import { loadState, saveState, createTemplateWindow } from './Utils/windowHelper'
 export const windows = <Record<string, BrowserWindow | null>>{
     app: null,
@@ -19,6 +20,7 @@ export async function createWindow() {
             webviewTag: true,
             // @ts-ignore
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+            contextIsolation: false,
         },
         show: false,
     })
@@ -69,4 +71,39 @@ export async function createArtifactSwitch() {
             saveState('artifactSwitch')
         },
     )
+}
+
+export async function createMapView() {
+    createTemplateWindow(
+        'mapView',
+        {
+            ...loadState('mapView', 320, 420),
+            transparent: false,
+            alwaysOnTop: true,
+            maximizable: true,
+            webPreferences: {
+                webviewTag: true,
+            },
+        },
+        () => {
+            saveState('mapView')
+        },
+    )
+}
+export async function createMapScan() {
+    createTemplateWindow(
+        'mapScan',
+        {
+            ...loadState('mapScan', 125, 165),
+            transparent: true,
+            alwaysOnTop: true,
+            maximizable: false,
+        },
+        () => {
+            saveState('mapScan')
+            windows.mapScan = null
+            mapcvStop()
+        },
+    )
+    mapcvInit()
 }

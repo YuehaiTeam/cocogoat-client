@@ -11,6 +11,12 @@ export interface IwindowStates {
     width: number
     height: number
 }
+export interface IwindowStates {
+    x?: number
+    y?: number
+    width: number
+    height: number
+}
 export interface IOptions {
     lang: string
     firstRun: boolean

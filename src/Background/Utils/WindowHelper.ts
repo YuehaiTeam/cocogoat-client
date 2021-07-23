@@ -1,3 +1,4 @@
+import merge from 'lodash/merge'
 import { windows } from '../windows'
 import { saveOptions } from '../config'
 import { config, IwindowStates } from '@/typings/config'
@@ -34,15 +35,14 @@ export function createTemplateWindow(
         origWin.focus()
         return
     }
+    options.webPreferences = merge(options.webPreferences, {
+        nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+        contextIsolation: false,
+    })
     const newWin = new BrowserWindow({
-        ...options,
         frame: false,
-        webPreferences: {
-            // @ts-ignore
-            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-            contextIsolation: false,
-        },
         show: false,
+        ...options,
     })
     newWin.on('close', () => {
         onClose && onClose(newWin)
