@@ -3,7 +3,7 @@ import { bus } from './bus'
 import { ipcRenderer } from 'electron'
 import AppHeader from './Components/AppHeader'
 import { getposition, capture, mapcv, mapcvInit, sendToMapWindow } from './ipc'
-import map3k from '@/assets/map/genshin_map_w3000.jpg'
+import map3k from '@/assets/map/map2107-4.jpg'
 import { sleep } from '@/ArtifactView/utils'
 export default {
     components: {
@@ -51,6 +51,8 @@ export default {
             return rawCV ? this.ensurePosition(rawCV) : false
         },
         async ensurePosition(data) {
+            console.log(data)
+            /*
             const ratio = 5450 / 3000 // 地图缩放比
             let { x, y } = data.center
             let r
@@ -67,7 +69,8 @@ export default {
             return {
                 x,
                 y,
-            }
+            } */
+            return data.center
         },
         async convertAxis(x, y, ratio, tX, tY) {
             let pX = x / ratio

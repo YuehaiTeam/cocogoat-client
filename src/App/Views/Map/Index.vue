@@ -27,7 +27,22 @@ export default defineComponent({
             </el-button>
         </div>
     </teleport>
-    <div class="page-main"></div>
+    <div class="page-main">
+        <div class="placeholder">点击右上角按钮，打开悬浮地图</div>
+    </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.placeholder {
+    color: #999;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+}
+
+.page-main {
+    height: 100%;
+}
+</style>

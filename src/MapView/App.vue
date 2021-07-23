@@ -38,8 +38,8 @@ export default {
     methods: {
         async updatePosition(event, data) {
             // 米游社大地图与内置地图坐标转换
-            bus.x = (data.x * 5450) / 3000 + 1742 - 4845
-            bus.y = (data.y * 4850) / 2669 + 1742 - 2795
+            bus.x = data.x * 2 - 3212
+            bus.y = data.y * 2 - 1164
         },
         onHashChange(event) {
             bus.zoom = event.url.split('zoom=')[1].split('&')[0]
@@ -88,6 +88,7 @@ export default {
                     position: fixed !important;
                     top: 0.08rem;
                     right: 0.55rem !important;
+                    background-position: 0.02rem;
                 }
             }`)
             seeliePlugin =
@@ -114,6 +115,9 @@ export default {
 @import '~@/styles/fonts.scss';
 * {
     font-family: GenshinImpact;
+}
+.el-message-box {
+    max-width: 90%;
 }
 </style>
 <style lang="scss" scoped>

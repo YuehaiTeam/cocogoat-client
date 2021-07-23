@@ -1,6 +1,7 @@
 <script>
 import { devtools, openSync } from '../ipc'
 import { bus } from '../bus'
+import { ElMessageBox } from 'element-plus'
 export default {
     emits: ['clickprocess'],
     data() {
@@ -14,7 +15,15 @@ export default {
         },
     },
     methods: {
-        openSync,
+        async openSync() {
+            try {
+                await ElMessageBox.confirm(
+                    '地图同步器是测试中的实验性功能，目前处于极度不稳定状态，请谨慎使用。',
+                    '实验性功能',
+                )
+                openSync()
+            } catch (e) {}
+        },
         close() {
             window.close()
         },
