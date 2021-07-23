@@ -8,6 +8,7 @@ const ocrCorrectionMap = [
     ['医力', '攻击力'],
     ['鬼已装备', '魈已装备'],
     ['魁已装备', '魈已装备'],
+    ['宗室之钢', '宗室之翎'],
     ['宗室之邻', '宗室之翎'],
     ['宗室之领', '宗室之翎'],
     ['生花', '生之花'],
@@ -49,6 +50,7 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         textNumber(
             ocrres.level.text
                 .toLowerCase()
+                .replace(/^1.0$/, '0')
                 .replace(/o/g, '0')
                 .replace(/古/g, '0')
                 .replace(/土/g, '1')
