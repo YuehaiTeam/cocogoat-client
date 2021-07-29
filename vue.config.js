@@ -32,7 +32,7 @@ module.exports = {
     },
     pluginOptions: {
         electronBuilder: {
-            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi', 'vigemclient'],
+            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi'],
             nodeIntegration: true,
             chainWebpackMainProcess: (config) => {
                 // source map
@@ -41,14 +41,16 @@ module.exports = {
                 config.entry('background_worker').add('./src/background_worker.ts').end()
                 // Chain webpack config for electron main process only
                 config.externals({
-                    robotjs: 'commonjs2 robotjs',
-                    bindings: 'commonjs2 bindings',
                     iohook: 'commonjs2 iohook',
-                    vigemclient: 'commonjs2 vigemclient',
                     'ffi-napi': 'commonjs2 ffi-napi',
                     'ref-napi': 'commonjs2 ref-napi',
                     'electron-active-window/build/Release/wm.node':
                         'commonjs2 electron-active-window/build/Release/wm.node',
+                    // make binary out for viggemclient
+                    'vigemclient/build/Release/vigemclient': 'commonjs2 vigemclient/build/Release/vigemclient.node',
+                    '../build/Release/vigemclient': 'commonjs2 vigemclient/build/Release/vigemclient.node',
+                    // make binary out for robotjs
+                    './build/Release/robotjs.node': 'commonjs2 robotjs/build/Release/robotjs.node',
                 })
                 /* Sentry: source map uploading */
                 if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {
@@ -80,7 +82,6 @@ module.exports = {
                 },
                 asarUnpack: [
                     'node_modules/robotjs',
-                    'node_modules/robotjs',
                     'node_modules/iohook',
                     'node_modules/ref-napi',
                     'node_modules/ffi-napi',
@@ -102,11 +103,22 @@ module.exports = {
                     '!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}',
                     '!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output,.vscode,.github}',
                     '!**/{appveyor.yml,.travis.yml,circle.yml}',
+                    '!**/.github/**',
                     '!**/deps/libffi/**', // ffi's source code is not needed
                     '!**/*.map', // source map is not important
                     '!**/zlibjs/**', // zlibjs is not used during runtime
                     '!**/node_modules/nan/**', // nan is not used during runtime
                     '!**/prebuild-install/**', // prebuild-install is not used during runtime
+
+                    '!**/node_modules/vigemclient/**', // js of vigem is packed by webpack
+                    '**/node_modules/vigemclient/**/*.node', // but node is not
+                    '**/node_modules/vigemclient/**/*.dll', // and dll
+
+                    '!**/node_modules/robotjs/**', // js of robotjs is packed by webpack
+                    '**/node_modules/robotjs/**/*.node', // but node is not
+
+                    '!**/node_modules/electron-active-window/**', // js of electron-active-window is packed by webpack
+                    '**/node_modules/electron-active-window/**/*.node', // but node is not
                 ],
             },
         },
