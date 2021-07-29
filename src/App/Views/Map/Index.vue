@@ -12,6 +12,9 @@ export default defineComponent({
         createMapView() {
             ipcRenderer.send('createMapView')
         },
+        createRouteExtractView() {
+            ipcRenderer.send('createRouteExtractView')
+        },
     },
 })
 </script>
@@ -28,7 +31,20 @@ export default defineComponent({
         </div>
     </teleport>
     <div class="page-main">
-        <div class="placeholder">点击右上角按钮，打开悬浮地图</div>
+        <div class="placeholder">
+            <div>
+                点击右上角按钮，打开悬浮地图
+                <el-button
+                    class="createRouteExtractView"
+                    size="mini"
+                    plain
+                    icon="el-icon-video-camera-solid"
+                    @click="createRouteExtractView"
+                >
+                    {{ __('视频导航数据提取') }}
+                </el-button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -40,6 +56,11 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
     font-size: 25px;
+}
+.createRouteExtractView {
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;
 }
 
 .page-main {

@@ -162,6 +162,11 @@ style.innerHTML = `
     color: #941dc5;
     font-weight: bold;
 }
+.cocogoat-user-posiotion{
+    background:transparent no-repeat center;
+    background-size:contain;
+    background-image:url(data:image/png;base64,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);
+}
 `
 document.head.appendChild(style)
 /* english */
@@ -324,7 +329,12 @@ function initLeafletDraw() {
     let leafletDraw = document.head.appendChild(document.createElement('script'))
     leafletDraw.src = 'https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js'
 
+    let polylineDecorator = document.head.appendChild(document.createElement('script'))
+    polylineDecorator.src =
+        'https://cdn.jsdelivr.net/gh/bbecquet/Leaflet.PolylineDecorator@master/dist/leaflet.polylineDecorator.js'
+
     leafletDraw.onload = function () {
+        initCocogoat()
         icon = L.divIcon({
             // iconUrl: 'https://uploadstatic.mihoyo.com/hk4e/upload/officialsites/202011/wiki-ys-map-in-game-2_1605084458_8544.png',
             iconSize: [32, 42],
@@ -333,8 +343,7 @@ function initLeafletDraw() {
             popupAnchor: [0, -45],
             alt: '',
             className: 'mhy-game-gis-marker',
-            html:
-                '<div data-v-2c9139f8="" class="mhy-game-gis-icon" style="opacity: 1;"><div data-v-2c9139f8="" class="mhy-game-gis-icon__img" style="background-image: url(&quot;https://uploadstatic.mihoyo.com/ys-obc/2020/11/10/75276545/de87958fa1e78efcc84da49aad61dede_613786767338836681.jpg&quot;);"></div> <!----></div>',
+            html: '<div data-v-2c9139f8="" class="mhy-game-gis-icon" style="opacity: 1;"><div data-v-2c9139f8="" class="mhy-game-gis-icon__img" style="background-image: url(&quot;https://uploadstatic.mihoyo.com/ys-obc/2020/11/10/75276545/de87958fa1e78efcc84da49aad61dede_613786767338836681.jpg&quot;);"></div> <!----></div>',
         })
 
         drawnItems = new L.FeatureGroup()
@@ -343,115 +352,6 @@ function initLeafletDraw() {
             drawPreset(presets[selected])
         } else {
             drawPreset(userMarkers)
-        }
-
-        if (code == 'pt') {
-            L.drawLocal = {
-                draw: {
-                    toolbar: {
-                        actions: {
-                            title: 'Cancelar desenho',
-                            text: 'Cancelar',
-                        },
-                        finish: {
-                            title: 'Finalizar desenho',
-                            text: 'Finalizar',
-                        },
-                        undo: {
-                            title: 'Excluir o último ponto desenhado',
-                            text: 'Excluir último',
-                        },
-                        buttons: {
-                            polyline: 'Desenhar rota',
-                            polygon: 'Desenhar polígono',
-                            rectangle: 'Desenhar retângulo',
-                            circle: 'Desenhar círculo',
-                            marker: 'Adicionar marcador',
-                            circlemarker: 'Desenhar marcador círculo',
-                        },
-                    },
-                    handlers: {
-                        circle: {
-                            tooltip: {
-                                start: 'Clique e arraste para desenhar um círculo.',
-                            },
-                            radius: 'Raio',
-                        },
-                        circlemarker: {
-                            tooltip: {
-                                start: 'Clique para adicionar um marcador círculo.',
-                            },
-                        },
-                        marker: {
-                            tooltip: {
-                                start: 'Clique para adicionar um marcador.',
-                            },
-                        },
-                        polygon: {
-                            tooltip: {
-                                start: 'Clique para começar a desenhar uma forma.',
-                                cont: 'Clique para continuar a desenhar a forma.',
-                                end: 'Clique no ponto inicial para terminar a forma.',
-                            },
-                        },
-                        polyline: {
-                            error: '<strong>Erro:</strong> beiradas da forma não podem se cruzar!',
-                            tooltip: {
-                                start: 'Clique para começar a desenhar a rota.',
-                                cont: 'Clique para continuar desenhando a rota.',
-                                end: 'Clique no último ponto para finalizar a rota.',
-                            },
-                        },
-                        rectangle: {
-                            tooltip: {
-                                start: 'Clique e arraste para desenhar um retângulo.',
-                            },
-                        },
-                        simpleshape: {
-                            tooltip: {
-                                end: 'Solte o mouse para finalizar o desenho.',
-                            },
-                        },
-                    },
-                },
-                edit: {
-                    toolbar: {
-                        actions: {
-                            save: {
-                                title: 'Salvar alterações',
-                                text: 'Salvar',
-                            },
-                            cancel: {
-                                title: 'Cancelar edição, descartar mudanças',
-                                text: 'Cancelar',
-                            },
-                            clearAll: {
-                                title: 'Limpar todas as camadas',
-                                text: 'Limpar Tudo',
-                            },
-                        },
-                        buttons: {
-                            edit: 'Editar camadas',
-                            editDisabled: 'Sem camadas para editar',
-                            remove: 'Excluir camadas',
-                            removeDisabled: 'Sem camadas para excluir',
-                        },
-                    },
-                    handlers: {
-                        edit: {
-                            tooltip: {
-                                text: 'Arraste as alças ou marcadores para editar.',
-                                subtext: 'Clique em cancelar para desfazer as alterações.',
-                            },
-                        },
-                        remove: {
-                            tooltip: {
-                                text: 'Clique em algo para excluir.',
-                            },
-                        },
-                    },
-                },
-            }
         }
 
         var drawControl = new L.Control.Draw({
@@ -742,4 +642,34 @@ function dataRestore() {
     } catch (error) {
         return alert(lang.error)
     }
+}
+let COCOGOAT_PLAYER_ROUTE, COCOGOAT_PLAYER_ARROW, COCOGOAT_USER_MARKER
+const COCOGOAT_USER_ICON = L.divIcon({
+    iconSize: [48, 48],
+    alt: '',
+    className: 'cocogoat-user-posiotion',
+})
+async function initCocogoat() {
+    COCOGOAT_USER_MARKER = L.marker([0, 0], { icon: COCOGOAT_USER_ICON }).addTo(map)
+    COCOGOAT_USER_MARKER.setRotationOrigin('center')
+}
+function _cocogoat_draw_path(dataArr) {
+    COCOGOAT_PLAYER_ARROW?.remove()
+    COCOGOAT_PLAYER_ROUTE?.remove()
+    COCOGOAT_PLAYER_ROUTE = L.polyline(dataArr, { color: '#007accaa', weight: 10 }).addTo(map)
+    COCOGOAT_PLAYER_ARROW = L.polylineDecorator(COCOGOAT_PLAYER_ROUTE, {
+        patterns: [
+            {
+                offset: 30, // 箭头起始位置距离线条两端的距离
+                repeat: 60, // 箭头重复的间隔
+                symbol: L.Symbol.arrowHead({
+                    pixelSize: 5, // 箭头大小
+                    headAngle: 75, // 角度
+                    polygon: false,
+                    pathOptions: { stroke: true, weight: 2, color: '#fff' },
+                }),
+            },
+        ],
+    }).addTo(map)
+    map.fitBounds(COCOGOAT_PLAYER_ROUTE.getBounds(), { padding: [15, 15] })
 }

@@ -1,18 +1,21 @@
 <script>
 import path from 'path'
 import fsex from 'fs-extra'
+import { watch } from 'vue'
 import { bus } from './bus'
 import { ipcRenderer } from 'electron'
 import AppHeader from './Components/AppHeader'
-import { watch } from 'vue'
+import RoutePlayer from './Components/RoutePlayer'
 let seeliePlugin = ''
 export default {
     components: {
         AppHeader,
+        RoutePlayer,
     },
     data() {
         return {
             ready: false,
+            showRoute: false,
             mapUrl: `https://webstatic.mihoyo.com/app/ys-map-cn/index.html#/map/2?center=${bus.y},${bus.x}&zoom=${bus.zoom}`,
         }
     },
@@ -36,10 +39,19 @@ export default {
         ipcRenderer.off('position', this._updatePosition)
     },
     methods: {
+        drawPath(dataArr) {
+            const frame = this.$refs.mapFrame
+            frame?.executeJavaScript(`_cocogoat_draw_path(${JSON.stringify(dataArr)})`)
+        },
         async updatePosition(event, data) {
             // 米游社大地图与内置地图坐标转换
-            bus.x = data.x * 2 - 3212
-            bus.y = data.y * 2 - 1164
+            bus.x = data.center.x * 2 - 3212
+            bus.y = data.center.y * 2 - 1164
+            const frame = this.$refs.mapFrame
+            if (data.angle) {
+                frame?.executeJavaScript(`try{COCOGOAT_USER_MARKER.setRotationAngle(${data.angle / 2})}catch(e){}`)
+            }
+            frame?.executeJavaScript(`try{COCOGOAT_USER_MARKER.setLatLng({lat:${bus.y},lng:${bus.x}})}catch(e){}`)
         },
         onHashChange(event) {
             bus.zoom = event.url.split('zoom=')[1].split('&')[0]
@@ -101,7 +113,8 @@ export default {
 }
 </script>
 <template>
-    <app-header />
+    <app-header @toggleRoute="showRoute = !showRoute" />
+    <route-player v-if="showRoute" />
     <webview
         ref="mapFrame"
         class="mapFrame"

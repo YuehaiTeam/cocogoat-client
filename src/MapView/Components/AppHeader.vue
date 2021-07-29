@@ -3,7 +3,7 @@ import { devtools, openSync } from '../ipc'
 import { bus } from '../bus'
 import { ElMessageBox } from 'element-plus'
 export default {
-    emits: ['clickprocess'],
+    emits: ['clickprocess', 'toggleRoute'],
     data() {
         return {
             clickTimes: 0,
@@ -53,6 +53,9 @@ export default {
         <div class="actions">
             <button class="dump" :class="{ show: runtimeDebug }" @click="clickDebug" @contextmenu="ctxDebug">
                 <i class="el-icon-s-opportunity"></i>
+            </button>
+            <button class="sync" @click="$emit('toggleRoute')">
+                <i class="el-icon-d-arrow-left"></i>
             </button>
             <button class="sync" @click="openSync">
                 <i class="el-icon-aim"></i>
