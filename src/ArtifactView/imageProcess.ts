@@ -145,11 +145,11 @@ export async function split(
         ...subData,
     }
 }
-export async function imageDump(canvas: HTMLCanvasElement, list: SplitResults) {
+export async function imageDump(canvas: HTMLCanvasElement, list: SplitResults, id: string) {
     /* dynamic require node modules */
     const path = require('path')
     const fsex = require('fs-extra')
-    const exportPath = path.join(require('os').tmpdir(), 'cocogoat', 'artifacts', Date.now().toString())
+    const exportPath: string = path.join(require('os').tmpdir(), 'cocogoat', 'artifacts', id)
     await fsex.ensureDir(exportPath)
     const pms = []
     {
@@ -168,6 +168,13 @@ export async function imageDump(canvas: HTMLCanvasElement, list: SplitResults) {
         }
     }
     await Promise.all(pms)
+}
+export async function textDump(content: string, id: string, fn: string) {
+    /* dynamic require node modules */
+    const path = require('path')
+    const fsex = require('fs-extra')
+    const exportPath: string = path.join(require('os').tmpdir(), 'cocogoat', 'artifacts', id, fn)
+    fsex.writeFile(exportPath, content)
 }
 export async function ocr(ret: SplitResults) {
     const ocrpms = []

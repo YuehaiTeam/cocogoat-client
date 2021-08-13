@@ -6,13 +6,14 @@ import { ipcRenderer } from 'electron'
 import { status, STATUS } from './status'
 import { ElMessageBox } from 'element-plus'
 import { recognizeArtifact } from './recognizeArtifact'
-import { split, imageDump } from './imageProcess'
+import { ocr, split, imageDump, textDump } from './imageProcess'
 import { getposition, capture, getActiveWindow, sendToAppWindow } from './ipc'
 
 import { sendWrongOCRFeedback } from '@/api/feedback'
 
 import AppHeader from './Components/AppHeader'
 import Capture from './Components/Capture/Index'
+
 export default {
     components: {
         AppHeader,
@@ -111,19 +112,23 @@ export default {
             let canvas = await capture(x, y, w * p, h * p)
 
             /* 拆分、预处理 */
-            console.time('preprocess')
             let ret = await this.splitImages(canvas, p)
-            console.timeEnd('preprocess')
 
             /* 调试写入图片文件 */
+            const pid = Date.now().toString()
             if (status.runtimeDebug) {
-                imageDump(canvas, ret)
+                imageDump(canvas, ret, pid)
             }
 
             /* OCR、识别 */
-            console.time('ocr')
-            const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ret)
-            console.timeEnd('ocr')
+            const ocrres = await ocr(ret)
+            /* 调试写入OCR文本2 */
+            if (status.runtimeDebug) {
+                textDump(JSON.stringify(ocrres), pid, 'ocr.json')
+            }
+
+            /* 后处理 */
+            const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ocrres, ret)
             status.artifact = artifact
             status.potentialErrors = potentialErrors
             this.saveToMain()

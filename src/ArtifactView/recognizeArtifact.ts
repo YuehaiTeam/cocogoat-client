@@ -1,4 +1,4 @@
-import { ocr, SplitResults } from './imageProcess'
+import { SplitResults } from './imageProcess'
 import { Artifact, ArtifactParam } from '@/typings/Artifact'
 import { ArtifactNames, ArtifactParamTypes, ArtifactSubParamTypes } from '@/typings/ArtifactMap'
 import { detectStars, textCNEN, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
@@ -20,10 +20,11 @@ const ocrCorrectionMap = [
     ['雷灾的子遗', '雷灾的孑遗'],
 ]
 
-export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, string[], any]> {
+export async function recognizeArtifact(
+    ocrres: Record<string, any>,
+    ret: SplitResults,
+): Promise<[Artifact, string[], any]> {
     const potentialErrors: string[] = []
-    /* OCR */
-    const ocrres = await ocr(ret)
 
     /* 星数 */
     const stars = detectStars(ret.color.canvas)
