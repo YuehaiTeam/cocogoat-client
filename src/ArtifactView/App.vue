@@ -94,9 +94,9 @@ export default {
                 status.status = STATUS.ERROR
             }
         },
-        splitImages(canvas, scale) {
+        async splitImages(canvas, scale) {
             const posObj = this.$refs.captureDom.getPosition()
-            return split(canvas, posObj, scale)
+            return await split(canvas, posObj, scale)
         },
         async processOnce() {
             /* 计算窗口位置 */
@@ -111,7 +111,9 @@ export default {
             let canvas = await capture(x, y, w * p, h * p)
 
             /* 拆分、预处理 */
-            let ret = this.splitImages(canvas, p)
+            console.time('preprocess')
+            let ret = await this.splitImages(canvas, p)
+            console.timeEnd('preprocess')
 
             /* 调试写入图片文件 */
             if (status.runtimeDebug) {
@@ -119,7 +121,9 @@ export default {
             }
 
             /* OCR、识别 */
+            console.time('ocr')
             const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ret)
+            console.timeEnd('ocr')
             status.artifact = artifact
             status.potentialErrors = potentialErrors
             this.saveToMain()

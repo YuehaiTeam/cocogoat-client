@@ -68,11 +68,17 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         potentialErrors.push(maybeError)
     }
     /* 副词条 */
-    if (!ocrres.sub || !ocrres.sub.text) {
+    if (!ocrres.sub0 || !ocrres.sub0.text) {
         throw new Error("Sub cant't be empty")
     }
+    const subOrigArray = []
+    for (let i = 0; i < 4; i++) {
+        if (ocrres[`sub${i}`]) {
+            subOrigArray.push(ocrres[`sub${i}`].text.replace(/\s/g, ''))
+        }
+    }
     const subTextArray = santizeParamsArray(
-        ocrres.sub.text.split('\n').filter((e: string) => {
+        subOrigArray.filter((e: string) => {
             return e.trim() !== ''
         }),
     )
@@ -90,7 +96,11 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     }
 
     /* 副词条低置信度检查 */
-    potentialErrors.push(...findLowConfidence(ocrres.sub, 80, true))
+    for (let i = 0; i < 4; i++) {
+        if (ocrres[`sub${i}`]) {
+            potentialErrors.push(...findLowConfidence(ocrres[`sub${i}`], 80, true))
+        }
+    }
 
     /* 主词条低置信度检查 */
     potentialErrors.push(...findLowConfidence(ocrres.main, 80, true))

@@ -2,6 +2,7 @@ import 'context-filter-polyfill'
 import { ocr as ipcOcr } from './ipc'
 import imageConfig from './imageConfig'
 import { IocrResult } from '@/typings/ocr'
+import { getCV } from '@/plugins/opencv'
 
 export interface ISplitConfig {
     w: number
@@ -15,9 +16,91 @@ export interface ISplitResult {
     imageConfig: any
 }
 export type SplitResults = Record<string, ISplitResult>
-export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitConfig>, pixelRatio: number) {
+export async function splitSub(
+    canvas: HTMLCanvasElement,
+    sub: ISplitConfig,
+    pixelRatio: number,
+): Promise<SplitResults> {
+    const subList: SplitResults = {}
+    const acv = getCV()
+    const canvas1 = document.createElement('canvas')
+    canvas1.width = sub.w * pixelRatio
+    canvas1.height = sub.h * pixelRatio
+    const ctx = canvas1.getContext('2d')
+    if (!ctx) throw new Error('Canvas not supported')
+    ctx.drawImage(
+        canvas,
+        sub.x * pixelRatio,
+        sub.y * pixelRatio,
+        sub.w * pixelRatio,
+        sub.h * pixelRatio,
+        0,
+        0,
+        sub.w * pixelRatio,
+        sub.h * pixelRatio,
+    )
+    const cv = await acv
+    const p1 = cv.imread(canvas1)
+    cv.cvtColor(p1, p1, cv.COLOR_RGB2GRAY)
+    cv.threshold(p1, p1, 140, 255, cv.THRESH_BINARY)
+    const hor_list: number[] = []
+    for (let i = 0; i < p1.rows; i++) {
+        for (let j = 0; j < p1.cols; j++) {
+            if (p1.ucharPtr(i, j)[0] === 0) {
+                hor_list[i] = hor_list[i] ? hor_list[i] + 1 : 1
+            }
+        }
+    }
+    const pn = []
+    let last = -1
+    for (let i = 0; i < p1.rows; i++) {
+        const t = hor_list[i] > 0 ? 1 : 0
+        if (last < 0) {
+            last = t
+            continue
+        }
+        if (t !== last) {
+            last = t
+            pn.push(i)
+        }
+    }
+    cv.imshow(canvas1, p1)
+    p1.delete()
+    for (let i = 0; i < 4; i++) {
+        if ((!pn[2 * i] && pn[2 * i] !== 0) || !pn[2 * i + 1]) {
+            console.log(`sub${i} not found`, pn[2 * i], !pn[2 * i + 1])
+            continue
+        }
+        const splitConfig: ISplitConfig = {
+            w: canvas1.width,
+            h: pn[2 * i + 1] - pn[2 * i],
+            x: sub.x,
+            y: sub.y + pn[2 * i],
+        }
+        const canvas2 = document.createElement('canvas')
+        canvas2.width = splitConfig.w
+        canvas2.height = splitConfig.h
+        const ctx = canvas2.getContext('2d')
+        if (!ctx) throw new Error('Canvas not supported')
+        ctx.drawImage(canvas1, 0, pn[2 * i], splitConfig.w, splitConfig.h, 0, 0, splitConfig.w, splitConfig.h)
+        subList[`sub${i}`] = {
+            config: splitConfig,
+            imageConfig: {
+                singleLine: true,
+            },
+            canvas: canvas2,
+        }
+    }
+    return subList
+}
+export async function split(
+    canvas: HTMLCanvasElement,
+    posList: Record<string, ISplitConfig>,
+    pixelRatio: number,
+): Promise<SplitResults> {
     const ret: SplitResults = {}
-    console.log(posList)
+    const sub = posList.sub
+    delete posList.sub
     for (const i in posList) {
         if ({}.hasOwnProperty.call(posList, i)) {
             ret[i] = ret[i] || {}
@@ -30,7 +113,7 @@ export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitC
             if (!ctx) throw new Error('Canvas not supported')
 
             const currentImgConfig = imageConfig[i]
-            if (typeof currentImgConfig.handler === 'string') {
+            if (currentImgConfig && typeof currentImgConfig.handler === 'string') {
                 ctx.filter = currentImgConfig.handler
             } else {
                 ctx.filter = ''
@@ -48,14 +131,19 @@ export function split(canvas: HTMLCanvasElement, posList: Record<string, ISplitC
                 config.h * pixelRatio,
             )
 
-            if (typeof currentImgConfig.handler === 'function') {
-                currentImgConfig.handler(ctx, config.w * pixelRatio, config.h * pixelRatio)
+            if (currentImgConfig && typeof currentImgConfig.handler === 'function') {
+                currentImgConfig.handler(ctx, config.w * pixelRatio, config.h * pixelRatio, canvas1, await getCV())
             }
             ret[i].canvas = canvas1
             ret[i].imageConfig = currentImgConfig
         }
     }
-    return ret
+
+    const subData = await splitSub(canvas, sub, pixelRatio)
+    return {
+        ...ret,
+        ...subData,
+    }
 }
 export async function imageDump(canvas: HTMLCanvasElement, list: SplitResults) {
     /* dynamic require node modules */
