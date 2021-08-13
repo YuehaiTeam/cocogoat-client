@@ -24,7 +24,7 @@ export default {
         ipcRenderer.on('keydown', this.onKeydown)
         setTransparent(false)
         if (!bus.options.artifacts.fastScroll) {
-            sleepRatio = 2
+            sleepRatio = 3
         }
     },
     beforeUnmount() {
