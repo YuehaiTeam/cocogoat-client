@@ -1013,10 +1013,9 @@
   dependencies:
     cross-spawn "^7.0.1"
 
-"@mr-quin/mona_to_go@^1.0.3":
+"@mr-quin/mona_to_go@https://github.com/YuehaiTeam/mona_to_go#dist":
   version "1.0.3"
-  resolved "https://registry.nlark.com/@mr-quin/mona_to_go/download/@mr-quin/mona_to_go-1.0.3.tgz#395895455dfdcee43d406058d4dfb78e6be5a02c"
-  integrity sha1-OViVRV39zuQ9QGBY1N+3jmvloCw=
+  resolved "https://github.com/YuehaiTeam/mona_to_go#cb41c8340c78576a1bfdf2b9de3c6ee680dcfd58"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -6459,10 +6458,10 @@ internal-ip@^4.3.0:
     default-gateway "^4.2.0"
     ipaddr.js "^1.9.0"
 
-iohook@^0.9.0:
-  version "0.9.1"
-  resolved "https://registry.nlark.com/iohook/download/iohook-0.9.1.tgz#6577c1fe37c74de1793bcfdfedfc4e04337d11e4"
-  integrity sha1-ZXfB/jfHTeF5O8/f7fxOBDN9EeQ=
+iohook@0.9.0:
+  version "0.9.0"
+  resolved "https://registry.nlark.com/iohook/download/iohook-0.9.0.tgz#dae8311e2e9b9da08971bed23c66068a25c7ad44"
+  integrity sha1-2ugxHi6bnaCJcb7SPGYGiiXHrUQ=
   dependencies:
     nugget "^2.0.1"
     pump "^1.0.3"

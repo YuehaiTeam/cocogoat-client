@@ -15,7 +15,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@mr-quin/mona_to_go": "^1.0.3",
+    "@mr-quin/mona_to_go": "https://github.com/YuehaiTeam/mona_to_go#dist",
     "@sentry/electron": "^2.4.0",
     "@sentry/integrations": "^6.2.5",
     "@sentry/node": "^6.4.1",
