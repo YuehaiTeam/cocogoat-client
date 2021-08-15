@@ -2,6 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { Artifact as ArtifactType } from '@/typings/Artifact'
 import { ArtifactParamTypes, ArtifactSubParamTypes, ArtifactNames } from '@/typings/ArtifactMap'
+import { __ } from '@/i18n'
 export default defineComponent({
     props: {
         modelValue: {
@@ -12,10 +13,17 @@ export default defineComponent({
     },
     emits: ['update:modelValue', 'update:show'],
     data() {
+        const artifactNameOptions: { value: string; label: string }[] = []
+        for (let i of ArtifactNames) {
+            artifactNameOptions.push({
+                value: i,
+                label: __(i),
+            })
+        }
         return {
-            ArtifactNames,
             ArtifactParamTypes,
             ArtifactSubParamTypes,
+            artifactNameOptions,
             artifact: JSON.parse(JSON.stringify(this.modelValue)) as ArtifactType,
             levelMax: {
                 5: 20,
@@ -63,9 +71,15 @@ export default defineComponent({
     <el-dialog :title="title" width="400px" :model-value="show" @update:model-value="$emit('update:show', $event)">
         <article class="artiface-edit-panel">
             <div class="title">
-                <el-select v-model="artifact.name" class="title-select" filterable size="small" placeholder="圣遗物">
-                    <el-option v-for="(i, a) in ArtifactNames" :key="a" :value="i" :label="i"></el-option>
-                </el-select>
+                <el-select-v2
+                    v-model="artifact.name"
+                    class="title-select"
+                    filterable
+                    size="small"
+                    placeholder="圣遗物"
+                    :options="artifactNameOptions"
+                >
+                </el-select-v2>
             </div>
             <div class="level">
                 <el-input-number
@@ -82,7 +96,7 @@ export default defineComponent({
             <div class="image" :style="{ backgroundImage: getImg(artifact.name) }"></div>
             <div class="main">
                 <el-select v-model="artifact.main.name" size="small" :placeholder="__('主词条名')">
-                    <el-option v-for="(j, a) in ArtifactParamTypes" :key="a" :value="j" :label="j"></el-option>
+                    <el-option v-for="(j, a) in ArtifactParamTypes" :key="a" :value="j" :label="__(j)"></el-option>
                 </el-select>
                 <el-input v-model="artifact.main.value" size="small" :placeholder="__('主词条值')"> </el-input>
             </div>
@@ -98,7 +112,7 @@ export default defineComponent({
                                     v-for="(j, a) in ArtifactSubParamTypes"
                                     :key="a"
                                     :value="j"
-                                    :label="j"
+                                    :label="__(j)"
                                 ></el-option>
                             </el-select>
                         </template>
@@ -133,6 +147,10 @@ export default defineComponent({
     margin-top: -20px;
     &::v-deep(.el-select) .el-input {
         width: 150px;
+    }
+    .title-select {
+        width: 180px;
+        white-space: nowrap;
     }
     .image {
         position: absolute;

@@ -1,9 +1,18 @@
 <script lang="ts">
+import { __ } from '@/i18n'
 import { status } from '../../status'
-import { ArtifactParamTypes, ArtifactSubParamTypes } from '@/typings/ArtifactMap'
+import { ArtifactParamTypes, ArtifactSubParamTypes, ArtifactNames } from '@/typings/ArtifactMap'
 export default {
     data() {
+        const artifactNameOptions: { value: string; label: string }[] = []
+        for (let i of ArtifactNames) {
+            artifactNameOptions.push({
+                value: i,
+                label: __(i),
+            })
+        }
         return {
+            artifactNameOptions,
             ArtifactParamTypes,
             ArtifactSubParamTypes,
             levelMax: {
@@ -39,7 +48,14 @@ export default {
 <template>
     <article class="artiface-float-panel">
         <div class="title">
-            <el-input v-model="artifact.name" size="small" />
+            <el-select-v2
+                v-model="artifact.name"
+                class="title-input"
+                size="mini"
+                filterable
+                :options="artifactNameOptions"
+            >
+            </el-select-v2>
         </div>
         <div class="line2">
             <div class="stars">
@@ -59,7 +75,7 @@ export default {
             <el-input v-model="artifact.main.value" size="small" :placeholder="__('主词条值')">
                 <template #prepend>
                     <el-select v-model="artifact.main.name" size="small" :placeholder="__('主词条名')">
-                        <el-option v-for="(j, a) in ArtifactParamTypes" :key="a" :value="j" :label="j"></el-option>
+                        <el-option v-for="(j, a) in ArtifactParamTypes" :key="a" :value="j" :label="__(j)"></el-option>
                     </el-select>
                 </template>
                 <template v-if="artifact.sub.length < 4" #append>
@@ -76,7 +92,7 @@ export default {
                                 v-for="(j, a) in ArtifactSubParamTypes"
                                 :key="a"
                                 :value="j"
-                                :label="j"
+                                :label="__(j)"
                             ></el-option>
                         </el-select>
                     </template>
@@ -152,6 +168,10 @@ export default {
 
     .main {
         padding-top: 6px;
+    }
+    .title-input {
+        width: 100%;
+        margin-top: 10px;
     }
     .title .el-input__inner {
         text-align: center;

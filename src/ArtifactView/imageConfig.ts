@@ -20,7 +20,6 @@ export default <
         ignore: true,
     },
     main: {
-        /*
         handler: (_ctx, _w, _h, canvas, cv) => {
             const p1 = cv.imread(canvas)
             cv.cvtColor(p1, p1, cv.COLOR_RGB2GRAY)
@@ -28,7 +27,6 @@ export default <
             cv.imshow(canvas, p1)
             p1.delete()
         },
-        */
     },
     level: {
         singleLine: true,
@@ -47,6 +45,12 @@ export default <
             for (const i of data) {
                 if (i.width < p1.cols / 2 || Math.abs(i.width - p1.cols) < Math.max(2, p1.cols / 30)) continue
                 border = i
+            }
+            if (!border) {
+                p1.delete()
+                contours.delete()
+                hierarchy.delete()
+                return
             }
             cv.line(
                 p1,

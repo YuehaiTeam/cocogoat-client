@@ -11,6 +11,8 @@ export const availableLocales: Record<string, any> = {
             },
         },
         ...require('./locales/en.json'),
+        ...require('./locales/en_artifacts.json').params,
+        ...require('./locales/en_artifacts.json').names,
     },
     jp: {
         __name: '日本語',

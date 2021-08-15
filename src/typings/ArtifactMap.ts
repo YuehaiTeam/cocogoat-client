@@ -196,6 +196,14 @@ export const ArtifactNames = [
     '祈望之心',
     '无常之面',
 ]
+export const ArtifactNamesAll: string[] = [
+    ...ArtifactNames,
+    ...(Object.values(require('@/i18n/locales/en_artifacts.json').names) as string[]),
+]
+export const ArtifactParamTypesAll: string[] = [
+    ...ArtifactParamTypes,
+    ...(Object.values(require('@/i18n/locales/en_artifacts.json').params) as string[]),
+]
 /**
  *  圣遗物使用者表
  */

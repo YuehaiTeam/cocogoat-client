@@ -1,7 +1,8 @@
 import { SplitResults } from './imageProcess'
 import { Artifact, ArtifactParam } from '@/typings/Artifact'
-import { ArtifactNames, ArtifactParamTypes, ArtifactSubParamTypes } from '@/typings/ArtifactMap'
+import { ArtifactNamesAll, ArtifactParamTypesAll } from '@/typings/ArtifactMap'
 import { detectStars, textCNEN, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
+import { ArtifactReverse } from '@/i18n/artifactReverse'
 
 const ocrCorrectionMap = [
     ['莉力', '攻击力'],
@@ -20,6 +21,7 @@ const ocrCorrectionMap = [
     ['雷灾的子遗', '雷灾的孑遗'],
 ]
 
+// eslint-disable-next-line complexity
 export async function recognizeArtifact(
     ocrres: Record<string, any>,
     ret: SplitResults,
@@ -39,9 +41,11 @@ export async function recognizeArtifact(
         name = name.replace(i[0], i[1])
     }
 
-    if (!ArtifactNames.includes(name)) {
-        name = textBestmatch(name, ArtifactNames)
+    if (!ArtifactNamesAll.includes(name)) {
+        name = textBestmatch(name, ArtifactNamesAll)
     }
+
+    name = ArtifactReverse.names[name] || name
 
     /* 等级 */
     if (!ocrres.level || !ocrres.level.text) {
@@ -55,7 +59,11 @@ export async function recognizeArtifact(
                 .replace(/o/g, '0')
                 .replace(/古/g, '0')
                 .replace(/土/g, '1')
-                .replace(/吉/g, '10'),
+                .replace(/书/g, '8')
+                .replace(/福/g, '8')
+                .replace(/花/g, '8')
+                .replace(/吉/g, '10')
+                .replace(/112/g, '12'),
         ),
     )
     level = level > 20 ? 20 : level
@@ -105,7 +113,6 @@ export async function recognizeArtifact(
 
     /* 主词条低置信度检查 */
     potentialErrors.push(...findLowConfidence(ocrres.main, 80, true))
-
     return [
         {
             id: Date.now(),
@@ -147,8 +154,8 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
     let maybeError = null
     const rawName = textCNEN(newtext)
     let value = textNumber(newtext)
-    const toCompare = main ? ArtifactParamTypes : ArtifactSubParamTypes
-    const name = textBestmatch(rawName, toCompare)
+    let name = textBestmatch(rawName, ArtifactParamTypesAll)
+    name = ArtifactReverse.params[name] || name
 
     /*
      * PaddleOCR会将逗号(,)识别成点(.)

@@ -144,7 +144,7 @@ export default {
 .overlay-main {
     top: 14%;
     left: 2.5%;
-    width: 36%;
+    width: 42%;
     height: 11%;
     border: 2px solid;
 }

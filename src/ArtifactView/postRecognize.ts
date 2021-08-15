@@ -29,8 +29,8 @@ export function detectStars(colorCanvas: HTMLCanvasElement) {
 }
 export function textBestmatch(text: string, list: string[]) {
     if (list.includes(text)) return text
-    const matches = findBestMatch(text, list)
-    if (matches.bestMatch.rating > 3) return ''
+    const matches = findBestMatch(text.replace(/\s\s+/g, ' '), list)
+    if (!/[\\u4E00-\\u9FFF]+/g.test(text) && matches.bestMatch.rating > 3) return ''
     return matches.bestMatch.target
 }
 export function textChinese(t: string) {

@@ -128,7 +128,14 @@ export default {
             }
 
             /* 后处理 */
-            const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ocrres, ret)
+            let ares
+            try {
+                ares = await recognizeArtifact(ocrres, ret)
+            } catch (e) {
+                console.warn(ocrres)
+                throw e
+            }
+            const [artifact, potentialErrors, ocrResult] = ares
             status.artifact = artifact
             status.potentialErrors = potentialErrors
             this.saveToMain()
