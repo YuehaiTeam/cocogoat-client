@@ -200,7 +200,10 @@ export default defineComponent({
         border-color: #bce4ff;
     }
 
-    &.en {
+    &.en,
+    &.ru,
+    &.de,
+    &.pt {
         .name {
             font-size: 12px;
             max-width: 125px;
