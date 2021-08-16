@@ -31,6 +31,7 @@ export async function ocrInit() {
     workerReadyPms = []
     let ocrData = path.join(config.dataDir, 'ppocr-data')
     const ocrUserData = path.join(config.configDir, 'ppocr-data')
+    let hasUserOCR = false
     try {
         await fsex.access(path.join(ocrUserData, 'rec'))
         await fsex.access(path.join(ocrUserData, 'det'))
@@ -42,11 +43,13 @@ export async function ocrInit() {
             buttons: ['好的'],
         })
         ocrData = ocrUserData
+        hasUserOCR = true
     } catch (e) {}
-    console.log('OCR Datadir is ', ocrData)
-    let rec = path.join(ocrData, 'rec')
+    const ocrLang = !hasUserOCR && config.options.ocrLang ? `rec_${config.options.ocrLang}` : 'rec'
+    console.log('OCR Datadir is ', ocrData, ocrLang)
+    let rec = path.join(ocrData, ocrLang)
     let det = path.join(ocrData, 'det')
-    let dic = path.join(ocrData, 'dic.txt')
+    let dic = path.join(rec, 'dic.txt')
     /* 包含非ASCII字符时才使用虚拟路径，减少正常情况下损失 */
     if (/[^\x00-\x7F]/.test(dic)) {
         try {

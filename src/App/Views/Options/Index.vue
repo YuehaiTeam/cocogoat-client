@@ -213,6 +213,16 @@ export default {
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item :label="__(`OCR识别语言`)">
+                    <el-select :model-value="options.ocrLang" @update:model-value="opt('ocrLang', $event)">
+                        <el-option value="" label="默认"> {{ __('默认') }} </el-option>
+                        <template v-for="(i, a) in $availableLocales" :key="a">
+                            <el-option v-if="i.__ocr" :value="a" :label="i.__name">
+                                {{ i.__name }}
+                            </el-option>
+                        </template>
+                    </el-select>
+                </el-form-item>
             </el-form>
         </article>
         <article>

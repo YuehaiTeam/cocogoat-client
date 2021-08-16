@@ -19,7 +19,7 @@ export function logHook(output?: string) {
         let buffer = ''
         buffer += `[${dayjs().format('YYYY-MM-DD HH:mm:ss')}][LOG]${prefix} `
         for (const i of args) {
-            buffer += typeof i === 'string' ? i : inspect(i) + ' '
+            buffer += (typeof i === 'string' ? i : inspect(i)) + ' '
         }
         process.stdout.write(buffer + '\r\n')
     }
@@ -27,7 +27,7 @@ export function logHook(output?: string) {
         let buffer = ''
         buffer += `[${dayjs().format('YYYY-MM-DD HH:mm:ss')}][ERR]${prefix} `
         for (const i of args) {
-            buffer += typeof i === 'string' ? i : inspect(i) + ' '
+            buffer += (typeof i === 'string' ? i : inspect(i)) + ' '
         }
         process.stdout.write(buffer + '\r\n')
     }

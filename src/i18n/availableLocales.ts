@@ -16,6 +16,7 @@ export const availableLocales: Record<string, any> = {
     },
     jp: {
         __name: '日本語',
+        __ocr: true,
         '': {
             language: 'jp',
             plurals: {
@@ -65,6 +66,7 @@ export const availableLocales: Record<string, any> = {
     },
     kr: {
         __name: 'Korean',
+        __ocr: true,
         '': {
             language: 'kr',
             plurals: {

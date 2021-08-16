@@ -199,6 +199,10 @@ export const ArtifactNames = [
 export const ArtifactNamesAll: string[] = [
     ...ArtifactNames,
     ...(Object.values(require('@/i18n/locales/en_artifacts.json').names) as string[]),
+    ...(Object.values(require('@/i18n/locales/jp_artifacts.json').names) as string[]),
+    ...(Object.values(require('@/i18n/locales/kr_artifacts.json').names) as string[]),
+    ...(Object.values(require('@/i18n/locales/pt_artifacts.json').names) as string[]),
+    ...(Object.values(require('@/i18n/locales/de_artifacts.json').names) as string[]),
 ]
 export const ArtifactParamTypesAll: string[] = [
     ...ArtifactParamTypes,

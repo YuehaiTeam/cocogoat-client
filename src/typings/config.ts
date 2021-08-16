@@ -19,6 +19,7 @@ export interface IwindowStates {
 }
 export interface IOptions {
     lang: string
+    ocrLang: string
     firstRun: boolean
     sendErrorReports: boolean
     sendWrongOCRReports: boolean
@@ -49,6 +50,7 @@ export function defaultConfig(): IConfig {
         dataDir: '',
         options: {
             lang: '',
+            ocrLang: '',
             firstRun: true,
             sendErrorReports: true,
             sendWrongOCRReports: true,
