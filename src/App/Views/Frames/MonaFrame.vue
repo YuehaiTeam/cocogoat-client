@@ -45,13 +45,13 @@ export default defineComponent({
 </script>
 <template>
     <teleport to="#app-title">
-        <span>莫娜占卜铺</span>
-        <span class="title-desc">(由 @wormtql 开发，已授权)</span>
+        <span>{{ __('莫娜占卜铺') }}</span>
+        <span class="title-desc">{{ __('(由 @wormtql 开发，已授权)') }}</span>
     </teleport>
     <div class="page-main">
         <div
             v-loading="loading"
-            element-loading-text="正在敲开伟大占星术士的家门..."
+            element-loading-text="__('正在敲开伟大占星术士的家门...')"
             element-loading-background="#fff"
             class="loading-area"
         ></div>
