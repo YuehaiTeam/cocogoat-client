@@ -1,6 +1,7 @@
 <script lang="ts">
 import { ipcRenderer } from 'electron'
 import { defineComponent } from 'vue'
+import { __ } from '@/i18n'
 export default defineComponent({
     components: {},
     data() {
