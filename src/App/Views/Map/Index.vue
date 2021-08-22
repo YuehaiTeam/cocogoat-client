@@ -1,6 +1,7 @@
 <script lang="ts">
 import { ipcRenderer } from 'electron'
 import { defineComponent } from 'vue'
+import { __ } from '@/i18n'
 export default defineComponent({
     components: {},
     data() {
@@ -20,7 +21,7 @@ export default defineComponent({
 </script>
 <template>
     <teleport to="#app-title">
-        <span>地图</span>
+        <span>{{ __('地图') }}</span>
     </teleport>
 
     <teleport to="#app-actions">
@@ -33,7 +34,7 @@ export default defineComponent({
     <div class="page-main">
         <div class="placeholder">
             <div>
-                点击右上角按钮，打开悬浮地图
+                {{ __('点击右上角按钮，打开悬浮地图') }}
                 <el-button
                     class="createRouteExtractView"
                     size="mini"
