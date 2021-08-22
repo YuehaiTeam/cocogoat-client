@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron'
 import Actions from './Components/Actions'
 import AppHeader from './Components/AppHeader'
 import TransparentArea from './Components/TransparentArea'
-import { getposition, capture, setTransparent, tryocr, click, joystickStatus, joystickNext } from './ipc'
+import { getposition, capture, setTransparent, tryocr, tryocrSec, click, joystickStatus, joystickNext } from './ipc'
 import { bus, STATUS } from './bus'
 import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
@@ -307,26 +307,32 @@ export default {
         },
         async clickFirstLine() {
             let { x, y } = getBlockCenter(bus.blocks[0])
+            let ocrPromise = Promise.resolve()
             for (let i = 0; i < bus.cols; i++) {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                await sleep(30 * sleepRatio)
+                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
                 bus.checkedCount++
-                await tryocr()
+                const [p, q] = await tryocrSec()
+                await p
+                ocrPromise = q
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
             }
         },
         async clickOtherLine() {
+            let ocrPromise = Promise.resolve()
             for (let i = bus.cols; i < bus.blocks.length; i++) {
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                await sleep(30 * sleepRatio)
+                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
                 bus.checkedCount++
-                await tryocr()
+                const [p, q] = await tryocrSec()
+                await p
+                ocrPromise = q
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
             }
         },

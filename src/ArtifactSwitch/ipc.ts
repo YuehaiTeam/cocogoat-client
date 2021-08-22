@@ -48,6 +48,22 @@ export async function tryocr(): Promise<Artifact | null> {
     return <Artifact>await p
 }
 
+export async function tryocrSec(): Promise<null | [Promise<void>, Promise<Artifact>]> {
+    const artifactViewWindowId = await getArtifactViewWindowId()
+    if (artifactViewWindowId < 0) {
+        return null
+    }
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`tryocr-${id}`, (result, data) => resolve(data))
+    })
+    const q = new Promise((resolve) => {
+        ipcRenderer.once(`tryocr-${id}-capture`, (result, data) => resolve(data))
+    })
+    ipcRenderer.sendTo(artifactViewWindowId, 'tryocr', { id })
+    return [<Promise<void>>q, <Promise<Artifact>>p]
+}
+
 export async function click({ x, y }: { x: number; y: number }) {
     const id = uuid()
     const p = new Promise((resolve) => {

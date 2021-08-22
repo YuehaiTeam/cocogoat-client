@@ -45,7 +45,9 @@ export default {
         )
         ipcRenderer.send('readyArtifactView')
         ipcRenderer.on('tryocr', async (event, { id }) => {
-            const result = await this.processWithTimeout()
+            const result = await this.processWithTimeout(() => {
+                ipcRenderer.sendTo(event.senderId, `tryocr-${id}-capture`)
+            })
             ipcRenderer.sendTo(event.senderId, `tryocr-${id}`, result)
         })
     },
@@ -83,11 +85,11 @@ export default {
                 this.activeWindow = currentWin
             }
         },
-        async processWithTimeout() {
+        async processWithTimeout(captureCB) {
             if (status.status === STATUS.LOADING) return
             status.status = STATUS.LOADING
             try {
-                const result = await this.processOnce()
+                const result = await this.processOnce(captureCB)
                 status.status = STATUS.SUCCESS
                 return result
             } catch (e) {
@@ -99,7 +101,7 @@ export default {
             const posObj = this.$refs.captureDom.getPosition()
             return await split(canvas, posObj, scale)
         },
-        async processOnce() {
+        async processOnce(captureCB) {
             /* 计算窗口位置 */
             const p = window.devicePixelRatio
             let [x, y] = await getposition()
@@ -118,6 +120,10 @@ export default {
             const pid = Date.now().toString()
             if (status.runtimeDebug) {
                 imageDump(canvas, ret, pid)
+            }
+
+            if (captureCB) {
+                captureCB()
             }
 
             /* OCR、识别 */
