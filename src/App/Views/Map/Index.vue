@@ -35,7 +35,7 @@ export default defineComponent({
         <div class="placeholder">
             <div>
                 {{ __('点击右上角按钮，打开悬浮地图') }}
-                <el-button
+                <!--el-button
                     class="createRouteExtractView"
                     size="mini"
                     plain
@@ -43,7 +43,7 @@ export default defineComponent({
                     @click="createRouteExtractView"
                 >
                     {{ __('视频导航数据提取') }}
-                </el-button>
+                </el-button-->
             </div>
         </div>
     </div>
