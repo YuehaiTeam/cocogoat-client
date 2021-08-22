@@ -2,7 +2,6 @@
 import { bus } from '@/App/bus'
 import { defineComponent } from 'vue'
 import { convertAsMona } from '@/App/export/Mona'
-import { __ } from '@/i18n'
 export default defineComponent({
     components: {},
     data() {
