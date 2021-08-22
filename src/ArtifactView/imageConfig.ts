@@ -13,23 +13,111 @@ export default <
     >
 >{
     title: {
-        handler: 'invert(100%) brightness(180%) grayscale(100%) contrast(300%)',
         singleLine: true,
+        handler: (_ctx, _w, _h, canvas, cv) => {
+            const p1 = cv.imread(canvas)
+            cv.cvtColor(p1, p1, cv.COLOR_RGB2GRAY)
+            cv.threshold(p1, p1, 165, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C)
+            const hor_list: number[] = []
+            for (let i = 0; i < p1.rows; i++) {
+                for (let j = 0; j < p1.cols; j++) {
+                    if (p1.ucharPtr(i, j)[0] === 0) {
+                        hor_list[i] = hor_list[i] ? hor_list[i] + 1 : 1
+                    }
+                }
+            }
+            const pn = []
+            let last = -1
+            for (let i = 0; i < p1.rows; i++) {
+                const t = hor_list[i] > 0 ? 1 : 0
+                if (last < 0) {
+                    last = t
+                    continue
+                }
+                if (t !== last) {
+                    last = t
+                    pn.push(i)
+                }
+            }
+            if (pn.length < 4) {
+                cv.imshow(canvas, p1)
+                p1.delete()
+                return
+            }
+            const canvas2 = document.createElement('canvas')
+            cv.imshow(canvas2, p1)
+            p1.delete()
+            canvas.height = pn[1] - pn[0]
+            canvas.width = canvas2.width + canvas2.width * ((pn[1] - pn[0]) / (pn[3] - pn[2]))
+            const ctx = canvas.getContext('2d')
+            if (!ctx) return
+            ctx.drawImage(canvas2, 0, pn[0], canvas2.width, canvas.height, 0, 0, canvas2.width, canvas.height)
+            ctx.drawImage(
+                canvas2,
+                0,
+                pn[2],
+                canvas2.width,
+                pn[3] - pn[2],
+                canvas2.width,
+                0,
+                canvas2.width * ((pn[1] - pn[0]) / (pn[3] - pn[2])),
+                canvas.height,
+            )
+        },
     },
     color: {
         ignore: true,
     },
     main: {
+        singleLine: true,
         handler: (_ctx, _w, _h, canvas, cv) => {
             const p1 = cv.imread(canvas)
             cv.cvtColor(p1, p1, cv.COLOR_RGB2GRAY)
             cv.threshold(p1, p1, 155, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C)
-            cv.imshow(canvas, p1)
+            const hor_list: number[] = []
+            for (let i = 0; i < p1.rows; i++) {
+                for (let j = 0; j < p1.cols; j++) {
+                    if (p1.ucharPtr(i, j)[0] === 0) {
+                        hor_list[i] = hor_list[i] ? hor_list[i] + 1 : 1
+                    }
+                }
+            }
+            const pn = []
+            let last = -1
+            for (let i = 0; i < p1.rows; i++) {
+                const t = hor_list[i] > 0 ? 1 : 0
+                if (last < 0) {
+                    last = t
+                    continue
+                }
+                if (t !== last) {
+                    last = t
+                    pn.push(i)
+                }
+            }
+            const canvas2 = document.createElement('canvas')
+            cv.imshow(canvas2, p1)
             p1.delete()
+            canvas.height = pn[1] - pn[0]
+            canvas.width = canvas2.width + canvas2.width * ((pn[1] - pn[0]) / (pn[3] - pn[2]))
+            const ctx = canvas.getContext('2d')
+            if (!ctx) return
+            ctx.drawImage(canvas2, 0, pn[0], canvas2.width, canvas.height, 0, 0, canvas2.width, canvas.height)
+            ctx.drawImage(
+                canvas2,
+                0,
+                pn[2],
+                canvas2.width,
+                pn[3] - pn[2],
+                canvas2.width,
+                0,
+                canvas2.width * ((pn[1] - pn[0]) / (pn[3] - pn[2])),
+                canvas.height,
+            )
         },
     },
     level: {
-        singleLine: true,
+        singleLine: false,
         handler: (_ctx, _w, _h, canvas, cv) => {
             const p1 = cv.imread(canvas)
             const contours = new cv.MatVector()

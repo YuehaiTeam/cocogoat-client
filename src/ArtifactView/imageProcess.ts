@@ -93,53 +93,70 @@ export async function splitSub(
     }
     return subList
 }
+async function splitOne(
+    canvas: HTMLCanvasElement,
+    posList: Record<string, ISplitConfig>,
+    pixelRatio: number,
+    i: string,
+): Promise<SplitResults> {
+    const ret: SplitResults = {}
+    ret[i] = ret[i] || {}
+    const config = posList[i]
+    ret[i].config = config
+    const canvas1 = document.createElement('canvas')
+    canvas1.width = config.w * pixelRatio
+    canvas1.height = config.h * pixelRatio
+    const ctx = canvas1.getContext('2d')
+    if (!ctx) throw new Error('Canvas not supported')
+
+    const currentImgConfig = imageConfig[i]
+    if (currentImgConfig && typeof currentImgConfig.handler === 'string') {
+        ctx.filter = currentImgConfig.handler
+    } else {
+        ctx.filter = ''
+    }
+
+    ctx.drawImage(
+        canvas,
+        config.x * pixelRatio,
+        config.y * pixelRatio,
+        config.w * pixelRatio,
+        config.h * pixelRatio,
+        0,
+        0,
+        config.w * pixelRatio,
+        config.h * pixelRatio,
+    )
+
+    if (currentImgConfig && typeof currentImgConfig.handler === 'function') {
+        currentImgConfig.handler(ctx, config.w * pixelRatio, config.h * pixelRatio, canvas1, await getCV())
+    }
+    ret[i].canvas = canvas1
+    ret[i].imageConfig = currentImgConfig
+    return ret
+}
 export async function split(
     canvas: HTMLCanvasElement,
     posList: Record<string, ISplitConfig>,
     pixelRatio: number,
 ): Promise<SplitResults> {
-    const ret: SplitResults = {}
+    let ret: SplitResults = {}
     const sub = posList.sub
     delete posList.sub
+    const pms: Promise<SplitResults>[] = []
     for (const i in posList) {
         if ({}.hasOwnProperty.call(posList, i)) {
-            ret[i] = ret[i] || {}
-            const config = posList[i]
-            ret[i].config = config
-            const canvas1 = document.createElement('canvas')
-            canvas1.width = config.w * pixelRatio
-            canvas1.height = config.h * pixelRatio
-            const ctx = canvas1.getContext('2d')
-            if (!ctx) throw new Error('Canvas not supported')
-
-            const currentImgConfig = imageConfig[i]
-            if (currentImgConfig && typeof currentImgConfig.handler === 'string') {
-                ctx.filter = currentImgConfig.handler
-            } else {
-                ctx.filter = ''
-            }
-
-            ctx.drawImage(
-                canvas,
-                config.x * pixelRatio,
-                config.y * pixelRatio,
-                config.w * pixelRatio,
-                config.h * pixelRatio,
-                0,
-                0,
-                config.w * pixelRatio,
-                config.h * pixelRatio,
-            )
-
-            if (currentImgConfig && typeof currentImgConfig.handler === 'function') {
-                currentImgConfig.handler(ctx, config.w * pixelRatio, config.h * pixelRatio, canvas1, await getCV())
-            }
-            ret[i].canvas = canvas1
-            ret[i].imageConfig = currentImgConfig
+            pms.push(splitOne(canvas, posList, pixelRatio, i))
         }
     }
-
-    const subData = await splitSub(canvas, sub, pixelRatio)
+    const pall = Promise.all(pms)
+    const [pres, subData] = await Promise.all([pall, splitSub(canvas, sub, pixelRatio)])
+    for (const i of pres) {
+        ret = {
+            ...ret,
+            ...i,
+        }
+    }
     return {
         ...ret,
         ...subData,
