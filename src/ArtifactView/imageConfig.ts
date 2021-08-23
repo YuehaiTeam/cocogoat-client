@@ -68,6 +68,15 @@ export default <
     color: {
         ignore: true,
     },
+    image: {
+        ignore: true,
+        handler: (_ctx, _w, _h, canvas, cv) => {
+            const p1 = cv.imread(canvas)
+            cv.resize(p1, p1, new cv.Size(64, 64), 0, 0, cv.INTER_AREA)
+            cv.imshow(canvas, p1)
+            p1.delete()
+        },
+    },
     main: {
         singleLine: true,
         handler: (_ctx, _w, _h, canvas, cv) => {

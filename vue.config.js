@@ -32,7 +32,7 @@ module.exports = {
     },
     pluginOptions: {
         electronBuilder: {
-            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi'],
+            externals: ['iohook', 'bindings', 'robotjs', 'ffi-napi', 'ref-napi', 'onnxruntime-node'],
             nodeIntegration: true,
             chainWebpackMainProcess: (config) => {
                 // source map
@@ -51,6 +51,7 @@ module.exports = {
                     '../build/Release/vigemclient': 'commonjs2 vigemclient/build/Release/vigemclient.node',
                     // make binary out for robotjs
                     './build/Release/robotjs.node': 'commonjs2 robotjs/build/Release/robotjs.node',
+                    'onnxruntime-node': 'commonjs2 onnxruntime-node',
                 })
                 /* Sentry: source map uploading */
                 if (process.env.NODE_ENV === 'production' && process.env.BUILD_TYPE === 'REL') {

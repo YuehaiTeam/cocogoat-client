@@ -11,13 +11,15 @@ const pipeline = util.promisify(stream.pipeline)
 function copy(fr: string, to: string) {
     return pipeline(fsex.createReadStream(fr), fsex.createWriteStream(to))
 }
+let onnxImageWorker: Worker | null
 let ocrWorker: Worker[] = []
 let workerReadyPms: Promise<void>[] = []
 let ocrReady: Promise<any> | null
 let workerPtr: number = 0
 let ocrRunning = false
 let onOcrEvent: any
-const workerCount = 8
+let onOnnxImageEvent: any
+const workerCount = 6
 const q = Queue({
     concurrency: workerCount,
     autostart: true,
@@ -80,6 +82,49 @@ export async function ocrInit() {
         console.log('no non-ascii characters in path, read model directly')
     }
     let noavx = false
+
+    workerReadyPms.push(
+        new Promise((resolve, reject) => {
+            const worker = new Worker(
+                path.join(__dirname.replace('app.asar', 'app.asar.unpacked'), 'background_worker.js'),
+                {
+                    workerData: {
+                        worker: 'onnxImage',
+                        name: `onnxImage`,
+                        config,
+                    },
+                },
+            )
+            worker.on(
+                'message',
+                ({ event, message, reply, id }: { event: string; message: any; reply?: any; id?: string }) => {
+                    if (event === 'ready') {
+                        resolve()
+                    }
+                    if (event === 'reply' && id && reply) {
+                        const win = webContents.fromId(reply.window)
+                        if (win) {
+                            webContents.fromId(reply.window).send(`${reply.event}-${id}`, message)
+                        } else {
+                            console.log('Window', win, 'not found')
+                        }
+                    }
+                    if (event === 'error') {
+                        dialog.showMessageBox({
+                            type: 'error',
+                            title: 'OCR模块加载失败',
+                            message: `如果你不知道发生了什么，请联系开发者。错误信息：${message}`,
+                            buttons: ['好的'],
+                        })
+                        windows.artifactView && windows.artifactView.close()
+                        return
+                    }
+                },
+            )
+            worker.on('error', reject)
+            onnxImageWorker = worker
+        }),
+    )
     for (let i = 0; i < workerCount; i++) {
         workerReadyPms.push(
             new Promise((resolve, reject) => {
@@ -159,6 +204,23 @@ export async function ocrInit() {
         })
     }
     ipcMain.on('ocr', onOcrEvent)
+    onOnnxImageEvent = async (event: IpcMainEvent, { image, id }: { image: string; id: string }) => {
+        await ocrReady
+        if (!onnxImageWorker) return
+        console.log(`onnxImage Worker processing`)
+        onnxImageWorker.postMessage({
+            event: 'recognize',
+            message: {
+                image,
+            },
+            id,
+            reply: {
+                window: event.sender.id,
+                event: 'onnxRecognizeImage',
+            },
+        })
+    }
+    ipcMain.on('onnxRecognizeImage', onOnnxImageEvent)
     ocrReady = Promise.all(workerReadyPms)
     ocrReady.then(() => {
         console.log('ocr ready')
@@ -170,7 +232,16 @@ export async function ocrStop() {
     }
     ocrRunning = false
     ipcMain.off('ocr', onOcrEvent)
+    ipcMain.off('onnxRecognizeImage', onOnnxImageEvent)
     const p = []
+    if (onnxImageWorker) {
+        onnxImageWorker.postMessage({ event: 'exit' })
+        p.push(
+            new Promise((resolve) => {
+                onnxImageWorker && onnxImageWorker.on('exit', resolve)
+            }),
+        )
+    }
     for (const i of ocrWorker) {
         i.postMessage({ event: 'exit' })
         p.push(

@@ -1,5 +1,5 @@
 import 'context-filter-polyfill'
-import { ocr as ipcOcr } from './ipc'
+import { ocr as ipcOcr, onnxRecognizeImage } from './ipc'
 import imageConfig from './imageConfig'
 import { IocrResult } from '@/typings/ocr'
 import { getCV } from '@/plugins/opencv'
@@ -193,12 +193,23 @@ export async function textDump(content: string, id: string, fn: string) {
     const exportPath: string = path.join(require('os').tmpdir(), 'cocogoat', 'artifacts', id, fn)
     fsex.writeFile(exportPath, content)
 }
+export async function recognizeImage(r: ISplitResult) {
+    const ctx = r.canvas.getContext('2d')
+    if (!ctx) throw new Error('Canvas not supported')
+    const imgData = ctx.getImageData(0, 0, r.canvas.width, r.canvas.height)
+    const ocrData = {
+        width: r.canvas.width,
+        height: r.canvas.height,
+        data: Buffer.from(imgData?.data.buffer as ArrayBuffer),
+    }
+    return await onnxRecognizeImage(ocrData)
+}
 export async function ocr(ret: SplitResults) {
     const ocrpms = []
     const ocrpmk: Record<number, string> = {}
     for (const i in ret) {
         if ({}.hasOwnProperty.call(ret, i)) {
-            if (i === 'color') continue
+            if (i === 'color' || i === 'image') continue
             const ctx = ret[i].canvas.getContext('2d')
             const imgData = ctx?.getImageData(0, 0, ret[i].canvas.width, ret[i].canvas.height)
             const ocrData = {

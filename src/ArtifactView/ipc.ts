@@ -56,6 +56,14 @@ export async function ocr(image: string | Record<string, any>): Promise<IocrResu
     ipcRenderer.send('ocr', { image, id })
     return <IocrResult[]>await p
 }
+export async function onnxRecognizeImage(image: string | Record<string, any>): Promise<IocrResult[]> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`onnxRecognizeImage-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('onnxRecognizeImage', { image, id })
+    return <IocrResult[]>await p
+}
 export function close() {
     ipcRenderer.send('closeArtifactView')
 }

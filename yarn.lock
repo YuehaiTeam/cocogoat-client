@@ -884,6 +884,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.11.2":
+  version "7.15.3"
+  resolved "https://registry.nlark.com/@babel/runtime/download/@babel/runtime-7.15.3.tgz#2e1c2880ca118e5b2f9988322bd8a7656a32502b"
+  integrity sha1-LhwogMoRjlsvmYgyK9inZWoyUCs=
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/template@^7.0.0", "@babel/template@^7.12.13":
   version "7.12.13"
   resolved "https://registry.nlark.com/@babel/template/download/@babel/template-7.12.13.tgz#530265be8a2589dbb37523844c5bcb55947fb327"
@@ -7806,6 +7813,13 @@ natural-compare@^1.4.0:
   resolved "https://registry.nlark.com/natural-compare/download/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
+nd4js@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.nlark.com/nd4js/download/nd4js-1.3.0.tgz#83eb40aa2f6bcfb8e991b74e46f6456cfc13c458"
+  integrity sha1-g+tAqi9rz7jpkbdORvZFbPwTxFg=
+  dependencies:
+    "@babel/runtime" "^7.11.2"
+
 negotiator@0.6.2:
   version "0.6.2"
   resolved "https://registry.nlark.com/negotiator/download/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
@@ -7828,7 +7842,7 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
-node-abi@^2.13.0, node-abi@^2.7.0:
+node-abi@^2.13.0, node-abi@^2.21.0, node-abi@^2.7.0:
   version "2.30.0"
   resolved "https://registry.nlark.com/node-abi/download/node-abi-2.30.0.tgz#8be53bf3e7945a34eea10e0fc9a5982776cf550b"
   integrity sha1-i+U78+eUWjTuoQ4PyaWYJ3bPVQs=
@@ -8169,6 +8183,19 @@ onetime@^5.1.0, onetime@^5.1.2:
   integrity sha1-0Oluu1awdHbfHdnEgG5SN5hcpF4=
   dependencies:
     mimic-fn "^2.1.0"
+
+onnxruntime-common@~1.8.0:
+  version "1.8.0"
+  resolved "https://registry.nlark.com/onnxruntime-common/download/onnxruntime-common-1.8.0.tgz#f9c5284fc13f2d9c5215949014bc28fb38184a86"
+  integrity sha1-+cUoT8E/LZxSFZSQFLwo+zgYSoY=
+
+onnxruntime-node@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.nlark.com/onnxruntime-node/download/onnxruntime-node-1.8.0.tgz#a9725626571a241d18f6585d5991daecda3b71c8"
+  integrity sha1-qXJWJlcaJB0Y9lhdWZHa7No7ccg=
+  dependencies:
+    onnxruntime-common "~1.8.0"
+    prebuild-install "^6.1.2"
 
 open@^6.3.0:
   version "6.4.0"
@@ -8989,6 +9016,25 @@ prebuild-install@^5.3.3:
     tar-fs "^2.0.0"
     tunnel-agent "^0.6.0"
     which-pm-runs "^1.0.0"
+
+prebuild-install@^6.1.2:
+  version "6.1.4"
+  resolved "https://registry.nlark.com/prebuild-install/download/prebuild-install-6.1.4.tgz#ae3c0142ad611d58570b89af4986088a4937e00f"
+  integrity sha1-rjwBQq1hHVhXC4mvSYYIikk34A8=
+  dependencies:
+    detect-libc "^1.0.3"
+    expand-template "^2.0.3"
+    github-from-package "0.0.0"
+    minimist "^1.2.3"
+    mkdirp-classic "^0.5.3"
+    napi-build-utils "^1.0.1"
+    node-abi "^2.21.0"
+    npmlog "^4.0.1"
+    pump "^3.0.0"
+    rc "^1.2.7"
+    simple-get "^3.0.3"
+    tar-fs "^2.0.0"
+    tunnel-agent "^0.6.0"
 
 prelude-ls@^1.2.1:
   version "1.2.1"

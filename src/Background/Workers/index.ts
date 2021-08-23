@@ -5,6 +5,7 @@ import { mapcvWorkerInit } from './mapcv'
 import { joystickWorkerInit } from './joystick'
 import { logHook } from '../Utils/LogHook'
 import * as Sentry from '@sentry/node'
+import { onnxImageWorkerInit } from './onnximage'
 logHook()
 export const config: IConfig = workerData.config
 if (config.options.sendErrorReports && process.env.NODE_ENV !== 'development') {
@@ -31,6 +32,10 @@ switch (workerData.worker) {
     case 'joystick':
         joystickWorkerInit()
         break
+    case 'onnxImage':
+        onnxImageWorkerInit()
+        break
+
     default:
         console.log('unknown worker')
 }

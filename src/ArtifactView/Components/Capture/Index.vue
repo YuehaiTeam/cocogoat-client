@@ -43,7 +43,10 @@ export default {
 </script>
 
 <template>
-    <section ref="overlay.title" class="overlay overlay-title"></section>
+    <section ref="overlay.image" class="overlay overlay-image">
+        <div class="padding-box"></div>
+    </section>
+    <section class="overlay overlay-title"></section>
     <section ref="overlay.color" class="overlay overlay-color"></section>
     <section class="overlay overlay-type"></section>
     <section ref="overlay.main" class="overlay overlay-main"></section>
@@ -148,7 +151,15 @@ export default {
     height: 11%;
     border: 2px solid;
 }
-
+.overlay-image {
+    top: 7%;
+    right: 2.5%;
+    width: 42%;
+    border: 2px solid;
+}
+.padding-box {
+    padding-top: 100%;
+}
 .float {
     position: absolute;
     left: 0;

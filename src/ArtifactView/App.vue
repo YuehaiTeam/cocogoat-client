@@ -6,7 +6,7 @@ import { ipcRenderer } from 'electron'
 import { status, STATUS } from './status'
 import { ElMessageBox } from 'element-plus'
 import { recognizeArtifact } from './recognizeArtifact'
-import { ocr, split, imageDump, textDump } from './imageProcess'
+import { ocr, split, imageDump, textDump, recognizeImage } from './imageProcess'
 import { getposition, capture, getActiveWindow, sendToAppWindow } from './ipc'
 
 import { sendWrongOCRFeedback } from '@/api/feedback'
@@ -125,9 +125,13 @@ export default {
             if (captureCB) {
                 captureCB()
             }
-
+            const wocr = ocr(ret)
+            const wtitle = recognizeImage(ret.image)
             /* OCR、识别 */
-            const ocrres = await ocr(ret)
+            const [ocrres, titleRes] = await Promise.all([wocr, wtitle])
+            titleRes.text = titleRes.result[0].name
+            titleRes.words = []
+            ocrres.title = titleRes
             /* 调试写入OCR文本2 */
             if (status.runtimeDebug) {
                 textDump(JSON.stringify(ocrres), pid, 'ocr.json')
