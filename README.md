@@ -65,7 +65,6 @@
 **已知问题：**
  - 如果游戏显示比例不是16:9，可能会出现出现识别窗口无法对齐的问题，建议调节游戏分辨率。  
    推荐分辨率：**1920x1080**和**1600x900**。
- - 部分用户可能遇到`cannot load xxxxx.dll`并无法启动程序问题，如有遇到请下载[特制版](https://77.cocogoat.work/v1/ascension/特制版/)，该问题属于打包工具，已尝试反馈，正在等得回复。
 
 如您的问题未在此处列出或遇到不明闪退问题，您可以[搜索或提交issue](https://github.com/YuehaiTeam/cocogoat/issues)或者[加入交流群：933468075](https://jq.qq.com/?_wv=1027&k=Pl2MFHcA)反馈。
 

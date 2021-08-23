@@ -53,7 +53,6 @@ A toolbox for Genshin Impact with every line of code made by working overtime.
 **Known Issues：**
  - If the aspect ratio of the game is not 16:9, the recognition window may not align properly. We recommend adjusting the game resolution to the correct aspect ratio.  
    Recommended resolutions：**1920x1080** & **1600x900**。
- - Some users may encounter the message `cannot load xxxxx.dll` when attempting to start the program, Please download the [Special Edition](https://77.cocogoat.work/v1/ascension/特制版/) and attempt to use it while waiting for a response.
    
 ## Data Storage and Portable mode
 The default data location for the app is `%appdata%/cocogoat/config`. To use the application in portable mode (On a flash drive, etc), you can create a `cocogoat` folder in the same location as the exe file and this folder will be used as the data directory when you start the app.
