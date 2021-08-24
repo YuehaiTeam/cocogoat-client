@@ -64,7 +64,6 @@ export async function splitSub(
             pn.push(i)
         }
     }
-    cv.imshow(canvas1, p1)
     p1.delete()
     for (let i = 0; i < 4; i++) {
         if ((!pn[2 * i] && pn[2 * i] !== 0) || !pn[2 * i + 1]) {
