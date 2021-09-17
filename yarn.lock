@@ -950,6 +950,11 @@
     dir-compare "^2.4.0"
     fs-extra "^9.0.1"
 
+"@element-plus/icons@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.nlark.com/@element-plus/icons/download/@element-plus/icons-0.0.11.tgz#9b187c002774548b911850d17fa5fc2f9a515f57"
+  integrity sha1-mxh8ACd0VIuRGFDRf6X8L5pRX1c=
+
 "@eslint/eslintrc@^0.4.1":
   version "0.4.1"
   resolved "https://registry.nlark.com/@eslint/eslintrc/download/@eslint/eslintrc-0.4.1.tgz#442763b88cecbe3ee0ec7ca6d6dd6168550cbf14"
@@ -1013,10 +1018,9 @@
   dependencies:
     cross-spawn "^7.0.1"
 
-"@mr-quin/mona_to_go@^1.0.3":
+"@mr-quin/mona_to_go@https://github.com/YuehaiTeam/mona_to_go#dist":
   version "1.0.3"
-  resolved "https://registry.nlark.com/@mr-quin/mona_to_go/download/@mr-quin/mona_to_go-1.0.3.tgz#395895455dfdcee43d406058d4dfb78e6be5a02c"
-  integrity sha1-OViVRV39zuQ9QGBY1N+3jmvloCw=
+  resolved "https://github.com/YuehaiTeam/mona_to_go#cb41c8340c78576a1bfdf2b9de3c6ee680dcfd58"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -1397,7 +1401,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/lodash@^4.14.161", "@types/lodash@^4.14.168":
+"@types/lodash@^4.14.168":
   version "4.14.170"
   resolved "https://registry.nlark.com/@types/lodash/download/@types/lodash-4.14.170.tgz?cache=0&sync_timestamp=1621593376559&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40types%2Flodash%2Fdownload%2F%40types%2Flodash-4.14.170.tgz#0d67711d4bf7f4ca5147e9091b847479b87925d6"
   integrity sha1-DWdxHUv39MpRR+kJG4R0ebh5JdY=
@@ -4570,13 +4574,13 @@ electron@^11.4.3:
     "@types/node" "^12.0.12"
     extract-zip "^1.0.3"
 
-element-plus@^1.0.2-beta.36:
-  version "1.0.2-beta.44"
-  resolved "https://registry.nlark.com/element-plus/download/element-plus-1.0.2-beta.44.tgz?cache=0&sync_timestamp=1620704066776&other_urls=https%3A%2F%2Fregistry.nlark.com%2Felement-plus%2Fdownload%2Felement-plus-1.0.2-beta.44.tgz#7aff122e6181088223027adb65a4a8321e1ef4e9"
-  integrity sha1-ev8SLmGBCIIjAnrbZaSoMh4e9Ok=
+element-plus@^1.0.2-beta.70:
+  version "1.0.2-beta.70"
+  resolved "https://registry.nlark.com/element-plus/download/element-plus-1.0.2-beta.70.tgz?cache=0&sync_timestamp=1628174916668&other_urls=https%3A%2F%2Fregistry.nlark.com%2Felement-plus%2Fdownload%2Felement-plus-1.0.2-beta.70.tgz#13058f4e78c5e73b19a915404d71076a13a2616e"
+  integrity sha1-EwWPTnjF5zsZqRVATXEHahOiYW4=
   dependencies:
+    "@element-plus/icons" "^0.0.11"
     "@popperjs/core" "^2.4.4"
-    "@types/lodash" "^4.14.161"
     async-validator "^3.4.0"
     dayjs "1.x"
     lodash "^4.17.20"
@@ -6459,10 +6463,10 @@ internal-ip@^4.3.0:
     default-gateway "^4.2.0"
     ipaddr.js "^1.9.0"
 
-iohook@^0.9.0:
-  version "0.9.1"
-  resolved "https://registry.nlark.com/iohook/download/iohook-0.9.1.tgz#6577c1fe37c74de1793bcfdfedfc4e04337d11e4"
-  integrity sha1-ZXfB/jfHTeF5O8/f7fxOBDN9EeQ=
+iohook@0.9.0:
+  version "0.9.0"
+  resolved "https://registry.nlark.com/iohook/download/iohook-0.9.0.tgz#dae8311e2e9b9da08971bed23c66068a25c7ad44"
+  integrity sha1-2ugxHi6bnaCJcb7SPGYGiiXHrUQ=
   dependencies:
     nugget "^2.0.1"
     pump "^1.0.3"

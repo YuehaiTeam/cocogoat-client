@@ -1,6 +1,6 @@
 {
   "name": "cocogoat",
-  "version": "0.4.7",
+  "version": "0.5.0",
   "description": "cocogoat, produces cocomilk.",
   "author": "月海亭YuehaiTeam",
   "private": true,
@@ -15,7 +15,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@mr-quin/mona_to_go": "^1.0.3",
+    "@mr-quin/mona_to_go": "https://github.com/YuehaiTeam/mona_to_go#dist",
     "@sentry/electron": "^2.4.0",
     "@sentry/integrations": "^6.2.5",
     "@sentry/node": "^6.4.1",
@@ -24,7 +24,7 @@
     "core-js": "^3.6.5",
     "dayjs": "^1.10.4",
     "electron-active-window": "^0.0.5",
-    "element-plus": "^1.0.2-beta.36",
+    "element-plus": "^1.0.2-beta.70",
     "extendable-error-class": "^0.1.2",
     "ffi-napi": "^4.0.3",
     "flyio": "^0.6.14",

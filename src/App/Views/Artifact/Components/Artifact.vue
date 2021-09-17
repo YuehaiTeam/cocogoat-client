@@ -30,25 +30,25 @@ export default defineComponent({
 })
 </script>
 <template>
-    <el-card class="artifact" :class="{ selected }" @click="updateSelected">
+    <el-card class="artifact" :class="`${$lang.lang} ${selected ? 'selected' : ''}`" @click="updateSelected">
         <div class="selected-icon" :class="{ selected }">
             <i class="el-icon-check"></i>
         </div>
         <div class="main-part" :class="`star${artifact.stars}`">
             <div class="image" :style="{ backgroundImage: getImg(artifact.name) }"></div>
             <div class="name">
-                {{ artifact.name }}
+                {{ __(artifact.name) }}
             </div>
             <div class="level">+{{ artifact.level }}</div>
             <el-rate class="stars" :modelValue="artifact.stars" disabled />
             <div class="main">
-                <div class="name">{{ artifact.main.name }}</div>
+                <div class="name">{{ __(artifact.main.name) }}</div>
                 <div class="value">{{ artifact.main.value }}</div>
             </div>
         </div>
         <ul class="sub-part">
             <li v-for="(i, a) in artifact.sub" :key="a">
-                <span>{{ i.name }}+{{ i.value }}</span>
+                <span>{{ __(i.name) }}+{{ i.value }}</span>
             </li>
         </ul>
         <div class="action-area">
@@ -195,9 +195,19 @@ export default defineComponent({
         }
     }
 
-    &.selected ::v-deep(.el-card) {
+    &.selected {
         box-shadow: 0 2px 12px 0 rgba(0, 122, 204, 0.5);
         border-color: #bce4ff;
+    }
+
+    &.en,
+    &.ru,
+    &.de,
+    &.pt {
+        .name {
+            font-size: 12px;
+            max-width: 125px;
+        }
     }
 }
 .action-area {
@@ -206,6 +216,7 @@ export default defineComponent({
     right: 5px;
     width: 80px;
     text-align: right;
+    z-index: 5;
     .actions {
         background: transparent;
         color: #fff;

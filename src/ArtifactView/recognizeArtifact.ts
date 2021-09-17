@@ -1,13 +1,15 @@
-import { ocr, SplitResults } from './imageProcess'
+import { SplitResults } from './imageProcess'
 import { Artifact, ArtifactParam } from '@/typings/Artifact'
-import { ArtifactNames, ArtifactParamTypes, ArtifactSubParamTypes } from '@/typings/ArtifactMap'
+import { ArtifactNamesAll, ArtifactParamTypesAll } from '@/typings/ArtifactMap'
 import { detectStars, textCNEN, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
+import { ArtifactReverse } from '@/i18n/artifactReverse'
 
 const ocrCorrectionMap = [
     ['莉力', '攻击力'],
     ['医力', '攻击力'],
     ['鬼已装备', '魈已装备'],
     ['魁已装备', '魈已装备'],
+    ['宗室之钢', '宗室之翎'],
     ['宗室之邻', '宗室之翎'],
     ['宗室之领', '宗室之翎'],
     ['生花', '生之花'],
@@ -19,10 +21,12 @@ const ocrCorrectionMap = [
     ['雷灾的子遗', '雷灾的孑遗'],
 ]
 
-export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, string[], any]> {
+// eslint-disable-next-line complexity
+export async function recognizeArtifact(
+    ocrres: Record<string, any>,
+    ret: SplitResults,
+): Promise<[Artifact, string[], any]> {
     const potentialErrors: string[] = []
-    /* OCR */
-    const ocrres = await ocr(ret)
 
     /* 星数 */
     const stars = detectStars(ret.color.canvas)
@@ -37,9 +41,11 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         name = name.replace(i[0], i[1])
     }
 
-    if (!ArtifactNames.includes(name)) {
-        name = textBestmatch(name, ArtifactNames)
+    if (!ArtifactNamesAll.includes(name)) {
+        name = textBestmatch(name, ArtifactNamesAll)
     }
+
+    name = ArtifactReverse.names[name] || name
 
     /* 等级 */
     if (!ocrres.level || !ocrres.level.text) {
@@ -49,10 +55,15 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         textNumber(
             ocrres.level.text
                 .toLowerCase()
+                .replace(/^1.0$/, '0')
                 .replace(/o/g, '0')
                 .replace(/古/g, '0')
                 .replace(/土/g, '1')
-                .replace(/吉/g, '10'),
+                .replace(/书/g, '8')
+                .replace(/福/g, '8')
+                .replace(/花/g, '8')
+                .replace(/吉/g, '10')
+                .replace(/112/g, '12'),
         ),
     )
     level = level > 20 ? 20 : level
@@ -66,11 +77,17 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
         potentialErrors.push(maybeError)
     }
     /* 副词条 */
-    if (!ocrres.sub || !ocrres.sub.text) {
+    if (!ocrres.sub0 || !ocrres.sub0.text) {
         throw new Error("Sub cant't be empty")
     }
+    const subOrigArray = []
+    for (let i = 0; i < 4; i++) {
+        if (ocrres[`sub${i}`]) {
+            subOrigArray.push(ocrres[`sub${i}`].text.replace(/\s/g, ''))
+        }
+    }
     const subTextArray = santizeParamsArray(
-        ocrres.sub.text.split('\n').filter((e: string) => {
+        subOrigArray.filter((e: string) => {
             return e.trim() !== ''
         }),
     )
@@ -88,11 +105,14 @@ export async function recognizeArtifact(ret: SplitResults): Promise<[Artifact, s
     }
 
     /* 副词条低置信度检查 */
-    potentialErrors.push(...findLowConfidence(ocrres.sub, 80, true))
+    for (let i = 0; i < 4; i++) {
+        if (ocrres[`sub${i}`]) {
+            potentialErrors.push(...findLowConfidence(ocrres[`sub${i}`], 80, true))
+        }
+    }
 
     /* 主词条低置信度检查 */
     potentialErrors.push(...findLowConfidence(ocrres.main, 80, true))
-
     return [
         {
             id: Date.now(),
@@ -134,8 +154,8 @@ function recognizeParams(text: string, main = false): [ArtifactParam, string | n
     let maybeError = null
     const rawName = textCNEN(newtext)
     let value = textNumber(newtext)
-    const toCompare = main ? ArtifactParamTypes : ArtifactSubParamTypes
-    const name = textBestmatch(rawName, toCompare)
+    let name = textBestmatch(rawName, ArtifactParamTypesAll)
+    name = ArtifactReverse.params[name] || name
 
     /*
      * PaddleOCR会将逗号(,)识别成点(.)

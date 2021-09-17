@@ -13,6 +13,7 @@ import { ElMessageBox, ElNotification } from 'element-plus'
 import { artifactClear, artifactDelete, artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { convertAsMingyulab } from '../../export/Mingyulab'
+// @ts-ignore
 import monaToGO from '@mr-quin/mona_to_go'
 import { clipboard } from 'electron'
 import { defineComponent } from 'vue'
@@ -133,7 +134,43 @@ export default defineComponent({
             }
             switch (format) {
                 case 'GO':
-                    return JSON.stringify(monaToGO(convertAsMona(artifacts), 0, 3), null, 4)
+                    return JSON.stringify(
+                        {
+                            version: 0,
+                            characterDatabase: {},
+                            artifactDatabase: monaToGO(convertAsMona(artifacts), 0, 3),
+                            artifactDisplay: {
+                                filterArtSetKey: '',
+                                filterStars: [3, 4, 5],
+                                filterLevelLow: 0,
+                                filterLevelHigh: 20,
+                                filterSlotKey: '',
+                                filterMainStatKey: '',
+                                filterSubstats: ['', '', '', ''],
+                                filterLocation: '',
+                                filterLocked: '',
+                                ascending: false,
+                                sortType: 'quality',
+                                maxNumArtifactsToDisplay: 50,
+                                effFilter: [
+                                    'hp',
+                                    'hp_',
+                                    'atk',
+                                    'atk_',
+                                    'def_',
+                                    'def',
+                                    'eleMas',
+                                    'enerRech_',
+                                    'critRate_',
+                                    'critDMG_',
+                                ],
+                            },
+                            characterDisplay: {},
+                            buildsDisplay: {},
+                        },
+                        null,
+                        4,
+                    )
                 case 'Mingyulab':
                     return JSON.stringify(convertAsMingyulab(artifacts), null, 4)
                 default:

@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron'
 import Actions from './Components/Actions'
 import AppHeader from './Components/AppHeader'
 import TransparentArea from './Components/TransparentArea'
-import { getposition, capture, setTransparent, tryocr, click, joystickStatus, joystickNext } from './ipc'
+import { getposition, capture, setTransparent, tryocr, tryocrSec, click, joystickStatus, joystickNext } from './ipc'
 import { bus, STATUS } from './bus'
 import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
@@ -24,7 +24,7 @@ export default {
         ipcRenderer.on('keydown', this.onKeydown)
         setTransparent(false)
         if (!bus.options.artifacts.fastScroll) {
-            sleepRatio = 2
+            sleepRatio = 3
         }
     },
     beforeUnmount() {
@@ -141,7 +141,7 @@ export default {
 
             // 按平均值先进行快速滚动
             if (avgTimes && bus.options.artifacts.fastScroll) {
-                while (time < avgTimes * 0.6) {
+                while (time < avgTimes * 0.5) {
                     time++
                     ipcRenderer.send('scrollTick', false)
                 }
@@ -160,7 +160,7 @@ export default {
                 // 首次有上方首次延时，后面有opencv处理延迟填充，保证抓屏时界面展示已经完成
                 // 减少抓屏区域以提高效率
                 const canvas = await this.getCanvas(
-                    (window.innerWidth / bus.cols) * 2 + 4,
+                    (window.innerWidth / bus.cols) * 1.5,
                     (window.innerHeight / bus.rows) * 2 + 84,
                 )
                 new Image().src = canvas.toDataURL()
@@ -174,7 +174,7 @@ export default {
                     }).blocks
                 })()
                 // 用opencv处理时间填充抓屏延迟
-                await Promise.all([getImage, sleep(40 * sleepRatio)])
+                await Promise.all([getImage, sleep(30 * sleepRatio)])
                 // 处理本次数据
                 const curr = blocks[0]
                 if (!middlePassed && curr.y <= orig.y - orig.height - 1) {
@@ -281,19 +281,22 @@ export default {
                 const orig = bus.blocks[0]
                 while (bus.auto) {
                     bus.status = STATUS.CLICK
-                    if (!bus.isLastPage) {
-                        await this.clickFirstLine()
+                    await this.clickAllLines()
+                    let i = bus.rows
+                    while (!bus.isLastPage && i > 0) {
                         const p = await this.nextPage(false, orig, avgTimes)
                         if (p > 0) {
                             if (!avgTimes) avgTimes = p
+                            i--
                         } else {
                             bus.isLastPage = true
                         }
                     }
                     await this.detectOnce(false, false)
                     if (bus.isLastPage) {
+                        console.log('isLastPage')
                         bus.status = STATUS.CLICK
-                        await this.clickOtherLine()
+                        await this.clickOtherLine(i)
                         break
                     }
                 }
@@ -307,26 +310,47 @@ export default {
         },
         async clickFirstLine() {
             let { x, y } = getBlockCenter(bus.blocks[0])
+            let ocrPromise = Promise.resolve()
             for (let i = 0; i < bus.cols; i++) {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                await sleep(30 * sleepRatio)
+                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
                 bus.checkedCount++
-                await tryocr()
+                const [p, q] = await tryocrSec()
+                await p
+                ocrPromise = q
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
             }
         },
-        async clickOtherLine() {
-            for (let i = bus.cols; i < bus.blocks.length; i++) {
+        async clickOtherLine(n) {
+            let ocrPromise = Promise.resolve()
+            for (let i = n * bus.cols; i < bus.blocks.length; i++) {
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                await sleep(30 * sleepRatio)
+                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
                 bus.checkedCount++
-                await tryocr()
+                const [p, q] = await tryocrSec()
+                await p
+                ocrPromise = q
+                await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
+            }
+        },
+        async clickAllLines() {
+            let ocrPromise = Promise.resolve()
+            for (let i = 0; i < bus.blocks.length; i++) {
+                if (!bus.auto) return
+                const { x, y } = getBlockCenter(bus.blocks[i])
+                await click(await toWindowPos(x, y))
+                // 延时等待抓屏
+                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
+                bus.checkedCount++
+                const [p, q] = await tryocrSec()
+                await p
+                ocrPromise = q
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
             }
         },

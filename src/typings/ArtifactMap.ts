@@ -185,6 +185,24 @@ export const ArtifactNames = [
     '停摆之刻',
     '超越之盏',
     '嗤笑之面',
+    '明威之镡',
+    '切落之羽',
+    '雷云之笼',
+    '绯花之壶',
+    '华饰之兜',
+    '羁缠之花',
+    '思忆之矢',
+    '朝露之时',
+    '祈望之心',
+    '无常之面',
+]
+export const ArtifactNamesAll: string[] = [
+    ...ArtifactNames,
+    ...(Object.values(require('@/i18n/locales/en_artifacts.json').names) as string[]),
+]
+export const ArtifactParamTypesAll: string[] = [
+    ...ArtifactParamTypes,
+    ...(Object.values(require('@/i18n/locales/en_artifacts.json').params) as string[]),
 ]
 /**
  *  圣遗物使用者表

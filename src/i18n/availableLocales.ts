@@ -11,6 +11,8 @@ export const availableLocales: Record<string, any> = {
             },
         },
         ...require('./locales/en.json'),
+        ...require('./locales/en_artifacts.json').params,
+        ...require('./locales/en_artifacts.json').names,
     },
     jp: {
         __name: '日本語',
@@ -24,6 +26,8 @@ export const availableLocales: Record<string, any> = {
             },
         },
         ...require('./locales/jp.json'),
+        ...require('./locales/jp_artifacts.json').names,
+        ...require('./locales/jp_artifacts.json').params,
     },
     pt: {
         __name: 'Portuguese',
@@ -37,6 +41,8 @@ export const availableLocales: Record<string, any> = {
             },
         },
         ...require('./locales/pt.json'),
+        ...require('./locales/pt_artifacts.json').names,
+        ...require('./locales/pt_artifacts.json').params,
     },
     ru: {
         __name: 'Russian',
@@ -54,5 +60,37 @@ export const availableLocales: Record<string, any> = {
             },
         },
         ...require('./locales/ru.json'),
+        ...require('./locales/ru_artifacts.json').names,
+        ...require('./locales/ru_artifacts.json').params,
+    },
+    kr: {
+        __name: 'Korean',
+        '': {
+            language: 'kr',
+            plurals: {
+                text: 'nplurals = 1; plural = 0',
+                func: function () {
+                    return 0
+                },
+            },
+        },
+        ...require('./locales/kr.json'),
+        ...require('./locales/kr_artifacts.json').names,
+        ...require('./locales/kr_artifacts.json').params,
+    },
+    de: {
+        __name: 'German',
+        '': {
+            language: 'de',
+            plurals: {
+                text: 'nplurals = 2; plural = (n !== 1)',
+                func: function (n: number) {
+                    return n !== 1
+                },
+            },
+        },
+        ...require('./locales/de.json'),
+        ...require('./locales/de_artifacts.json').names,
+        ...require('./locales/de_artifacts.json').params,
     },
 }

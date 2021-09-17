@@ -6,13 +6,14 @@ import { ipcRenderer } from 'electron'
 import { status, STATUS } from './status'
 import { ElMessageBox } from 'element-plus'
 import { recognizeArtifact } from './recognizeArtifact'
-import { split, imageDump } from './imageProcess'
+import { ocr, split, imageDump, textDump } from './imageProcess'
 import { getposition, capture, getActiveWindow, sendToAppWindow } from './ipc'
 
 import { sendWrongOCRFeedback } from '@/api/feedback'
 
 import AppHeader from './Components/AppHeader'
 import Capture from './Components/Capture/Index'
+
 export default {
     components: {
         AppHeader,
@@ -44,7 +45,9 @@ export default {
         )
         ipcRenderer.send('readyArtifactView')
         ipcRenderer.on('tryocr', async (event, { id }) => {
-            const result = await this.processWithTimeout()
+            const result = await this.processWithTimeout(() => {
+                ipcRenderer.sendTo(event.senderId, `tryocr-${id}-capture`)
+            })
             ipcRenderer.sendTo(event.senderId, `tryocr-${id}`, result)
         })
     },
@@ -82,11 +85,11 @@ export default {
                 this.activeWindow = currentWin
             }
         },
-        async processWithTimeout() {
+        async processWithTimeout(captureCB) {
             if (status.status === STATUS.LOADING) return
             status.status = STATUS.LOADING
             try {
-                const result = await this.processOnce()
+                const result = await this.processOnce(captureCB)
                 status.status = STATUS.SUCCESS
                 return result
             } catch (e) {
@@ -94,11 +97,11 @@ export default {
                 status.status = STATUS.ERROR
             }
         },
-        splitImages(canvas, scale) {
+        async splitImages(canvas, scale) {
             const posObj = this.$refs.captureDom.getPosition()
-            return split(canvas, posObj, scale)
+            return await split(canvas, posObj, scale)
         },
-        async processOnce() {
+        async processOnce(captureCB) {
             /* 计算窗口位置 */
             const p = window.devicePixelRatio
             let [x, y] = await getposition()
@@ -111,15 +114,34 @@ export default {
             let canvas = await capture(x, y, w * p, h * p)
 
             /* 拆分、预处理 */
-            let ret = this.splitImages(canvas, p)
+            let ret = await this.splitImages(canvas, p)
 
             /* 调试写入图片文件 */
+            const pid = Date.now().toString()
             if (status.runtimeDebug) {
-                imageDump(canvas, ret)
+                imageDump(canvas, ret, pid)
+            }
+
+            if (captureCB) {
+                captureCB()
             }
 
             /* OCR、识别 */
-            const [artifact, potentialErrors, ocrResult] = await recognizeArtifact(ret)
+            const ocrres = await ocr(ret)
+            /* 调试写入OCR文本2 */
+            if (status.runtimeDebug) {
+                textDump(JSON.stringify(ocrres), pid, 'ocr.json')
+            }
+
+            /* 后处理 */
+            let ares
+            try {
+                ares = await recognizeArtifact(ocrres, ret)
+            } catch (e) {
+                console.warn(ocrres)
+                throw e
+            }
+            const [artifact, potentialErrors, ocrResult] = ares
             status.artifact = artifact
             status.potentialErrors = potentialErrors
             this.saveToMain()
