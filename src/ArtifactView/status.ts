@@ -49,6 +49,7 @@ export const status = reactive(<statusType>{
         id: 0,
         name: '魔女的心之火',
         stars: 5,
+        lock: false,
         level: 20,
         user: '诺艾尔',
         main: {

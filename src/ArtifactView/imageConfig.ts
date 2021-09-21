@@ -68,6 +68,9 @@ export default <
     color: {
         ignore: true,
     },
+    lock: {
+        ignore: true,
+    },
     main: {
         singleLine: true,
         handler: (_ctx, _w, _h, canvas, cv) => {

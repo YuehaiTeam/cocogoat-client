@@ -32,6 +32,10 @@ export interface Artifact {
      */
     stars: number
     /**
+     * 是否上锁
+     */
+    lock: boolean
+    /**
      * 等级
      */
     level: number
@@ -53,6 +57,7 @@ export function createEmptyArtifact() {
         id: Date.now(),
         name: '',
         stars: 0,
+        lock: false,
         level: 0,
         main: {
             name: '',

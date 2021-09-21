@@ -197,7 +197,7 @@ export async function ocr(ret: SplitResults) {
     const ocrpmk: Record<number, string> = {}
     for (const i in ret) {
         if ({}.hasOwnProperty.call(ret, i)) {
-            if (i === 'color') continue
+            if (i === 'color' || i === 'lock') continue
             const ctx = ret[i].canvas.getContext('2d')
             const imgData = ctx?.getImageData(0, 0, ret[i].canvas.width, ret[i].canvas.height)
             const ocrData = {

@@ -49,8 +49,9 @@ export default {
     <section ref="overlay.main" class="overlay overlay-main"></section>
     <section ref="overlay.level" class="overlay overlay-level"></section>
     <section ref="overlay.sub" class="overlay overlay-sub"></section>
+    <section ref="overlay.lock" class="overlay overlay-lock"></section>
     <section class="overlay overlay-user">
-        <section class="overlay-user-in"></section>
+        <section ref="overlay.user" class="overlay-user-in"></section>
     </section>
     <section class="float">
         <intro :class="{ show: status.status === STATUS.INTRO }" @start="$emit('start')" />
@@ -130,6 +131,15 @@ export default {
     height: 17.5%;
     border-top: 2px solid;
     border-bottom: 2px solid;
+    border-left: 2px solid;
+}
+.overlay-lock {
+    left: 86.2%;
+    right: 4.6%;
+    top: 32.3%;
+    height: 4.7%;
+    border-top: 2px solid;
+    border-right: 2px solid;
     border-left: 2px solid;
 }
 
