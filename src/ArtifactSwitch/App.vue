@@ -1,10 +1,11 @@
 <script>
+import { v4 as uuid } from 'uuid'
 import { __ } from '@/i18n'
 import { ipcRenderer } from 'electron'
 import Actions from './Components/Actions'
 import AppHeader from './Components/AppHeader'
 import TransparentArea from './Components/TransparentArea'
-import { getposition, capture, setTransparent, tryocr, tryocrSec, click, joystickStatus, joystickNext } from './ipc'
+import { getposition, capture, setTransparent, tryocr, tryocrSec, click, joystickStatus, joystickNext, syncArtifact, getArtifactViewWindowId } from './ipc'
 import { bus, STATUS } from './bus'
 import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
@@ -12,6 +13,7 @@ import { sleep } from '@/ArtifactView/utils'
 import { ElMessageBox } from 'element-plus'
 import { sendToAppWindow } from '@/ArtifactView/ipc'
 let sleepRatio = 1
+const lockTime = 250 // 等待至少250毫秒，确认锁的动画已经结束
 export default {
     components: {
         Actions,
@@ -206,14 +208,25 @@ export default {
             }
             return time
         },
-        async auto() {
-            if (await joystickStatus()) {
-                return await this.autoByJoystick()
-            } else {
-                return await this.autoByMouse()
+        async checkLock(artifact, callback, args) {
+            console.log(artifact)
+            if (!artifact) return
+            let syncedArtifact = await syncArtifact(artifact)
+            console.log(artifact, syncedArtifact)
+            if (!syncedArtifact) return
+            if (syncedArtifact.lock !== artifact.lock) {
+                console.log(`lock different, hash ${artifact.name + artifact.main.name + artifact.sub[0].value} current ${artifact.lock} saved ${syncedArtifact.lock}`)
+                await callback(args)
             }
         },
-        async autoByJoystick() {
+        async auto(autoLock = false) {
+            if (await joystickStatus()) {
+                return await this.autoByJoystick(autoLock)
+            } else {
+                return await this.autoByMouse(autoLock)
+            }
+        },
+        async autoByJoystick(autoLock) {
             bus.status = STATUS.JOYSTICK
             try {
                 bus.auto = true
@@ -229,7 +242,9 @@ export default {
                 const cacheIds = []
                 while (bus.auto) {
                     bus.checkedCount++
-                    const artifact = await tryocr()
+                    let artifact = await tryocr()
+                    if (autoLock)
+                        await this.checkLock(artifact, Promise.resolve())  // TODO press L3
                     await joystickNext()
                     await sleep(60 * sleepRatio)
                     try {
@@ -268,7 +283,7 @@ export default {
                 bus.status = bus.ERROR
             }
         },
-        async autoByMouse() {
+        async autoByMouse(autoLock) {
             try {
                 bus.auto = true
                 bus.totalCount = 0
@@ -281,7 +296,7 @@ export default {
                 const orig = bus.blocks[0]
                 while (bus.auto) {
                     bus.status = STATUS.CLICK
-                    await this.clickAllLines()
+                    await this.clickAllLines(autoLock)
                     let i = bus.rows
                     while (!bus.isLastPage && i > 0) {
                         const p = await this.nextPage(false, orig, avgTimes)
@@ -296,7 +311,7 @@ export default {
                     if (bus.isLastPage) {
                         console.log('isLastPage')
                         bus.status = STATUS.CLICK
-                        await this.clickOtherLine(i)
+                        await this.clickOtherLine(i, autoLock)
                         break
                     }
                 }
@@ -308,14 +323,31 @@ export default {
                 bus.status = bus.ERROR
             }
         },
-        async clickFirstLine() {
+        async lockBack(args) {
+            const [x, y, lastx, lasty] = args
+            const sleepTime = 500  // now set fixed 500ms to wait
+            await click(await toWindowPos(lastx, lasty))
+            await sleep(sleepTime)
+            const id = uuid()
+            const artifactViewId = await getArtifactViewWindowId()
+            console.log('clicklock', id)
+            ipcRenderer.sendTo(artifactViewId, 'clickLock', { id })
+            await new Promise((resolve) => {
+                ipcRenderer.once(`clickLock-${id}`, (result, data) => resolve(data))
+            })
+            await click(await toWindowPos(x, y))
+            await sleep(sleepTime)
+        },
+        async clickFirstLine(autoLock) {
             let { x, y } = getBlockCenter(bus.blocks[0])
             let ocrPromise = Promise.resolve()
             for (let i = 0; i < bus.cols; i++) {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
+                const [artifact, _] = await Promise.all([ocrPromise, sleep(lockTime + 50 * sleepRatio)])
+                if (autoLock)
+                    await this.checkLock(artifact, this.lockBack, [x, y, x - bus.blockWidth, y])
                 bus.checkedCount++
                 const [p, q] = await tryocrSec()
                 await p
@@ -323,35 +355,65 @@ export default {
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
                 x += bus.blockWidth
             }
+            if (autoLock) {
+                const artifact = await ocrPromise
+                await this.checkLock(artifact, this.lockBack, [x, y, x - bus.blockWidth, y])
+            }
         },
-        async clickOtherLine(n) {
+        async clickOtherLine(n, autoLock) {
             let ocrPromise = Promise.resolve()
+            let lastx = 0
+            let lasty = 0;
             for (let i = n * bus.cols; i < bus.blocks.length; i++) {
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
+                const [artifact, _] = await Promise.all([ocrPromise, sleep(lockTime + 50 * sleepRatio)])
+                if (autoLock)
+                    await this.checkLock(artifact, this.lockBack, [x, y, lastx, lasty])
                 bus.checkedCount++
                 const [p, q] = await tryocrSec()
                 await p
                 ocrPromise = q
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
+                lastx = x
+                lasty = y
+            }
+            if (autoLock){
+                const artifact = await ocrPromise
+                await this.checkLock(artifact, this.lockBack, [lastx, lasty, lastx, lasty])
             }
         },
-        async clickAllLines() {
+        async clickAllLines(autoLock) {
             let ocrPromise = Promise.resolve()
+            let lastx = 0
+            let lasty = 0;
             for (let i = 0; i < bus.blocks.length; i++) {
+                console.log(i)
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
+                console.log('click')
                 // 延时等待抓屏
-                await Promise.all([ocrPromise, sleep(50 * sleepRatio)])
+                const [artifact, _] = await Promise.all([ocrPromise, sleep(lockTime, 50 * sleepRatio)])
+                console.log('ocr')
+                if (autoLock)
+                    await this.checkLock(artifact, this.lockBack, [x, y, lastx, lasty])
+                console.log('autolock')
                 bus.checkedCount++
                 const [p, q] = await tryocrSec()
                 await p
+                console.log('capture')
                 ocrPromise = q
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
+                console.log('sleep')
+                lastx = x
+                lasty = y
+            }
+            if (autoLock) {
+                const artifact = await ocrPromise
+                await this.checkLock(artifact, this.lockBack, [lastx, lasty, lastx, lasty])
             }
         },
         async onDetect() {
@@ -363,12 +425,15 @@ export default {
         async onAuto() {
             this.auto()
         },
+        async onLock() {
+            this.auto(true)
+        }
     },
 }
 </script>
 <template>
     <app-header />
-    <actions @detectonce="onDetect" @startauto="onAuto" @pagedown="nextPage" />
+    <actions @detectonce="onDetect" @startauto="onAuto" @pagedown="nextPage" @startlock="onLock" />
     <transparent-area />
 </template>
 <style lang="scss">

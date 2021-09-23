@@ -2,7 +2,7 @@
 import { __ } from '@/i18n'
 import { bus, STATUS } from '../bus'
 export default {
-    emits: ['pagedown', 'detectonce', 'startauto'],
+    emits: ['pagedown', 'detectonce', 'startauto', 'startlock'],
     computed: {
         bus: () => bus,
         STATUS: () => STATUS,
@@ -44,6 +44,10 @@ export default {
             <button v-if="!bus.intro && !bus.auto" size="mini" @click="$emit('startauto')">
                 <i class="el-icon-s-flag"></i>
                 {{ __('开始切换') }}
+            </button>
+            <button v-if="!bus.intro && !bus.auto" size="mini" @click="$emit('startlock')">
+                <i class="el-icon-lock"></i>
+                {{ __('更新圣遗物锁') }}
             </button>
             <div v-if="bus.auto" class="autotext">
                 <i class="el-icon-loading"></i>
@@ -107,7 +111,7 @@ export default {
             width: 50vw;
         }
         button {
-            width: 135px;
+            min-width: 135px;
             outline: 0;
             background: transparent;
             color: #fff;

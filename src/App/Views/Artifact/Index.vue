@@ -1,7 +1,9 @@
 <script lang="ts">
 import Artifact from './Components/Artifact.vue'
 import { Artifact as ArtifactType } from '@/typings/Artifact'
+import { ArtifactFilter, ArtifactFilter as ArtifactFilterClass } from '@/typings/ArtifactFilter'
 import ArtifactEditPanel from './Components/EditPanel.vue'
+import ArtifactFilterPanel from './Components/FilterPanel.vue'
 import {
     openArtifactView,
     showSaveDialog,
@@ -24,6 +26,7 @@ export default defineComponent({
     components: {
         Artifact,
         ArtifactEditPanel,
+        ArtifactFilterPanel,
     },
     data() {
         return {
@@ -31,10 +34,20 @@ export default defineComponent({
             editData: this.createEmptyArtifact(),
             isEdit: false,
             selectedIds: [] as number[],
+            showFilter: false,
+            isFiltering: false,
+            artifactFilter: new ArtifactFilterClass()
         }
     },
     computed: {
-        list() {
+        list(): ArtifactType[] {
+            if (this.isFiltering) {
+                let result = []
+                for (const artifact of bus.artifacts)
+                    if (this.artifactFilter.filter(artifact))
+                        result.push(artifact)
+                return result
+            }
             return bus.artifacts
         },
     },
@@ -44,6 +57,7 @@ export default defineComponent({
                 id: Date.now(),
                 name: '',
                 stars: 0,
+                lock: false,
                 level: 0,
                 main: {
                     name: '',
@@ -202,6 +216,29 @@ export default defineComponent({
                 console.log(e)
             }
         },
+        doFilter() {
+            if (this.isFiltering) this.isFiltering = false
+            else this.showFilter = true
+        },
+        updateArtifactFilter(filter: ArtifactFilter) {
+            this.artifactFilter = filter
+            this.isFiltering = true
+            this.selectedIds = []
+            console.log(this.artifactFilter)
+        },
+        doSelectAll() {
+            this.selectedIds = []
+            for (const artifact of this.list)
+                this.selectedIds.push(artifact.id)
+        },
+        doLockSelected(lock: boolean) {
+            const artifactLists = []
+            for (const artifact of this.list)
+                if (this.selectedIds.includes(artifact.id))
+                    artifactLists.push(artifact)
+            for (let artifact of artifactLists)
+                artifact.lock = lock
+        }
     },
 })
 </script>
@@ -231,6 +268,20 @@ export default defineComponent({
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
+            <el-dropdown class="header-plain-dropdown" size="mini">
+                <el-button size="mini">
+                    {{ __('操作') }}<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item @click="doSelectAll"><i class="el-icon-check"></i>{{  __('全部选择') }}</el-dropdown-item>
+                        <el-dropdown-item @click="selectedIds = []"><i class="el-icon-close"></i>{{ __('全部不选') }}</el-dropdown-item>
+                        <el-dropdown-item @click="doLockSelected(true)"><i class="el-icon-lock"></i>{{ __('加锁已选') }}</el-dropdown-item>
+                        <el-dropdown-item @click="doLockSelected(false)"><i class="el-icon-unlock"></i>{{ __('解锁已选') }}</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            <el-button size="mini" plain @click="doFilter">{{ __(isFiltering ? '取消过滤' : '过滤') }}</el-button>
             <template v-if="selectedIds.length <= 0">
                 <el-button size="mini" plain icon="el-icon-plus" @click="doCreate">{{ __('添加') }}</el-button>
                 <el-popconfirm
@@ -247,9 +298,6 @@ export default defineComponent({
                 </el-popconfirm>
             </template>
             <template v-else>
-                <el-button size="mini" plain icon="el-icon-remove-outline" @click="selectedIds = []">
-                    {{ __('取消选择') }}
-                </el-button>
                 <el-button size="mini" type="danger" plain icon="el-icon-delete" @click="doDeleteSelected">
                     {{ __('删除选中') }}
                 </el-button>
@@ -266,6 +314,7 @@ export default defineComponent({
             :artifact="i"
             :selected="selectedIds.includes(i.id)"
             @update:selected="doSelect(i.id, $event)"
+            @update:artifactlock="i.lock = $event"
             @delete="doDelete"
             @edit="doEdit"
         />
@@ -278,6 +327,12 @@ export default defineComponent({
         :title="__(isEdit ? '编辑圣遗物' : '添加圣遗物')"
         :model-value="editData"
         @update:model-value="doEditSave"
+    />
+    <artifact-filter-panel
+        v-model:show="showFilter"
+        v-model:filter="artifactFilter"
+        :title="__('圣遗物过滤器')"
+        @update:filter="updateArtifactFilter($event)"
     />
 </template>
 

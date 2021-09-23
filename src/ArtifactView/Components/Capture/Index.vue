@@ -9,7 +9,7 @@ export default {
         Actions,
         RecognizeResult,
     },
-    emits: ['start', 'modify', 'delete', 'reset', 'feedback'],
+    emits: ['start', 'modify', 'delete', 'reset', 'feedback', 'transparent'],
     data() {
         return {
             STATUS,
@@ -49,7 +49,7 @@ export default {
     <section ref="overlay.main" class="overlay overlay-main"></section>
     <section ref="overlay.level" class="overlay overlay-level"></section>
     <section ref="overlay.sub" class="overlay overlay-sub"></section>
-    <section ref="overlay.lock" class="overlay overlay-lock"></section>
+    <section ref="overlay.lock" class="overlay overlay-lock" @mouseenter="$emit('transparent', true)" @mouseleave="$emit('transparent', false)"></section>
     <section class="overlay overlay-user">
         <section ref="overlay.user" class="overlay-user-in"></section>
     </section>

@@ -7,7 +7,7 @@ import { status, STATUS } from './status'
 import { ElMessageBox } from 'element-plus'
 import { recognizeArtifact } from './recognizeArtifact'
 import { ocr, split, imageDump, textDump } from './imageProcess'
-import { getposition, capture, getActiveWindow, sendToAppWindow } from './ipc'
+import { getposition, capture, getActiveWindow, sendToAppWindow, setTransparent, click } from './ipc'
 
 import { sendWrongOCRFeedback } from '@/api/feedback'
 
@@ -45,10 +45,25 @@ export default {
         )
         ipcRenderer.send('readyArtifactView')
         ipcRenderer.on('tryocr', async (event, { id }) => {
+            console.log('tryocr', id)
             const result = await this.processWithTimeout(() => {
+                console.log('tryocr capture', id)
                 ipcRenderer.sendTo(event.senderId, `tryocr-${id}-capture`)
             })
+            console.log('tryocr over', id)
             ipcRenderer.sendTo(event.senderId, `tryocr-${id}`, result)
+        })
+        ipcRenderer.on('clickLock', async (event, { id }) => {
+            const lock = this.$refs['captureDom'].$refs['overlay.lock']
+            const { x, y, height, width } = lock.getBoundingClientRect()
+            const offsetY = y + height / 2;
+            const offsetX = x + width / 2;
+            const [winx, winy] = await getposition()
+            const finalx = (winx + offsetX) * window.devicePixelRatio
+            const finaly = (winy + offsetY) * window.devicePixelRatio
+            console.log('clickLock', finalx, finaly, id)
+            await click({ x: finalx, y: finaly })
+            ipcRenderer.sendTo(event.senderId, `clickLock-${id}`, null)
         })
     },
     beforeUnmount() {
@@ -98,6 +113,8 @@ export default {
             }
         },
         async splitImages(canvas, scale) {
+            console.log(this.$refs.captureDom)
+            console.log(this.$refs)
             const posObj = this.$refs.captureDom.getPosition()
             return await split(canvas, posObj, scale)
         },
@@ -236,6 +253,9 @@ export default {
             } catch (e) {}
             this.feedbackLoading = false
         },
+        async onSetTransparent(transparent) { 
+            setTransparent(transparent)
+        }
     },
 }
 </script>
@@ -250,6 +270,7 @@ export default {
             @delete="onDelete"
             @reset="onReset"
             @feedback="onFeedback"
+            @transparent="onSetTransparent"
         />
         <el-dialog v-model="feedbackVisible" title="反馈识别错误" width="90%">
             <div class="feedback-desc">

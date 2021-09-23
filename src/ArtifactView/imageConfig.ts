@@ -182,6 +182,7 @@ export default <
         handler: '',
     },
     user: {
+        singleLine: true,
         handler: '',
     },
 }
