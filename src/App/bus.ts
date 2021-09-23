@@ -20,7 +20,6 @@ interface IBusData {
 // for deduplication
 const artifactsHashes = new Map<string, number>()
 function calculateArtifactHash(artifact: Artifact): string {
-    console.log('hash', artifact)
     const prefix = `${artifact.name}-${artifact.level}-${artifact.main.name}-${artifact.main.value}-${artifact.stars}`
     const subs = artifact.sub.map((s) => `${s.name}-${s.value}`)
     return [prefix, ...subs].join('_')
@@ -54,7 +53,6 @@ export async function loadData() {
         artifactDelete(id)
     })
     ipcRenderer.on('syncArtifact', (event, { id, artifact }: { id: number, artifact: Artifact }) => {
-        console.log('syncArtifacton', id, artifact)
         const hash = calculateArtifactHash(artifact)
         const artifactId = artifactsHashes.get(hash)
         for (const artifact of bus.artifacts)

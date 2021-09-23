@@ -209,13 +209,10 @@ export default {
             return time
         },
         async checkLock(artifact, callback, args) {
-            console.log(artifact)
             if (!artifact) return
             let syncedArtifact = await syncArtifact(artifact)
-            console.log(artifact, syncedArtifact)
             if (!syncedArtifact) return
             if (syncedArtifact.lock !== artifact.lock) {
-                console.log(`lock different, hash ${artifact.name + artifact.main.name + artifact.sub[0].value} current ${artifact.lock} saved ${syncedArtifact.lock}`)
                 await callback(args)
             }
         },
@@ -330,7 +327,6 @@ export default {
             await sleep(sleepTime)
             const id = uuid()
             const artifactViewId = await getArtifactViewWindowId()
-            console.log('clicklock', id)
             ipcRenderer.sendTo(artifactViewId, 'clickLock', { id })
             await new Promise((resolve) => {
                 ipcRenderer.once(`clickLock-${id}`, (result, data) => resolve(data))
@@ -394,20 +390,15 @@ export default {
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
-                console.log('click')
                 // 延时等待抓屏
                 const [artifact, _] = await Promise.all([ocrPromise, sleep(lockTime, 50 * sleepRatio)])
-                console.log('ocr')
                 if (autoLock)
                     await this.checkLock(artifact, this.lockBack, [x, y, lastx, lasty])
-                console.log('autolock')
                 bus.checkedCount++
                 const [p, q] = await tryocrSec()
                 await p
-                console.log('capture')
                 ocrPromise = q
                 await sleep(bus.options.artifacts.autoSwitchDelay * 1e3)
-                console.log('sleep')
                 lastx = x
                 lasty = y
             }

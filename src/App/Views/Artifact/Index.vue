@@ -224,7 +224,6 @@ export default defineComponent({
             this.artifactFilter = filter
             this.isFiltering = true
             this.selectedIds = []
-            console.log(this.artifactFilter)
         },
         doSelectAll() {
             this.selectedIds = []

@@ -73,7 +73,6 @@ export async function tryocrSec(): Promise<null | [Promise<void>, Promise<Artifa
         ipcRenderer.once(`tryocr-${id}-capture`, (result, data) => resolve(data))
     })
     ipcRenderer.sendTo(artifactViewWindowId, 'tryocr', { id })
-    console.log('tryocrsec3')
     return [<Promise<void>>q, <Promise<Artifact>>p]
 }
 
@@ -103,16 +102,13 @@ export async function joystickNext() {
 }
 export async function syncArtifact(artifact: Artifact) {
     const appWindowId = await getAppWindowId()
-    console.log('appwindowid', appWindowId)
     if (appWindowId < 0) {
         return null
     }
     const id = uuid()
     const p = new Promise((resolve) => {
-        console.log(`syncArtifact-${id}`)
         ipcRenderer.once(`syncArtifact-${id}`, (result, data) => resolve(data))
     })
-    console.log('syncartifact', artifact)
     ipcRenderer.sendTo(appWindowId, 'syncArtifact', { id, artifact })
     return await p
 }

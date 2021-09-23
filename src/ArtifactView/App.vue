@@ -45,12 +45,9 @@ export default {
         )
         ipcRenderer.send('readyArtifactView')
         ipcRenderer.on('tryocr', async (event, { id }) => {
-            console.log('tryocr', id)
             const result = await this.processWithTimeout(() => {
-                console.log('tryocr capture', id)
                 ipcRenderer.sendTo(event.senderId, `tryocr-${id}-capture`)
             })
-            console.log('tryocr over', id)
             ipcRenderer.sendTo(event.senderId, `tryocr-${id}`, result)
         })
         ipcRenderer.on('clickLock', async (event, { id }) => {
@@ -61,7 +58,6 @@ export default {
             const [winx, winy] = await getposition()
             const finalx = (winx + offsetX) * window.devicePixelRatio
             const finaly = (winy + offsetY) * window.devicePixelRatio
-            console.log('clickLock', finalx, finaly, id)
             await click({ x: finalx, y: finaly })
             ipcRenderer.sendTo(event.senderId, `clickLock-${id}`, null)
         })
@@ -113,8 +109,6 @@ export default {
             }
         },
         async splitImages(canvas, scale) {
-            console.log(this.$refs.captureDom)
-            console.log(this.$refs)
             const posObj = this.$refs.captureDom.getPosition()
             return await split(canvas, posObj, scale)
         },
