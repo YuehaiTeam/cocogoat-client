@@ -12,7 +12,7 @@ import {
     checkVCRedistInstalled,
 } from '../../ipc'
 import { ElMessageBox, ElNotification } from 'element-plus'
-import { artifactClear, artifactDelete, artifactPush, bus } from '@/App/bus'
+import { loadData, artifactClear, artifactDelete, artifactPush, bus } from '@/App/bus'
 import { convertAsMona } from '../../export/Mona'
 import { convertAsMingyulab } from '../../export/Mingyulab'
 // @ts-ignore
@@ -237,6 +237,11 @@ export default defineComponent({
                     artifactLists.push(artifact)
             for (let artifact of artifactLists)
                 artifact.lock = lock
+        },
+        doLoad() {
+            this.selectedIds = []
+            this.isFiltering = false
+            loadData()
         }
     },
 })
@@ -245,6 +250,7 @@ export default defineComponent({
     <teleport to="#app-title"> {{ __('圣遗物仓库') }} </teleport>
     <teleport to="#app-actions">
         <div class="actions">
+            <el-button size="mini" type="primary" plain @click="doLoad">{{ __('更新圣遗物信息') }}</el-button>
             <el-dropdown class="header-plain-dropdown" size="mini" split-button @click="doExport">
                 {{ __(selectedIds.length > 0 ? '导出选中' : '导出') }}
                 <template #dropdown>
@@ -301,7 +307,7 @@ export default defineComponent({
                     {{ __('删除选中') }}
                 </el-button>
             </template>
-            <el-button size="mini" type="primary" plain icon="el-icon-aim" @click="openArtifactView">
+            <el-button size="mini" plain icon="el-icon-aim" @click="openArtifactView">
                 {{ __('识别') }}
             </el-button>
         </div>

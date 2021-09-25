@@ -34,6 +34,7 @@ export default defineComponent({
     methods: {
         doSave() {
             this.$emit('update:filter', this.filter)
+            this.$emit('update:show', false)
         },
         doAddIncludeSub() {
             this.filter.includeSub.push(new SubFilter())
@@ -47,6 +48,13 @@ export default defineComponent({
         doDeleteExcludeSub(key: number) {
             this.filter.excludeSub.splice(key, 1)
         },
+        onSubClick(sub: SubFilter) {
+            if (sub.name === '元素精通' && sub.value.indexOf('%') > -1)
+                sub.value = sub.value.replace('%', '')
+            if (['暴击率', '暴击伤害', '元素充能效率'].indexOf(sub.name.toString()) > -1
+                && sub.value.indexOf('%') === -1)
+                sub.value += '%'
+        }
     },
 })
 </script>
@@ -115,9 +123,10 @@ export default defineComponent({
                                     :key="a"
                                     :value="j"
                                     :label="__(j)"
+                                    @click="onSubClick(i)"
                                 ></el-option>
                             </el-select>
-                            <el-select v-model="i.equation" size="small">
+                            <el-select v-model="i.equation" size="small" style="margin-left: 0px;">
                                 <el-option
                                     v-for="(j, a) in availableSubFilterEquations"
                                     :key="a"
@@ -153,9 +162,10 @@ export default defineComponent({
                                     :key="a"
                                     :value="j"
                                     :label="__(j)"
+                                    @click="onSubClick(i)"
                                 ></el-option>
                             </el-select>
-                            <el-select v-model="i.equation" size="small">
+                            <el-select v-model="i.equation" size="small" style="margin-left: 0px;">
                                 <el-option
                                     v-for="(j, a) in availableSubFilterEquations"
                                     :key="a"
@@ -222,7 +232,7 @@ export default defineComponent({
         z-index: 2;
     }
     .sub {
-        height: 128px;
+        min-height: 128px;
         margin-bottom: 0;
     }
     .el-empty {

@@ -18,8 +18,8 @@ export class SubFilter {
     filterOne(input: ArtifactParam): number {
         if (this.name !== input.name) return 0
         if ((input.value.indexOf('%') === -1) !== (this.value.indexOf('%') === -1)) return 0 // 一个有%一个没有，不同类
-        const value = parseFloat(input.value)
-        const thisvalue = parseFloat(this.value)
+        const value = parseFloat(input.value.replaceAll(',', ''))
+        const thisvalue = parseFloat(this.value.replaceAll(',', ''))
         if (this.equation === SubFilterEquation['<'])
             return value < thisvalue ? 1 : 0
         if (this.equation === SubFilterEquation['<='])
