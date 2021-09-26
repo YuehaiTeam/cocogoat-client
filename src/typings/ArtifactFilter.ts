@@ -70,7 +70,7 @@ export class ArtifactFilter {
         inFilter &&= this.filterOne(set, this.set)
         inFilter &&= this.filterOne(position, this.position)
         const subInclude = this.filterSub(artifact.sub, this.includeSub, this.includeSubCount, true)
-        const subExclude = this.filterSub(artifact.sub, this.excludeSub, this.excludeSubCount, false)
+        const subExclude = this.filterSub(artifact.sub, this.excludeSub, this.excludeSubCount + 1, false)
         inFilter = inFilter && subInclude && !subExclude
         return inFilter
     }

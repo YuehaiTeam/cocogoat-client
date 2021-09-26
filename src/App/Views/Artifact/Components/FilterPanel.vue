@@ -115,7 +115,7 @@ export default defineComponent({
             <el-empty v-if="filter.includeSub.length <= 0" :image-size="80" :description="__('暂无副词条')"></el-empty>
             <ul v-else class="sub">
                 <li v-for="(i, a) in filter.includeSub" :key="a">
-                    <el-input v-model="i.value" size="small" :placeholder="__('属性值（不含百分号）')">
+                    <el-input v-model="i.value" size="small" :placeholder="__('属性值')">
                         <template #prepend>
                             <el-select v-model="i.name" size="small" :placeholder="__('属性名')">
                                 <el-option
@@ -142,7 +142,7 @@ export default defineComponent({
                 </li>
             </ul>
             {{ __('不想包含的副词条') }}<br />
-            {{ __('最少包含条数') }}<br />
+            {{ __('最多包含条数') }}<br />
             <el-select v-model="filter.excludeSubCount">
                 <el-option
                 v-for="item in [0, 1, 2, 3, 4]"
@@ -154,7 +154,7 @@ export default defineComponent({
             <el-empty v-if="filter.excludeSub.length <= 0" :image-size="80" :description="__('暂无副词条')"></el-empty>
             <ul v-else class="sub">
                 <li v-for="(i, a) in filter.excludeSub" :key="a">
-                    <el-input v-model="i.value" size="small" :placeholder="__('属性值（不含百分号）')">
+                    <el-input v-model="i.value" size="small" :placeholder="__('属性值')">
                         <template #prepend>
                             <el-select v-model="i.name" size="small" :placeholder="__('属性名')">
                                 <el-option
@@ -189,7 +189,7 @@ export default defineComponent({
                     style="float: left"
                     @click="doAddIncludeSub"
                 >
-                    {{ __('添加副词条') }}
+                    {{ __('添加想包含副词条') }}
                 </el-button>
                 <el-button
                     size="small"
@@ -197,9 +197,9 @@ export default defineComponent({
                     style="float: left"
                     @click="doAddExcludeSub"
                 >
-                    {{ __('添加非副词条') }}
+                    {{ __('添加不包含副词条') }}
                 </el-button>
-                <el-button size="small" type="primary" @click="doSave">{{ __('保存') }}</el-button>
+                <el-button size="small" type="primary" @click="doSave">{{ __('确定') }}</el-button>
             </span>
         </template>
     </el-dialog>
