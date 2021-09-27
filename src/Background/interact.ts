@@ -106,6 +106,14 @@ export function interactInit() {
             windows.artifactSwitch.setIgnoreMouseEvents(false)
         }
     })
+    ipcMain.on('setTransparentArtifactView', (event, { transparent }) => {
+        if (!windows.artifactView) return
+        if (transparent) {
+            windows.artifactView.setIgnoreMouseEvents(true, { forward: true })
+        } else {
+            windows.artifactView.setIgnoreMouseEvents(false)
+        }
+    })
     ipcMain.on('devtoolsApp', () => {
         if (!windows.app) return
         try {

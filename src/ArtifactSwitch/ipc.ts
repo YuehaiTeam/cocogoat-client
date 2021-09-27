@@ -35,6 +35,16 @@ export async function getArtifactViewWindowId(): Promise<number> {
     return winAppId
 }
 
+export async function getAppWindowId(): Promise<number> {
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`getAppWindowId-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.send('getAppWindowId', { id })
+    const winAppId = Number(await p)
+    return winAppId
+}
+
 export async function tryocr(): Promise<Artifact | null> {
     const artifactViewWindowId = await getArtifactViewWindowId()
     if (artifactViewWindowId < 0) {
@@ -49,7 +59,9 @@ export async function tryocr(): Promise<Artifact | null> {
 }
 
 export async function tryocrSec(): Promise<null | [Promise<void>, Promise<Artifact>]> {
+    console.log('tryocrsec')
     const artifactViewWindowId = await getArtifactViewWindowId()
+    console.log('tryocrsec2')
     if (artifactViewWindowId < 0) {
         return null
     }
@@ -87,4 +99,16 @@ export async function joystickNext() {
     await sleep(50)
     ipcRenderer.send('joystick', { event: 'keyup', data: { rawcode: 39 } })
     return
+}
+export async function syncArtifact(artifact: Artifact) {
+    const appWindowId = await getAppWindowId()
+    if (appWindowId < 0) {
+        return null
+    }
+    const id = uuid()
+    const p = new Promise((resolve) => {
+        ipcRenderer.once(`syncArtifact-${id}`, (result, data) => resolve(data))
+    })
+    ipcRenderer.sendTo(appWindowId, 'syncArtifact', { id, artifact })
+    return await p
 }

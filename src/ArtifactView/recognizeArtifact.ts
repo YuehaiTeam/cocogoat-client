@@ -1,7 +1,7 @@
 import { SplitResults } from './imageProcess'
 import { Artifact, ArtifactParam } from '@/typings/Artifact'
 import { ArtifactNamesAll, ArtifactParamTypesAll } from '@/typings/ArtifactMap'
-import { detectStars, textCNEN, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
+import { detectStars, detectLock, textCNEN, textNumber, textBestmatch, findLowConfidence } from './postRecognize'
 import { ArtifactReverse } from '@/i18n/artifactReverse'
 
 const ocrCorrectionMap = [
@@ -30,6 +30,8 @@ export async function recognizeArtifact(
 
     /* 星数 */
     const stars = detectStars(ret.color.canvas)
+
+    const lock = detectLock(ret.lock.canvas)
 
     /* 标题 */
     if (!ocrres.title || !ocrres.title.text) {
@@ -118,6 +120,7 @@ export async function recognizeArtifact(
             id: Date.now(),
             name,
             stars,
+            lock,
             level,
             user: '',
             main,

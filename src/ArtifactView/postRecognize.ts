@@ -27,6 +27,24 @@ export function detectStars(colorCanvas: HTMLCanvasElement) {
     // @ts-ignore
     return color_rmap[closestColor.R] || 0
 }
+export function detectLock(lockCanvas: HTMLCanvasElement) {
+    const ctx = lockCanvas.getContext('2d')
+    if (!ctx) throw new Error('Canvas not supported!')
+    const imgData = ctx.getImageData(0, 0, lockCanvas.width, lockCanvas.height)
+    const unlock_threshold = 140
+    const pixels = imgData.data.length / imgData.width / imgData.height
+    let higher_count = 0
+    let lower_count = 0
+    for (let i = 0; i < imgData.data.length; i += pixels){
+        let up_threshold = 0
+        for (let j = 0; j < 3; j ++ )
+            if (imgData.data[i + j] > unlock_threshold)
+                up_threshold ++
+        if (up_threshold === 3) higher_count ++
+        else lower_count ++
+    }
+    return lower_count > higher_count
+}
 export function textBestmatch(text: string, list: string[]) {
     if (list.includes(text)) return text
     const matches = findBestMatch(text.replace(/\s\s+/g, ' '), list)
@@ -98,17 +116,24 @@ export function levenshteinEditDistance(value: string, other: string): number {
 export function findBestMatch(mainString: string, targetStrings: string[]) {
     const ratings = []
     let bestMatchIndex = 0
+    let confuseLevel = 0
 
     for (let i = 0; i < targetStrings.length; i++) {
         const currentTargetString = targetStrings[i]
         const currentRating = levenshteinEditDistance(mainString, currentTargetString)
         ratings.push({ target: currentTargetString, rating: currentRating })
-        if (currentRating < ratings[bestMatchIndex].rating) {
+        if (currentRating === 0 || currentRating < ratings[bestMatchIndex].rating) {
             bestMatchIndex = i
+            confuseLevel = 0
+        }
+        else if (currentRating === ratings[bestMatchIndex].rating) {
+            confuseLevel ++ ;
         }
     }
 
     const bestMatch = ratings[bestMatchIndex]
+    if (confuseLevel)
+        bestMatch.rating = 10
 
     return { ratings: ratings, bestMatch: bestMatch, bestMatchIndex: bestMatchIndex }
 }

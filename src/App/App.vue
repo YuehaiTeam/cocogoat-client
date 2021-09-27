@@ -146,6 +146,7 @@ body,
     z-index: 9998 !important;
 }
 .header-plain-dropdown {
+    margin-left: 10px;
     .el-button {
         height: 29px;
         vertical-align: middle;

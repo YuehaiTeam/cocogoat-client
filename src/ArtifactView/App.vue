@@ -7,7 +7,7 @@ import { status, STATUS } from './status'
 import { ElMessageBox } from 'element-plus'
 import { recognizeArtifact } from './recognizeArtifact'
 import { ocr, split, imageDump, textDump } from './imageProcess'
-import { getposition, capture, getActiveWindow, sendToAppWindow } from './ipc'
+import { getposition, capture, getActiveWindow, sendToAppWindow, setTransparent, click } from './ipc'
 
 import { sendWrongOCRFeedback } from '@/api/feedback'
 
@@ -49,6 +49,17 @@ export default {
                 ipcRenderer.sendTo(event.senderId, `tryocr-${id}-capture`)
             })
             ipcRenderer.sendTo(event.senderId, `tryocr-${id}`, result)
+        })
+        ipcRenderer.on('clickLock', async (event, { id }) => {
+            const lock = this.$refs['captureDom'].$refs['overlay.lock']
+            const { x, y, height, width } = lock.getBoundingClientRect()
+            const offsetY = y + height / 2;
+            const offsetX = x + width / 2;
+            const [winx, winy] = await getposition()
+            const finalx = (winx + offsetX) * window.devicePixelRatio
+            const finaly = (winy + offsetY) * window.devicePixelRatio
+            await click({ x: finalx, y: finaly })
+            ipcRenderer.sendTo(event.senderId, `clickLock-${id}`, null)
         })
     },
     beforeUnmount() {
@@ -236,6 +247,9 @@ export default {
             } catch (e) {}
             this.feedbackLoading = false
         },
+        async onSetTransparent(transparent) { 
+            setTransparent(transparent)
+        }
     },
 }
 </script>
@@ -250,6 +264,7 @@ export default {
             @delete="onDelete"
             @reset="onReset"
             @feedback="onFeedback"
+            @transparent="onSetTransparent"
         />
         <el-dialog v-model="feedbackVisible" title="反馈识别错误" width="90%">
             <div class="feedback-desc">

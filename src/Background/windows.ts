@@ -12,8 +12,8 @@ export const windows = <Record<string, BrowserWindow | null>>{
 
 export async function createWindow() {
     windows.app = new BrowserWindow({
-        width: 990,
-        height: 720,
+        width: 1080,
+        height: 810,
         frame: false,
         webPreferences: {
             contextIsolation: false,
