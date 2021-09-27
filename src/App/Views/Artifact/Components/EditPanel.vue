@@ -76,7 +76,7 @@ export default defineComponent({
                     class="title-select"
                     filterable
                     size="small"
-                    placeholder="__('圣遗物')"
+                    :placeholder="__('圣遗物')"
                     :options="artifactNameOptions"
                 >
                 </el-select-v2>
