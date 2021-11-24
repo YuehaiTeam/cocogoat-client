@@ -32,13 +32,7 @@ export const ArtifactSubParamTypes = [
     '物理伤害加成',
     '治疗加成',
 ]
-export const ArtifactPositionNames = [
-    '生之花',
-    '死之羽',
-    '时之沙',
-    '空之杯',
-    '理之冠'
-]
+export const ArtifactPositionNames = ['生之花', '死之羽', '时之沙', '空之杯', '理之冠']
 const ArtifactNameLists = [
     ['行者之心', '故人之心', '归乡之羽', '逐光之石', '异国之盏', '感别之冠'],
     ['勇士之心', '勇士的勋章', '勇士的期许', '勇士的坚毅', '勇士的壮行', '勇士的冠冕'],
@@ -75,6 +69,8 @@ const ArtifactNameLists = [
     ['苍白之火', '无垢之花', '贤医之羽', '停摆之刻', '超越之盏', '嗤笑之面'],
     ['追忆之注连', '羁缠之花', '思忆之矢', '朝露之时', '祈望之心', '无常之面'],
     ['绝缘之旗印', '明威之镡', '切落之羽', '雷云之笼', '绯花之壶', '华饰之兜'],
+    ['荣花之期', '华馆之羽', '众生之谣', '梦醒之瓢', '形骸之笠'],
+    ['海染之花', '渊宫之羽', '离别之贝', '真珠之笼', '海祇之冠'],
 ]
 /**
  * 圣遗物名表
@@ -83,10 +79,10 @@ export const ArtifactNames: string[] = []
 export const ArtifactSetNames: string[] = []
 export const ArtifactPositionLists: string[][] = [[], [], [], [], []]
 export const ArtifactToSetPosition = new Map<string, string[]>()
-for (const oneSet of ArtifactNameLists){
+for (const oneSet of ArtifactNameLists) {
     ArtifactSetNames.push(oneSet[0])
-    for (let i = 1; i <= 5; i ++ )
-        if (oneSet[i].length){
+    for (let i = 1; i <= 5; i++)
+        if (oneSet[i].length) {
             ArtifactNames.push(oneSet[i])
             ArtifactPositionLists[i - 1].push(oneSet[i])
             ArtifactToSetPosition.set(oneSet[i], [oneSet[0], ArtifactPositionNames[i - 1]])
