@@ -35,13 +35,11 @@ export function detectLock(lockCanvas: HTMLCanvasElement) {
     const pixels = imgData.data.length / imgData.width / imgData.height
     let higher_count = 0
     let lower_count = 0
-    for (let i = 0; i < imgData.data.length; i += pixels){
+    for (let i = 0; i < imgData.data.length; i += pixels) {
         let up_threshold = 0
-        for (let j = 0; j < 3; j ++ )
-            if (imgData.data[i + j] > unlock_threshold)
-                up_threshold ++
-        if (up_threshold === 3) higher_count ++
-        else lower_count ++
+        for (let j = 0; j < 3; j++) if (imgData.data[i + j] > unlock_threshold) up_threshold++
+        if (up_threshold === 3) higher_count++
+        else lower_count++
     }
     return lower_count > higher_count
 }
@@ -125,15 +123,13 @@ export function findBestMatch(mainString: string, targetStrings: string[]) {
         if (currentRating === 0 || currentRating < ratings[bestMatchIndex].rating) {
             bestMatchIndex = i
             confuseLevel = 0
-        }
-        else if (currentRating === ratings[bestMatchIndex].rating) {
-            confuseLevel ++ ;
+        } else if (currentRating === ratings[bestMatchIndex].rating) {
+            confuseLevel++
         }
     }
 
     const bestMatch = ratings[bestMatchIndex]
-    if (confuseLevel)
-        bestMatch.rating = 10
+    if (confuseLevel) bestMatch.rating = 10
 
     return { ratings: ratings, bestMatch: bestMatch, bestMatchIndex: bestMatchIndex }
 }

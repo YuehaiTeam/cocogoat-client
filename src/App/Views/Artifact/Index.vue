@@ -36,16 +36,14 @@ export default defineComponent({
             selectedIds: [] as number[],
             showFilter: false,
             isFiltering: false,
-            artifactFilter: new ArtifactFilterClass()
+            artifactFilter: new ArtifactFilterClass(),
         }
     },
     computed: {
         list(): ArtifactType[] {
             if (this.isFiltering) {
                 let result = []
-                for (const artifact of bus.artifacts)
-                    if (this.artifactFilter.filter(artifact))
-                        result.push(artifact)
+                for (const artifact of bus.artifacts) if (this.artifactFilter.filter(artifact)) result.push(artifact)
                 return result
             }
             return bus.artifacts
@@ -227,22 +225,18 @@ export default defineComponent({
         },
         doSelectAll() {
             this.selectedIds = []
-            for (const artifact of this.list)
-                this.selectedIds.push(artifact.id)
+            for (const artifact of this.list) this.selectedIds.push(artifact.id)
         },
         doLockSelected(lock: boolean) {
             const artifactLists = []
-            for (const artifact of this.list)
-                if (this.selectedIds.includes(artifact.id))
-                    artifactLists.push(artifact)
-            for (let artifact of artifactLists)
-                artifact.lock = lock
+            for (const artifact of this.list) if (this.selectedIds.includes(artifact.id)) artifactLists.push(artifact)
+            for (let artifact of artifactLists) artifact.lock = lock
         },
         doLoad() {
             this.selectedIds = []
             this.isFiltering = false
             loadData()
-        }
+        },
     },
 })
 </script>
@@ -274,15 +268,21 @@ export default defineComponent({
                 </template>
             </el-dropdown>
             <el-dropdown class="header-plain-dropdown" size="mini">
-                <el-button size="mini">
-                    {{ __('操作') }}<i class="el-icon-arrow-down el-icon--right"></i>
-                </el-button>
+                <el-button size="mini"> {{ __('操作') }}<i class="el-icon-arrow-down el-icon--right"></i> </el-button>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item @click="doSelectAll"><i class="el-icon-check"></i>{{  __('全部选择') }}</el-dropdown-item>
-                        <el-dropdown-item @click="selectedIds = []"><i class="el-icon-close"></i>{{ __('全部不选') }}</el-dropdown-item>
-                        <el-dropdown-item @click="doLockSelected(true)"><i class="el-icon-lock"></i>{{ __('加锁已选') }}</el-dropdown-item>
-                        <el-dropdown-item @click="doLockSelected(false)"><i class="el-icon-unlock"></i>{{ __('解锁已选') }}</el-dropdown-item>
+                        <el-dropdown-item @click="doSelectAll"
+                            ><i class="el-icon-check"></i>{{ __('全部选择') }}</el-dropdown-item
+                        >
+                        <el-dropdown-item @click="selectedIds = []"
+                            ><i class="el-icon-close"></i>{{ __('全部不选') }}</el-dropdown-item
+                        >
+                        <el-dropdown-item @click="doLockSelected(true)"
+                            ><i class="el-icon-lock"></i>{{ __('加锁已选') }}</el-dropdown-item
+                        >
+                        <el-dropdown-item @click="doLockSelected(false)"
+                            ><i class="el-icon-unlock"></i>{{ __('解锁已选') }}</el-dropdown-item
+                        >
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>

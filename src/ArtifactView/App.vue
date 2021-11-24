@@ -53,8 +53,8 @@ export default {
         ipcRenderer.on('clickLock', async (event, { id }) => {
             const lock = this.$refs['captureDom'].$refs['overlay.lock']
             const { x, y, height, width } = lock.getBoundingClientRect()
-            const offsetY = y + height / 2;
-            const offsetX = x + width / 2;
+            const offsetY = y + height / 2
+            const offsetX = x + width / 2
             const [winx, winy] = await getposition()
             const finalx = (winx + offsetX) * window.devicePixelRatio
             const finaly = (winy + offsetY) * window.devicePixelRatio
@@ -247,9 +247,9 @@ export default {
             } catch (e) {}
             this.feedbackLoading = false
         },
-        async onSetTransparent(transparent) { 
+        async onSetTransparent(transparent) {
             setTransparent(transparent)
-        }
+        },
     },
 }
 </script>

@@ -52,11 +52,11 @@ export async function loadData() {
     ipcRenderer.on('artifactDelete', (event, { id }: { id: number }) => {
         artifactDelete(id)
     })
-    ipcRenderer.on('syncArtifact', (event, { id, artifact }: { id: number, artifact: Artifact }) => {
+    ipcRenderer.on('syncArtifact', (event, { id, artifact }: { id: number; artifact: Artifact }) => {
         const hash = calculateArtifactHash(artifact)
         const artifactId = artifactsHashes.get(hash)
         for (const artifact of bus.artifacts)
-            if (artifactId === artifact.id){
+            if (artifactId === artifact.id) {
                 ipcRenderer.sendTo(event.senderId, `syncArtifact-${id}`, JSON.parse(JSON.stringify(artifact)))
                 return
             }

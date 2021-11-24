@@ -1,6 +1,6 @@
 /**
  * 圣遗物过滤器
- * 
+ *
  */
 import { Artifact, ArtifactParam } from './Artifact'
 import { ArtifactToSetPosition } from './ArtifactMap'
@@ -9,7 +9,7 @@ export enum SubFilterEquation {
     '<=',
     '>',
     '>=',
-    '='
+    '=',
 }
 export class SubFilter {
     name: String = ''
@@ -20,21 +20,16 @@ export class SubFilter {
         if ((input.value.indexOf('%') === -1) !== (this.value.indexOf('%') === -1)) return 0 // 一个有%一个没有，不同类
         const value = parseFloat(input.value.replaceAll(',', ''))
         const thisvalue = parseFloat(this.value.replaceAll(',', ''))
-        if (this.equation === SubFilterEquation['<'])
-            return value < thisvalue ? 1 : 0
-        if (this.equation === SubFilterEquation['<='])
-            return value <= thisvalue ? 1 : 0
-        if (this.equation === SubFilterEquation['>'])
-            return value > thisvalue ? 1 : 0
-        if (this.equation === SubFilterEquation['>='])
-            return value >= thisvalue ? 1 : 0
+        if (this.equation === SubFilterEquation['<']) return value < thisvalue ? 1 : 0
+        if (this.equation === SubFilterEquation['<=']) return value <= thisvalue ? 1 : 0
+        if (this.equation === SubFilterEquation['>']) return value > thisvalue ? 1 : 0
+        if (this.equation === SubFilterEquation['>=']) return value >= thisvalue ? 1 : 0
         // remain '='
         return value === thisvalue ? 1 : 0
     }
-    filter (input: ArtifactParam[]): number {
+    filter(input: ArtifactParam[]): number {
         let res = 0
-        for (const i of input)
-            res += this.filterOne(i)
+        for (const i of input) res += this.filterOne(i)
         return res
     }
 }
@@ -56,8 +51,7 @@ export class ArtifactFilter {
     private filterSub(input: ArtifactParam[], filters: SubFilter[], targetCount: number, empty: boolean): boolean {
         if (filters.length === 0) return empty
         let matchCount = 0
-        for (const filter of filters)
-            matchCount += filter.filter(input)
+        for (const filter of filters) matchCount += filter.filter(input)
         return targetCount <= matchCount
     }
     filter(artifact: Artifact): boolean {

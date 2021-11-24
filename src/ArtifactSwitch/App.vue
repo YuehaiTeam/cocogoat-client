@@ -5,7 +5,18 @@ import { ipcRenderer } from 'electron'
 import Actions from './Components/Actions'
 import AppHeader from './Components/AppHeader'
 import TransparentArea from './Components/TransparentArea'
-import { getposition, capture, setTransparent, tryocr, tryocrSec, click, joystickStatus, joystickNext, syncArtifact, getArtifactViewWindowId } from './ipc'
+import {
+    getposition,
+    capture,
+    setTransparent,
+    tryocr,
+    tryocrSec,
+    click,
+    joystickStatus,
+    joystickNext,
+    syncArtifact,
+    getArtifactViewWindowId,
+} from './ipc'
 import { bus, STATUS } from './bus'
 import { imageDump, getBlocks, toWindowPos } from './imageProcess'
 import { santizeBlocks, getBlockCenter } from './postRecognize'
@@ -240,8 +251,7 @@ export default {
                 while (bus.auto) {
                     bus.checkedCount++
                     let artifact = await tryocr()
-                    if (autoLock)
-                        await this.checkLock(artifact, Promise.resolve())  // TODO press L3
+                    if (autoLock) await this.checkLock(artifact, Promise.resolve()) // TODO press L3
                     await joystickNext()
                     await sleep(60 * sleepRatio)
                     try {
@@ -322,7 +332,7 @@ export default {
         },
         async lockBack(args) {
             const [x, y, lastx, lasty] = args
-            const sleepTime = 500  // now set fixed 500ms to wait
+            const sleepTime = 500 // now set fixed 500ms to wait
             await click(await toWindowPos(lastx, lasty))
             await sleep(sleepTime)
             const id = uuid()
@@ -341,9 +351,8 @@ export default {
                 if (!bus.auto) return
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                const [artifact, _] = await Promise.all([ocrPromise, sleep(lockTime + 50 * sleepRatio)])
-                if (autoLock)
-                    await this.checkLock(artifact, this.lockBack, [x, y, x - bus.blockWidth, y])
+                const [artifact] = await Promise.all([ocrPromise, sleep(lockTime + 50 * sleepRatio)])
+                if (autoLock) await this.checkLock(artifact, this.lockBack, [x, y, x - bus.blockWidth, y])
                 bus.checkedCount++
                 const [p, q] = await tryocrSec()
                 await p
@@ -359,15 +368,14 @@ export default {
         async clickOtherLine(n, autoLock) {
             let ocrPromise = Promise.resolve()
             let lastx = 0
-            let lasty = 0;
+            let lasty = 0
             for (let i = n * bus.cols; i < bus.blocks.length; i++) {
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                const [artifact, _] = await Promise.all([ocrPromise, sleep(lockTime + 50 * sleepRatio)])
-                if (autoLock)
-                    await this.checkLock(artifact, this.lockBack, [x, y, lastx, lasty])
+                const [artifact] = await Promise.all([ocrPromise, sleep(lockTime + 50 * sleepRatio)])
+                if (autoLock) await this.checkLock(artifact, this.lockBack, [x, y, lastx, lasty])
                 bus.checkedCount++
                 const [p, q] = await tryocrSec()
                 await p
@@ -376,7 +384,7 @@ export default {
                 lastx = x
                 lasty = y
             }
-            if (autoLock){
+            if (autoLock) {
                 const artifact = await ocrPromise
                 await this.checkLock(artifact, this.lockBack, [lastx, lasty, lastx, lasty])
             }
@@ -384,16 +392,15 @@ export default {
         async clickAllLines(autoLock) {
             let ocrPromise = Promise.resolve()
             let lastx = 0
-            let lasty = 0;
+            let lasty = 0
             for (let i = 0; i < bus.blocks.length; i++) {
                 console.log(i)
                 if (!bus.auto) return
                 const { x, y } = getBlockCenter(bus.blocks[i])
                 await click(await toWindowPos(x, y))
                 // 延时等待抓屏
-                const [artifact, _] = await Promise.all([ocrPromise, sleep(lockTime, 50 * sleepRatio)])
-                if (autoLock)
-                    await this.checkLock(artifact, this.lockBack, [x, y, lastx, lasty])
+                const [artifact] = await Promise.all([ocrPromise, sleep(lockTime, 50 * sleepRatio)])
+                if (autoLock) await this.checkLock(artifact, this.lockBack, [x, y, lastx, lasty])
                 bus.checkedCount++
                 const [p, q] = await tryocrSec()
                 await p
@@ -418,7 +425,7 @@ export default {
         },
         async onLock() {
             this.auto(true)
-        }
+        },
     },
 }
 </script>
