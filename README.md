@@ -1,3 +1,6 @@
+# 暂时停更，完全重构的新项目在[cocogoat-web](https://github.com/YuehaiTeam/cocogoat-web)
+# Deprecated and moved to [cocogoat-web](https://github.com/YuehaiTeam/cocogoat-web) with a full refactor.
+----
 [English](https://github.com/YuehaiTeam/cocogoat/blob/main/README_en.md)
 <div align="center">
 
